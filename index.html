@@ -432,41 +432,8 @@
         </div>
     </div>
 
-        <div id="viewServingBottom" class="bottom-section-full">
-
-        <!-- MODAL MOVED HERE: This traps it inside the section -->
-        <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
-          <!-- LAYER 0: THE BACKGROUND PHOTO -->
-          <div id="modalMediaContainer" class="modal-bg-photo"></div>
-
-          <!-- LAYER 1: TOP INFO (Status, Points, Sticker) -->
-          <div id="modalOverlayInfo" class="modal-overlay-layer">
-              <div id="modalStatus" class="m-status-badge">APPROVED</div>
-              <div id="modalPoints" class="m-points-badge">+0 PTS</div>
-              <div id="modalSticker" class="m-sticker-float"></div>
-          </div>
-
-          <!-- LAYER 2: FEEDBACK BUBBLE (Floats in middle) -->
-          <div id="modalFeedbackBubble" class="feedback-bubble hidden">
-              <div class="bubble-label">QUEEN'S FEEDBACK</div>
-              <div id="modalFeedbackMedia" class="bubble-media"></div>
-              <div id="modalFeedbackText" class="bubble-text"></div>
-          </div>
-
-          <!-- LAYER 3: THE ORDER (Hidden by default) -->
-          <div id="modalOrderText" class="order-overlay hidden"></div>
-
-          <!-- LAYER 4: ACTION BUTTONS (Bottom) -->
-          <div class="modal-footer-actions">
-              <button onclick="toggleHistoryView('clear')" class="view-btn">SEE PHOTO</button>
-              <button onclick="toggleHistoryView('order')" class="view-btn">SEE ORDER</button>
-              <button onclick="toggleHistoryView('info')" class="view-btn">SEE STATUS</button>
-              <button onclick="closeModal(null)" class="view-btn close-btn">CLOSE</button>
-          </div>
-      </div>
-    </div>
-
-        <!-- EVIDENCE LOG HEADER (Now clean and separate) -->
+       
+<!-- EVIDENCE LOG HEADER (Now clean and separate) -->
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:0.8rem; color:#fff; font-weight:bold; padding-left: 5px;">
             <div style="width:6px; height:6px; background:var(--neon-yellow); border-radius:50%;"></div> EVIDENCE LOG
         </div>
@@ -476,13 +443,48 @@
             <div id="pendingGrid" class="pending-grid"></div>
         </div>
 
-        <div id="historySection" style="display:none; width:100%;">
+        <!-- THE TRAP: Added position: relative here -->
+        <div id="historySection" style="display:none; width:100%; position: relative; min-height: 300px;">
             <div class="section-header">HISTORY</div>
+
+            <!-- MODAL IS NOW INSIDE HISTORY -->
+            <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
+                <!-- LAYER 0: THE BACKGROUND PHOTO -->
+                <div id="modalMediaContainer" class="modal-bg-photo"></div>
+
+                <!-- LAYER 1: TOP INFO (Status, Points, Sticker) -->
+                <div id="modalOverlayInfo" class="modal-overlay-layer">
+                    <div id="modalStatus" class="m-status-badge">APPROVED</div>
+                    <div id="modalPoints" class="m-points-badge">+0 PTS</div>
+                    <div id="modalSticker" class="m-sticker-float"></div>
+                </div>
+
+                <!-- LAYER 2: FEEDBACK BUBBLE (Floats in middle) -->
+                <div id="modalFeedbackBubble" class="feedback-bubble hidden">
+                    <div class="bubble-label">QUEEN'S FEEDBACK</div>
+                    <div id="modalFeedbackMedia" class="bubble-media"></div>
+                    <div id="modalFeedbackText" class="bubble-text"></div>
+                </div>
+
+                <!-- LAYER 3: THE ORDER (Hidden by default) -->
+                <div id="modalOrderText" class="order-overlay hidden"></div>
+
+                <!-- LAYER 4: ACTION BUTTONS (Bottom) -->
+                <div class="modal-footer-actions">
+                    <button onclick="toggleHistoryView('clear')" class="view-btn">SEE PHOTO</button>
+                    <button onclick="toggleHistoryView('order')" class="view-btn">SEE ORDER</button>
+                    <button onclick="toggleHistoryView('info')" class="view-btn">SEE STATUS</button>
+                    <button onclick="closeModal(null)" class="view-btn close-btn">CLOSE</button>
+                </div>
+            </div>
+
             <div id="historyGrid" class="gallery-grid"></div>
             <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="width: 200px; margin: 20px auto; display: none; background: #222; color: #888;">LOAD MORE</button>
+          </div>
+  
         </div>
-    </div>
-</div>
+    </div> <!-- Closes app-container -->
+</div> <!-- Closes layout-right or main wrapper depending on your exact nesting -->
 
 <script>
     const CLOUD_NAME = 'dfqvezjlj'; 
@@ -494,7 +496,7 @@
     const TWITCH_CHANNEL = "qkarin"; 
     const SESSION_VERSION = "v1";
     const STREAM_PASSWORDS = ["QUEEN", "OBEY", "SESSION"];
-
+                
     let gameStats = { totalTasks: 0, completedTasks: 0, currentStreak: 0, points: 0, coins: 0 };
     let stats = { approvedTasks: 0, rejectedTasks: 0, skippedTasks: 0, dailyCompletedTasks: 0, dailyStreak: 0, dailyScore: 0, monthlyTotalTasks: 0, monthlyScore: 0};
     let userProfile = { name: "Slave", hierarchy: "Loading...", avatar: DEFAULT_AVATAR };
