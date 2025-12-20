@@ -1188,117 +1188,96 @@
                 let touchStartX = 0;
                 let activeHistoryItem = null; // New: Stores the current item for mode switching
                 
-                // 1. MAIN FUNCTION: Open Modal by Index with Layered UI
+                // 1. MAIN FUNCTION: Opens the card and fills it with CMS data
                 function openHistoryModal(index) {
-                    const historyItems = galleryData.filter(i => (i.status === 'approve' || i.status === 'reject') && i.proofUrl);
-                    if (historyItems.length === 0) return;
-                
-                    if (index < 0) index = historyItems.length - 1; 
-                    if (index >= historyItems.length) index = 0;     
+                    const item = galleryData[index];
+                    if(!item) return;
                 
                     currentHistoryIndex = index;
-                    const item = historyItems[index];
-                    activeHistoryItem = item; // Save this so buttons can use it later
+                    activeHistoryItem = item; // Stores item for the mode buttons
                 
-                    // A. SET BACKGROUND (Default to Sub Proof)
+                    // A. SET BACKGROUND (Shows Sub's proof by default)
                     setMediaLayer(item.proofUrl);
                 
-                    // B. POPULATE STATUS (Big at top)
+                    // B. POPULATE STATUS (Big Badge)
                     const statusEl = document.getElementById('modalStatus');
-                    if (statusEl) {
-                        statusEl.innerText = (item.status || "STATUS").toUpperCase();
-                        statusEl.style.color = item.status === 'approve' ? 'var(--neon-green)' : 'var(--neon-red)';
-                    }
+                    const s = (item.status || "REVIEW").toUpperCase();
+                    statusEl.innerText = s;
+                    statusEl.style.color = s.includes('APP') ? 'var(--neon-green)' : 'var(--neon-red)';
                 
-                    // C. POPULATE POINTS
-                    const pointsEl = document.getElementById('modalPoints');
-                    if (pointsEl) {
-                        pointsEl.innerText = `+${item.points || 0} PTS`;
-                    }
+                    // C. POPULATE POINTS (From CMS)
+                    document.getElementById('modalPoints').innerText = `+${item.points || item.score || 0} PTS`;
                 
                     // D. POPULATE STICKER
-                    const stickerEl = document.getElementById('modalSticker');
-                    if (stickerEl) {
-                        stickerEl.innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:70px; filter:drop-shadow(0 0 10px white);">` : "";
-                    }
+                    document.getElementById('modalSticker').innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:60px; filter:drop-shadow(0 0 10px white);">` : "";
                 
-                    // E. POPULATE QUEEN FEEDBACK (Media Left, Buttons Right)
+                    // E. POPULATE QUEEN FEEDBACK ROW (Media Left, Nav Right)
                     const fMedia = document.getElementById('modalFeedbackMedia');
-                    const fText = document.getElementById('modalFeedbackText');
                     const feedbackRow = document.getElementById('feedbackRow');
-                
-                    if (item.adminComment || item.adminMedia) {
-                        if (feedbackRow) feedbackRow.style.display = "flex";
-                        if (fText) fText.innerText = item.adminComment || "";
-                        
-                        if (fMedia) {
-                            if (item.adminMedia) {
-                                const isVid = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
-                                fMedia.innerHTML = isVid ? `<video src="${item.adminMedia}"></video>` : `<img src="${item.adminMedia}">`;
-                            } else { fMedia.innerHTML = ""; }
-                        }
+                    if (item.adminMedia) {
+                        feedbackRow.style.display = "flex";
+                        const isVid = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
+                        fMedia.innerHTML = isVid ? `<video src="${item.adminMedia}"></video>` : `<img src="${item.adminMedia}">`;
                     } else {
-                        if (feedbackRow) feedbackRow.style.display = "none";
+                        feedbackRow.style.display = "none";
                     }
                 
-                    // F. POPULATE TASK TEXT (Hidden by default)
-                    const orderEl = document.getElementById('modalOrderText');
-                    if (orderEl) {
-                        orderEl.innerText = item.text || "No task details found.";
-                    }
+                    // F. POPULATE HIDDEN TEXT AREAS
+                    document.getElementById('modalFeedbackText').innerText = item.adminComment || "No comment.";
+                    document.getElementById('modalOrderText').innerText = item.text || "No task details found.";
                 
-                    // RESET TO DEFAULT VIEW
+                    // G. RESET VIEW TO DEFAULT CARD
                     toggleHistoryView('info');
                 
-                    const glassModal = document.getElementById('glassModal');
-                    if (glassModal) {
-                        glassModal.classList.add('active');
-                        glassModal.style.display = 'flex'; 
-                    }
+                    // H. SHOW THE WINDOW
+                    const modal = document.getElementById('glassModal');
+                    modal.classList.add('active');
+                    modal.style.display = 'flex';
                 }
                 
-                // 2. VIEW MODES: Handles switching between Card, Task, Proof, and Queen Media
+                // 2. VIEW SWITCHER: Swaps between Proof, Task, Comment, and Queen Zoom
                 function toggleHistoryView(view, event) {
-                    if (event) event.stopPropagation(); // Stop modal from closing when clicking internal buttons
+                    if (event) event.stopPropagation(); // Prevents clicking buttons from closing the modal
                 
                     const card = document.getElementById('reviewCard');
-                    const orderOverlay = document.getElementById('modalOrderText');
+                    const orderText = document.getElementById('modalOrderText');
                     const feedbackText = document.getElementById('modalFeedbackText');
                 
-                    // Default: Hide everything
-                    if(card) card.classList.add('hidden');
-                    if(orderOverlay) orderOverlay.classList.add('hidden');
-                    if(feedbackText) feedbackText.classList.add('hidden');
+                    // Default: Hide all overlays
+                    card.classList.add('hidden');
+                    orderText.classList.add('hidden');
+                    feedbackText.classList.add('hidden');
                 
                     if (view === 'info') {
-                        // Show the Review Card (Status, Points, Sticker, Feedback Thumb)
-                        if(card) card.classList.remove('hidden');
+                        // SHOW: Status, Points, Sticker, Feedback Row
+                        card.classList.remove('hidden');
                         setMediaLayer(activeHistoryItem.proofUrl);
                     } 
-                    else if (view === 'comment') {
-                        // Show the Comment Bubble inside the card
-                        if(card) card.classList.remove('hidden');
-                        if(feedbackText) feedbackText.classList.remove('hidden');
-                    }
                     else if (view === 'task') {
-                        // Hide card, show only original Task Orders centered
-                        if(orderOverlay) orderOverlay.classList.remove('hidden');
+                        // SHOW: Only the original Orders in center
+                        orderText.classList.remove('hidden');
+                    }
+                    else if (view === 'comment') {
+                        // SHOW: The Card and the Text Bubble
+                        card.classList.remove('hidden');
+                        feedbackText.classList.remove('hidden');
                     }
                     else if (view === 'proof') {
-                        // Pure proof view: Hide everything overlayed
+                        // HIDE EVERYTHING: Clear view of sub's submitted photo
+                        setMediaLayer(activeHistoryItem.proofUrl);
                     }
                     else if (view === 'queen_media') {
-                        // Switch background media from Sub's photo to Queen's photo/video
+                        // ZOOM: Queen's photo/video covers the card area
                         setMediaLayer(activeHistoryItem.adminMedia);
                     }
                 }
                 
-                // Helper to switch the background media correctly
+                // 3. MEDIA HELPER: Swaps background media container safely
                 function setMediaLayer(url) {
-                    const mediaContainer = document.getElementById('modalMediaContainer');
-                    if (!mediaContainer || !url) return;
+                    const container = document.getElementById('modalMediaContainer');
+                    if (!container || !url) return;
                     const isVid = url.match(/\.(mp4|webm|mov)$/i);
-                    mediaContainer.innerHTML = isVid ?
+                    container.innerHTML = isVid ?
                         `<video src="${url}" autoplay loop muted style="width:100%; height:100%; object-fit:contain;"></video>` :
                         `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
                 }
