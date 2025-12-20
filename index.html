@@ -432,8 +432,41 @@
         </div>
     </div>
 
-       
-<!-- EVIDENCE LOG HEADER (Now clean and separate) -->
+        <div id="viewServingBottom" class="bottom-section-full">
+
+        <!-- MODAL MOVED HERE: This traps it inside the section -->
+        <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
+          <!-- LAYER 0: THE BACKGROUND PHOTO -->
+          <div id="modalMediaContainer" class="modal-bg-photo"></div>
+
+          <!-- LAYER 1: TOP INFO (Status, Points, Sticker) -->
+          <div id="modalOverlayInfo" class="modal-overlay-layer">
+              <div id="modalStatus" class="m-status-badge">APPROVED</div>
+              <div id="modalPoints" class="m-points-badge">+0 PTS</div>
+              <div id="modalSticker" class="m-sticker-float"></div>
+          </div>
+
+          <!-- LAYER 2: FEEDBACK BUBBLE (Floats in middle) -->
+          <div id="modalFeedbackBubble" class="feedback-bubble hidden">
+              <div class="bubble-label">QUEEN'S FEEDBACK</div>
+              <div id="modalFeedbackMedia" class="bubble-media"></div>
+              <div id="modalFeedbackText" class="bubble-text"></div>
+          </div>
+
+          <!-- LAYER 3: THE ORDER (Hidden by default) -->
+          <div id="modalOrderText" class="order-overlay hidden"></div>
+
+          <!-- LAYER 4: ACTION BUTTONS (Bottom) -->
+          <div class="modal-footer-actions">
+              <button onclick="toggleHistoryView('clear')" class="view-btn">SEE PHOTO</button>
+              <button onclick="toggleHistoryView('order')" class="view-btn">SEE ORDER</button>
+              <button onclick="toggleHistoryView('info')" class="view-btn">SEE STATUS</button>
+              <button onclick="closeModal(null)" class="view-btn close-btn">CLOSE</button>
+          </div>
+      </div>
+    </div>
+
+        <!-- EVIDENCE LOG HEADER (Now clean and separate) -->
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:0.8rem; color:#fff; font-weight:bold; padding-left: 5px;">
             <div style="width:6px; height:6px; background:var(--neon-yellow); border-radius:50%;"></div> EVIDENCE LOG
         </div>
@@ -443,59 +476,13 @@
             <div id="pendingGrid" class="pending-grid"></div>
         </div>
 
-        <!-- THE TRAP: Added position: relative here -->
-        <div id="historySection" style="display:none; width:100%; position: relative; overflow: hidden; min-height: 450px;">
+        <div id="historySection" style="display:none; width:100%;">
             <div class="section-header">HISTORY</div>
-
-            <!-- MODAL IS NOW TRAPPED INSIDE HISTORY -->
-            <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
-          <!-- THE MEDIA BACKGROUND (Sub Proof or Queen Media) -->
-          <div id="modalMediaContainer" class="modal-bg-photo"></div>
-      
-          <!-- THE FROSTED GLASS REVIEW CARD -->
-          <div id="reviewCard" class="review-details-card">
-              <!-- Status Badge -->
-              <div id="modalStatus" class="m-status-badge-big">APPROVED</div>
-      
-              <!-- Points & Sticker Row -->
-              <div style="display:flex; align-items:center; gap:20px; margin-bottom:10px;">
-                  <div id="modalPoints" class="m-points-val">+0 PTS</div>
-                  <div id="modalSticker"></div>
-              </div>
-      
-              <!-- Queen's Feedback Split Row -->
-              <div id="feedbackRow" class="q-feedback-split">
-                  <!-- Left: Queen's Media Thumb -->
-                  <div class="q-thumb-box" onclick="toggleHistoryView('queen_media', event)">
-                      <div id="modalFeedbackMedia" class="q-thumb-fill"></div>
-                      <div class="q-zoom-hint">🔍</div>
-                  </div>
-                  
-                  <!-- Right: Secondary Nav -->
-                  <div class="q-nav-stack">
-                      <div class="q-label">QUEEN'S FEEDBACK</div>
-                      <button class="q-nav-btn" onclick="toggleHistoryView('comment', event)">SEE COMMENT</button>
-                      <button class="q-nav-btn" onclick="toggleHistoryView('queen_media', event)">SEE PHOTO</button>
-                  </div>
-              </div>
-      
-              <!-- The Text Comment (Hidden by default) -->
-              <div id="modalFeedbackText" class="q-comment-area hidden"></div>
-          </div>
-      
-          <!-- Task text overlay -->
-          <div id="modalOrderText" class="order-overlay-centered hidden"></div>
-      
-          <!-- Bottom Nav Buttons -->
-          <div class="modal-footer-nav">
-              <button onclick="toggleHistoryView('task', event)" class="view-btn">SEE TASK</button>
-              <button onclick="toggleHistoryView('proof', event)" class="view-btn">SEE PROOF</button>
-              <button onclick="toggleHistoryView('info', event)" class="view-btn">SEE STATUS</button>
-              <button onclick="closeModal(null)" class="view-btn close-btn">CLOSE</button>
-          </div>
-      </div>
-    </div> <!-- Closes app-container -->
-</div> <!-- Closes layout-right or main wrapper depending on your exact nesting -->
+            <div id="historyGrid" class="gallery-grid"></div>
+            <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="width: 200px; margin: 20px auto; display: none; background: #222; color: #888;">LOAD MORE</button>
+        </div>
+    </div>
+</div>
 
 <script>
     const CLOUD_NAME = 'dfqvezjlj'; 
@@ -507,7 +494,7 @@
     const TWITCH_CHANNEL = "qkarin"; 
     const SESSION_VERSION = "v1";
     const STREAM_PASSWORDS = ["QUEEN", "OBEY", "SESSION"];
-                
+
     let gameStats = { totalTasks: 0, completedTasks: 0, currentStreak: 0, points: 0, coins: 0 };
     let stats = { approvedTasks: 0, rejectedTasks: 0, skippedTasks: 0, dailyCompletedTasks: 0, dailyStreak: 0, dailyScore: 0, monthlyTotalTasks: 0, monthlyScore: 0};
     let userProfile = { name: "Slave", hierarchy: "Loading...", avatar: DEFAULT_AVATAR };
@@ -628,39 +615,25 @@
     }
     initDomProfile();
 
-       // 1. Check for Full Data (Database & Profile)
-      if (data.type === "UPDATE_FULL_DATA") {
-          if (data.profile) { 
-              gameStats = { ...gameStats, ...data.profile }; 
-              if (data.profile.lastWorship) lastWorshipTime = new Date(data.profile.lastWorship).getTime();
-              updateStats(); 
-          }
-          if (data.galleryData) {
-              galleryData = Array.isArray(data.galleryData) ? data.galleryData : JSON.parse(data.galleryData);
-              renderGallery(); 
-          }
-      }
-    
-      // 2. Check for Chat Echo (Instant Messages)
+    /* --- MAIN LISTENER (DATABASE SYNC) --- */
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+
+      // Catch the immediate Echo from Wix
       if (data.type === "CHAT_ECHO") {
           const chatContent = document.getElementById('chatContent');
           if (chatContent && data.msgObj) {
+              // Reuse your existing logic to format the single message
               const m = data.msgObj;
-              const isMe = (m.sender === 'user'); 
-              const msgClass = isMe ? 'm-slave' : 'm-queen';
-              const rowClass = isMe ? 'mr-out' : 'mr-in';
-              
-              const contentHtml = `<div class="msg ${msgClass}">${m.message}</div>`;
+              const isMe = true; // Echo is always from 'user'
+              const contentHtml = `<div class="msg m-slave">${m.message}</div>`;
               const timeDiv = `<div class="msg-time">${new Date(m._createdDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
-              const rowContent = isMe ? 
-                  `<div class="msg-col" style="justify-content: flex-end;">${contentHtml} ${timeDiv}</div>` :
-                  `<div class="msg-col" style="justify-content: flex-start;">${contentHtml} ${timeDiv}</div>`;
+              const rowContent = `<div class="msg-col" style="justify-content: flex-end;">${contentHtml} ${timeDiv}</div>`;
               
-              chatContent.innerHTML += `<div class="msg-row ${rowClass}">${rowContent}</div>`;
-              forceBottom(); 
+              chatContent.innerHTML += `<div class="msg-row mr-out">${rowContent}</div>`;
+              forceBottom(); // Jump to the bottom immediately
           }
       }
-    
       
       // FIX: Capture all 8 Rules from CMS safely
       if (data.type === 'UPDATE_RULES') {
@@ -670,7 +643,7 @@
               if (el && rules['rule' + i]) el.innerHTML = rules['rule' + i];
           }
       }
-    
+
       // CMS TASKS
       if (data.type === "INIT_TASKS" || data.dailyTasks) {
           if (data.dailyTasks && Array.isArray(data.dailyTasks) && data.dailyTasks.length > 0) {
@@ -679,7 +652,7 @@
               taskDatabase = data.tasks;
           }
       }
-    
+
       // NEW: Listen for hierarchy from CMS
       if (data.type === "INIT_HIERARCHY" || data.hierarchy) {
           const incoming = data.hierarchy || data.hierarchyData;
@@ -687,14 +660,14 @@
               cmsHierarchyData = incoming;
           }
       }
-    
+
       else if (data.type === "INIT_WISHLIST" || data.wishlist) {
         if (data.wishlist && Array.isArray(data.wishlist) && data.wishlist.length > 0) {
             WISHLIST_ITEMS = data.wishlist;
             renderWishlist('all');
         }
       }
-    
+
       // DOM STATUS & FEED
       if (data.type === "UPDATE_DOM_STATUS") {
           const badge = document.getElementById('chatStatusBadge');
@@ -713,7 +686,7 @@
           }
           if(domRing) domRing.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
       }
-    
+
       // *** NEW LISTENER FOR FEED ***
       if (data.type === "UPDATE_Q_FEED") {
           if (data.domVideos && Array.isArray(data.domVideos)) {
@@ -721,7 +694,7 @@
               renderNews(data.domVideos);
           }
       }
-    
+
       // UNIVERSAL DATA
       const payload = data.profile || data.galleryData || data.pendingState ? data : null;
       if (payload) {
@@ -747,7 +720,7 @@
                 // 3. Force Update Button Visuals (now using kneelCount)
                 updateDevotionStatus(); 
                 // --------------------------
-    
+
                 stats = { ...stats, ...payload.profile.stats };  
                 stats = migrateGameStatsToStats(gameStats, stats);
                 
@@ -758,7 +731,7 @@
                 
                 updateStats();
             }
-    
+
           if (payload.galleryData) {
               let rawGallery = payload.galleryData;
               if (typeof rawGallery === 'string') { try { rawGallery = JSON.parse(rawGallery); } catch(e) { rawGallery = []; } }
@@ -780,7 +753,7 @@
                   }
               }
           }
-    
+
           if (payload.pendingState !== undefined) {
                if (!taskJustFinished && !ignoreBackendUpdates) {
                   pendingTaskState = payload.pendingState;
@@ -804,7 +777,7 @@
                }
           }
       }
-    
+
       if (data.type === "UPDATE_CHAT" || data.chatHistory) {
           const msgs = data.chatHistory || data.messages; 
           if(msgs) renderChat(msgs);
@@ -1169,7 +1142,7 @@
         const encText = encodeURIComponent(item.text || "");
         const encStatus = encodeURIComponent("PENDING REVIEW");
 
-        return `<div class="pending-card" onclick="openHistoryModal(galleryData.indexOf(item))">
+        return `<div class="pending-card" onclick='openModal("${encUrl}", "${encStatus}", "${encText}", ${isVideo}, "", "", "")'>
                     <div class="pc-media"><img src="${thumb}" class="pc-thumb" loading="lazy"><div class="pc-gradient"></div><div class="absolute inset-0 flex items-center justify-center z-10"><svg class="w-8 h-8 fill-yellow-400 drop-shadow-md"><use href="#icon-timer"></use></svg></div></div>
                     <div class="pc-content"><div class="pc-badge">PENDING</div><div class="pc-title">${cleanText}</div></div>
                 </div>`;
@@ -1200,144 +1173,169 @@
   
                 let currentHistoryIndex = 0;
                 let touchStartX = 0;
-                let activeHistoryItem = null; // New: Stores the current item for mode switching
-                
-                // 1. MAIN FUNCTION: Opens the card and fills it with CMS data
+
+                // 1. MAIN FUNCTION: Open Modal by Index with Layered UI
                 function openHistoryModal(index) {
-                    const item = galleryData[index];
-                    if(!item) return;
-                
+                    // Filter history items only
+                    const historyItems = galleryData.filter(i => (i.status === 'approve' || i.status === 'reject') && i.proofUrl);
+
+                    if (historyItems.length === 0) return;
+
+                    // --- LOOP LOGIC: Allows continuous swiping ---
+                    if (index < 0) index = historyItems.length - 1; 
+                    if (index >= historyItems.length) index = 0;     
+
                     currentHistoryIndex = index;
-                    activeHistoryItem = item; // Stores item for the mode buttons
-                
-                    // A. SET BACKGROUND (Shows Sub's proof by default)
-                    setMediaLayer(item.proofUrl);
-                
-                    // B. POPULATE STATUS (Big Badge)
+                    const item = historyItems[index];
+
+                    // Detect media type for background
+                    const isVideo = item.proofType === 'video' || (item.proofUrl && item.proofUrl.match(/\.(mp4|webm|mov)$/i));
+
+                    // LAYER 0: Set Background Media
+                    const mediaContainer = document.getElementById('modalMediaContainer');
+                    if (mediaContainer) {
+                        mediaContainer.innerHTML = isVideo ?
+                            `<video src="${item.proofUrl}" autoplay loop muted style="width:100%; height:100%; object-fit:cover;"></video>` :
+                            `<img src="${item.proofUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                    }
+
+                    // LAYER 1: Set Status Badge & Points
                     const statusEl = document.getElementById('modalStatus');
-                    const s = (item.status || "REVIEW").toUpperCase();
-                    statusEl.innerText = s;
-                    statusEl.style.color = s.includes('APP') ? 'var(--neon-green)' : 'var(--neon-red)';
-                
-                    // C. POPULATE POINTS (From CMS)
-                    document.getElementById('modalPoints').innerText = `+${item.points || item.score || 0} PTS`;
-                
-                    // D. POPULATE STICKER
-                    document.getElementById('modalSticker').innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:60px; filter:drop-shadow(0 0 10px white);">` : "";
-                
-                    // E. POPULATE QUEEN FEEDBACK ROW (Media Left, Nav Right)
+                    if (statusEl) {
+                        statusEl.innerText = (item.status || "STATUS").toUpperCase();
+                        statusEl.style.backgroundColor = item.status === 'approve' ? 'var(--neon-green)' : 'var(--neon-red)';
+                    }
+
+                    const pointsEl = document.getElementById('modalPoints');
+                    if (pointsEl) {
+                        pointsEl.innerText = `+${item.points || 0} PTS`;
+                    }
+
+                    // LAYER 1.5: Set Sticker
+                    const stickerEl = document.getElementById('modalSticker');
+                    if (stickerEl) {
+                        stickerEl.innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:60px; filter:drop-shadow(0 0 5px white);">` : "";
+                    }
+
+                    // LAYER 2: Set Feedback Bubble (Small floating bubble)
+                    const bubble = document.getElementById('modalFeedbackBubble');
                     const fMedia = document.getElementById('modalFeedbackMedia');
-                    const feedbackRow = document.getElementById('feedbackRow');
-                    if (item.adminMedia) {
-                        feedbackRow.style.display = "flex";
-                        const isVid = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
-                        fMedia.innerHTML = isVid ? `<video src="${item.adminMedia}"></video>` : `<img src="${item.adminMedia}">`;
-                    } else {
-                        feedbackRow.style.display = "none";
+                    const fText = document.getElementById('modalFeedbackText');
+
+                    if (bubble) {
+                        if (item.adminComment || item.adminMedia) {
+                            bubble.classList.remove('hidden');
+                            if (fText) fText.innerText = item.adminComment || "";
+                            if (fMedia) {
+                                if (item.adminMedia) {
+                                    const isAdmVideo = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
+                                    fMedia.innerHTML = isAdmVideo ?
+                                        `<video src="${item.adminMedia}" controls style="max-height:100px; border-radius:8px; width:auto;"></video>` :
+                                        `<img src="${item.adminMedia}" style="max-height:100px; border-radius:8px; width:auto;">`;
+                                } else { fMedia.innerHTML = ""; }
+                            }
+                        } else {
+                            bubble.classList.add('hidden');
+                        }
                     }
-                
-                    // F. POPULATE HIDDEN TEXT AREAS
-                    document.getElementById('modalFeedbackText').innerText = item.adminComment || "No comment.";
-                    document.getElementById('modalOrderText').innerText = item.text || "No task details found.";
-                
-                    // G. RESET VIEW TO DEFAULT CARD
+
+                    // LAYER 3: Set Order Overlay Text
+                    const orderEl = document.getElementById('modalOrderText');
+                    if (orderEl) {
+                        orderEl.innerText = item.text || "No details available.";
+                    }
+
+                    // Reset view to 'info' state whenever a new photo opens
                     toggleHistoryView('info');
-                
-                    // H. SHOW THE WINDOW
-                    const modal = document.getElementById('glassModal');
-                    modal.classList.add('active');
-                    modal.style.display = 'flex';
+
+                    // Show the Modal
+                    const glassModal = document.getElementById('glassModal');
+                    if (glassModal) {
+                        glassModal.classList.add('active');
+                        glassModal.style.display = 'flex'; 
+                    }
                 }
-                
-                // 2. VIEW SWITCHER: Swaps between Proof, Task, Comment, and Queen Zoom
-                function toggleHistoryView(view, event) {
-                    if (event) event.stopPropagation(); // Prevents clicking buttons from closing the modal
-                
-                    const card = document.getElementById('reviewCard');
-                    const orderText = document.getElementById('modalOrderText');
-                    const feedbackText = document.getElementById('modalFeedbackText');
-                
-                    // Default: Hide all overlays
-                    card.classList.add('hidden');
-                    orderText.classList.add('hidden');
-                    feedbackText.classList.add('hidden');
-                
+
+                // 2. VIEW CONTROLLER: Logic for "See Order", "See Photo", etc.
+                function toggleHistoryView(view) {
+                    const infoLayer = document.getElementById('modalOverlayInfo');
+                    const feedbackBubble = document.getElementById('modalFeedbackBubble');
+                    const orderOverlay = document.getElementById('modalOrderText');
+
+                    if (!infoLayer || !orderOverlay) return;
+
+                    // Default: Hide all floating layers
+                    infoLayer.style.display = "none";
+                    if (feedbackBubble) feedbackBubble.style.display = "none";
+                    orderOverlay.classList.add('hidden');
+
                     if (view === 'info') {
-                        // SHOW: Status, Points, Sticker, Feedback Row
-                        card.classList.remove('hidden');
-                        setMediaLayer(activeHistoryItem.proofUrl);
-                    } 
-                    else if (view === 'task') {
-                        // SHOW: Only the original Orders in center
-                        orderText.classList.remove('hidden');
+                        // Show Status, Points, Sticker, and Feedback
+                        infoLayer.style.display = "flex";
+                        if (feedbackBubble && feedbackBubble.innerHTML.trim() !== "") {
+                            feedbackBubble.style.display = "block";
+                        }
+                    } else if (view === 'order') {
+                        // Show only the Task Description centered
+                        orderOverlay.classList.remove('hidden');
                     }
-                    else if (view === 'comment') {
-                        // SHOW: The Card and the Text Bubble
-                        card.classList.remove('hidden');
-                        feedbackText.classList.remove('hidden');
-                    }
-                    else if (view === 'proof') {
-                        // HIDE EVERYTHING: Clear view of sub's submitted photo
-                        setMediaLayer(activeHistoryItem.proofUrl);
-                    }
-                    else if (view === 'queen_media') {
-                        // ZOOM: Queen's photo/video covers the card area
-                        setMediaLayer(activeHistoryItem.adminMedia);
-                    }
+                    // 'clear' view leaves everything hidden (See Photo only)
                 }
-                
-                // 3. MEDIA HELPER: Swaps background media container safely
-                function setMediaLayer(url) {
-                    const container = document.getElementById('modalMediaContainer');
-                    if (!container || !url) return;
-                    const isVid = url.match(/\.(mp4|webm|mov)$/i);
-                    container.innerHTML = isVid ?
-                        `<video src="${url}" autoplay loop muted style="width:100%; height:100%; object-fit:contain;"></video>` :
-                        `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
-                }
-                
-                // 3. SWIPE DETECTION: Core Listeners (Logic preserved)
+
+                // 3. SWIPE DETECTION: Core Listeners
                 const modalEl = document.getElementById('glassModal');
-                modalEl.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+
+                modalEl.addEventListener('touchstart', e => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
                 modalEl.addEventListener('touchend', e => {
                     const touchEndX = e.changedTouches[0].screenX;
                     const diff = touchStartX - touchEndX;
+
+                    // 70px threshold to verify swipe vs tap
                     if (Math.abs(diff) > 70) {
-                        if (diff > 0) { openHistoryModal(currentHistoryIndex + 1); } 
-                        else { openHistoryModal(currentHistoryIndex - 1); }
+                        if (diff > 0) {
+                            openHistoryModal(currentHistoryIndex + 1); // Swipe Left -> Next
+                        } else {
+                            openHistoryModal(currentHistoryIndex - 1); // Swipe Right -> Prev
+                        }
                     }
                 }, { passive: true });
 
   
     function renderGallery() {
-        const hGrid = document.getElementById('historyGrid');
         const pGrid = document.getElementById('pendingGrid');
-        
-        // Safety check for empty data
-        if (!galleryData || galleryData.length === 0) return;
-    
-        const hItems = galleryData.filter(i => i.status && i.status.toLowerCase() !== 'pending');
-        const pItems = galleryData.filter(i => i.status && i.status.toLowerCase() === 'pending');
-    
-        hGrid.innerHTML = hItems.map(item => `
-            <div class="gallery-item" onclick="openHistoryModal(${galleryData.indexOf(item)})" style="position:relative; aspect-ratio:1; background:#000; border-radius:8px; overflow:hidden; border:1px solid #333;">
-                <img src="${item.proofUrl}" style="width:100%; height:100%; object-fit:cover; opacity:0.6;">
-                ${item.sticker ? `<img src="${item.sticker}" style="position:absolute; top:2px; right:2px; width:20px; z-index:10;">` : ''}
-                <div style="position:absolute; bottom:5px; left:5px; font-size:0.5rem; background:rgba(0,0,0,0.8); padding:2px 5px; border-radius:3px; color: ${item.status.toLowerCase().includes('app') ? 'var(--neon-green)' : 'var(--neon-red)'}">${item.status.toUpperCase()}</div>
-            </div>`).join('');
-            
-        pGrid.innerHTML = pItems.map(item => `
-            <div onclick="openHistoryModal(${galleryData.indexOf(item)})" style="aspect-ratio:1.5; background:#111; border-radius:10px; overflow:hidden; position:relative; border:1px solid var(--neon-yellow);">
-                <img src="${item.proofUrl}" style="width:100%; height:100%; object-fit:cover; opacity:0.4;">
-                <div style="position:absolute; bottom:10px; left:10px; font-weight:bold; font-size:0.7rem; color:var(--neon-yellow);">PENDING REVIEW</div>
-            </div>`).join('');
-    
+        const hGrid = document.getElementById('historyGrid');
+        const pItems = galleryData.filter(i => i.status === 'pending' && i.proofUrl);
+        if(pGrid) pGrid.innerHTML = pItems.slice(0, pendingLimit).map(createPendingCardHTML).join('');
         document.getElementById('pendingSection').style.display = pItems.length > 0 ? 'block' : 'none';
-        document.getElementById('historySection').style.display = 'block';
+        const hItems = galleryData.filter(i => (i.status === 'approve' || i.status === 'reject') && i.proofUrl);
+        if(hGrid) hGrid.innerHTML = hItems.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
+        document.getElementById('historySection').style.display = (hItems.length > 0 || pItems.length === 0) ? 'block' : 'none';
+        document.getElementById('loadMoreBtn').style.display = hItems.length > historyLimit ? 'block' : 'none';
     }
-  
     function loadMoreHistory() { historyLimit += 25; renderGallery(); }
+  
 
+    function openModal(encUrl, encStatus, encText, isVideo, encComment, encMedia, encSticker) {
+        document.querySelector('.gm-content').style.maxWidth = "900px";
+        const mediaZone = document.getElementById('modalMediaContainer');
+        
+        const url = decodeURIComponent(encUrl);
+        const status = decodeURIComponent(encStatus);
+        const text = decodeURIComponent(encText);
+        const adminComment = encComment ? decodeURIComponent(encComment) : "";
+        const adminMedia = encMedia ? decodeURIComponent(encMedia) : "";
+        const sticker = encSticker ? decodeURIComponent(encSticker) : "";
+
+        let statusColor = "#888";
+        let statusShadow = "none";
+        if (status.includes("APPROVED")) {
+            statusColor = "var(--neon-green)"; statusShadow = "0 0 15px var(--neon-green)";
+        } else if (status.includes("REJECTED")) {
+            statusColor = "var(--neon-red)"; statusShadow = "0 0 15px var(--neon-red)";
+        }
 
         mediaZone.style.display = "flex";
         mediaZone.innerHTML = isVideo ? `<video src="${url}" class="gm-img" controls autoplay></video>` : `<img src="${url}" class="gm-img">`;
