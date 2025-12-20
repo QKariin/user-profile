@@ -628,11 +628,7 @@
     }
     initDomProfile();
 
-    /* --- MAIN LISTENER (DATABASE SYNC) --- */
-    window.addEventListener("message", (event) => {
-      const data = event.data;
-
-      // 1. Check for Full Data (Database & Profile)
+       // 1. Check for Full Data (Database & Profile)
       if (data.type === "UPDATE_FULL_DATA") {
           if (data.profile) { 
               gameStats = { ...gameStats, ...data.profile }; 
@@ -644,7 +640,7 @@
               renderGallery(); 
           }
       }
-
+    
       // 2. Check for Chat Echo (Instant Messages)
       if (data.type === "CHAT_ECHO") {
           const chatContent = document.getElementById('chatContent');
@@ -664,7 +660,7 @@
               forceBottom(); 
           }
       }
-
+    
       
       // FIX: Capture all 8 Rules from CMS safely
       if (data.type === 'UPDATE_RULES') {
@@ -674,7 +670,7 @@
               if (el && rules['rule' + i]) el.innerHTML = rules['rule' + i];
           }
       }
-
+    
       // CMS TASKS
       if (data.type === "INIT_TASKS" || data.dailyTasks) {
           if (data.dailyTasks && Array.isArray(data.dailyTasks) && data.dailyTasks.length > 0) {
@@ -683,7 +679,7 @@
               taskDatabase = data.tasks;
           }
       }
-
+    
       // NEW: Listen for hierarchy from CMS
       if (data.type === "INIT_HIERARCHY" || data.hierarchy) {
           const incoming = data.hierarchy || data.hierarchyData;
@@ -691,14 +687,14 @@
               cmsHierarchyData = incoming;
           }
       }
-
+    
       else if (data.type === "INIT_WISHLIST" || data.wishlist) {
         if (data.wishlist && Array.isArray(data.wishlist) && data.wishlist.length > 0) {
             WISHLIST_ITEMS = data.wishlist;
             renderWishlist('all');
         }
       }
-
+    
       // DOM STATUS & FEED
       if (data.type === "UPDATE_DOM_STATUS") {
           const badge = document.getElementById('chatStatusBadge');
@@ -717,7 +713,7 @@
           }
           if(domRing) domRing.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
       }
-
+    
       // *** NEW LISTENER FOR FEED ***
       if (data.type === "UPDATE_Q_FEED") {
           if (data.domVideos && Array.isArray(data.domVideos)) {
@@ -725,7 +721,7 @@
               renderNews(data.domVideos);
           }
       }
-
+    
       // UNIVERSAL DATA
       const payload = data.profile || data.galleryData || data.pendingState ? data : null;
       if (payload) {
@@ -751,7 +747,7 @@
                 // 3. Force Update Button Visuals (now using kneelCount)
                 updateDevotionStatus(); 
                 // --------------------------
-
+    
                 stats = { ...stats, ...payload.profile.stats };  
                 stats = migrateGameStatsToStats(gameStats, stats);
                 
@@ -762,7 +758,7 @@
                 
                 updateStats();
             }
-
+    
           if (payload.galleryData) {
               let rawGallery = payload.galleryData;
               if (typeof rawGallery === 'string') { try { rawGallery = JSON.parse(rawGallery); } catch(e) { rawGallery = []; } }
@@ -784,7 +780,7 @@
                   }
               }
           }
-
+    
           if (payload.pendingState !== undefined) {
                if (!taskJustFinished && !ignoreBackendUpdates) {
                   pendingTaskState = payload.pendingState;
@@ -808,7 +804,7 @@
                }
           }
       }
-
+    
       if (data.type === "UPDATE_CHAT" || data.chatHistory) {
           const msgs = data.chatHistory || data.messages; 
           if(msgs) renderChat(msgs);
