@@ -1787,6 +1787,9 @@ html, body {
     bottom: 0 !important;
     width: 100% !important;
     height: 100% !important;
+
+    overflow: hidden !important; 
+    border: 2px solid #333; /* This draws the "Frame" around the history photo */
     
     /* Background and Look */
     background: rgba(0, 0, 0, 0.95) !important;
@@ -1953,14 +1956,28 @@ html, body {
             
           .hidden { display: none !important; }
           .modal-bg-photo { position: absolute; inset: 0; z-index: 1; }
-          .modal-bg-photo img, .modal-bg-photo video { width: 100%; height: 100%; object-fit: cover; }
+          .modal-bg-photo img, .modal-bg-photo video { width: 100%; height: 100%; object-fit: contain !important; }
 
           .modal-overlay-layer { position: relative; z-index: 10; padding: 15px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
           .m-status-badge { background: var(--neon-green); color: black; font-weight: 900; padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; }
           .m-points-badge { background: rgba(0,0,0,0.8); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); padding: 5px 15px; border-radius: 4px; font-weight: bold; }
 
-          .feedback-bubble { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border: 1px solid var(--neon-pink); border-radius: 15px; padding: 12px; z-index: 20; text-align: center; }
-          .order-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 30px; text-align: center; font-weight: bold; font-size: 1.2rem; }
+          .feedback-bubble {
+              position: absolute !important;
+              bottom: 70px !important; /* Sits it right above the "Close" buttons */
+              left: 5% !important;
+              transform: none !important;
+              top: auto !important;
+              width: 90% !important;
+              z-index: 30 !important;
+              background: rgba(0,0,0,0.85);
+              border: 1px solid var(--neon-pink);
+              border-radius: 15px;
+              padding: 12px;
+              text-align: center;
+            }          
+            
+            .order-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 30px; text-align: center; font-weight: bold; font-size: 1.2rem; }
 
           .modal-footer-actions { margin-top: auto; position: relative; z-index: 40; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 10px; background: linear-gradient(to top, black, transparent); }
           .view-btn { background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; padding: 8px; font-size: 0.6rem; border-radius: 4px; }
