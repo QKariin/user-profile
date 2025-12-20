@@ -1155,7 +1155,7 @@
         const encText = encodeURIComponent(item.text || "");
         const encStatus = encodeURIComponent("PENDING REVIEW");
 
-        return `<div class="pending-card" onclick='openModal("${encUrl}", "${encStatus}", "${encText}", ${isVideo}, "", "", "")'>
+        return `<div class="pending-card" onclick="openHistoryModal(galleryData.indexOf(item))">
                     <div class="pc-media"><img src="${thumb}" class="pc-thumb" loading="lazy"><div class="pc-gradient"></div><div class="absolute inset-0 flex items-center justify-center z-10"><svg class="w-8 h-8 fill-yellow-400 drop-shadow-md"><use href="#icon-timer"></use></svg></div></div>
                     <div class="pc-content"><div class="pc-badge">PENDING</div><div class="pc-title">${cleanText}</div></div>
                 </div>`;
@@ -1322,32 +1322,17 @@
         const pItems = galleryData.filter(i => i.status === 'pending' && i.proofUrl);
         if(pGrid) pGrid.innerHTML = pItems.slice(0, pendingLimit).map(createPendingCardHTML).join('');
         document.getElementById('pendingSection').style.display = pItems.length > 0 ? 'block' : 'none';
-        const hItems = galleryData.filter(i => (i.status === 'approve' || i.status === 'reject') && i.proofUrl);
+        const hItems = galleryData.filter(i => {
+          if (!i.status || !i.proofUrl) return false;
+          const s = i.status.toLowerCase();
+          return s.includes('approve') || s.includes('reject');
+      });
         if(hGrid) hGrid.innerHTML = hItems.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
         document.getElementById('historySection').style.display = (hItems.length > 0 || pItems.length === 0) ? 'block' : 'none';
         document.getElementById('loadMoreBtn').style.display = hItems.length > historyLimit ? 'block' : 'none';
     }
     function loadMoreHistory() { historyLimit += 25; renderGallery(); }
-  
 
-    function openModal(encUrl, encStatus, encText, isVideo, encComment, encMedia, encSticker) {
-        document.querySelector('.gm-content').style.maxWidth = "900px";
-        const mediaZone = document.getElementById('modalMediaContainer');
-        
-        const url = decodeURIComponent(encUrl);
-        const status = decodeURIComponent(encStatus);
-        const text = decodeURIComponent(encText);
-        const adminComment = encComment ? decodeURIComponent(encComment) : "";
-        const adminMedia = encMedia ? decodeURIComponent(encMedia) : "";
-        const sticker = encSticker ? decodeURIComponent(encSticker) : "";
-
-        let statusColor = "#888";
-        let statusShadow = "none";
-        if (status.includes("APPROVED")) {
-            statusColor = "var(--neon-green)"; statusShadow = "0 0 15px var(--neon-green)";
-        } else if (status.includes("REJECTED")) {
-            statusColor = "var(--neon-red)"; statusShadow = "0 0 15px var(--neon-red)";
-        }
 
         mediaZone.style.display = "flex";
         mediaZone.innerHTML = isVideo ? `<video src="${url}" class="gm-img" controls autoplay></video>` : `<img src="${url}" class="gm-img">`;
