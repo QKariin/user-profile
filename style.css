@@ -1882,8 +1882,7 @@ html, body {
   
   /* 2. THE PRISONER: This forces the modal to strictly follow the History Section boundaries */
   #glassModal {
-    display: none;
-    /* This is the secret: explicitly naming the boundaries */
+    display: none !important; /* This is the fix */
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
