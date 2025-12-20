@@ -449,58 +449,51 @@
 
             <!-- MODAL IS NOW TRAPPED INSIDE HISTORY -->
             <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
-                
-                <!-- LAYER 0: THE BACKGROUND (Sub Proof OR Queen Media) -->
-                <div id="modalMediaContainer" class="modal-bg-photo"></div>
-            
-                <!-- LAYER 1: THE REVIEW CARD (Frosted glass overlay) -->
-                <div id="reviewCard" class="review-details-card">
-                    
-                    <!-- Big Status -->
-                    <div id="modalStatus" class="m-status-badge-big">APPROVED</div>
-                    
-                    <!-- Points & Sticker -->
-                    <div class="m-reward-row">
-                        <div id="modalPoints" class="m-points-glow">+0 PTS</div>
-                        <div id="modalSticker" class="m-sticker-main"></div>
-                    </div>
-            
-                    <!-- Queen's Feedback Split Row -->
-                    <div id="feedbackRow" class="q-feedback-split">
-                        <!-- Left: Queen's Media Thumb -->
-                        <div class="q-media-box" onclick="setHistoryMode('queen_media', event)">
-                            <div id="modalFeedbackMedia" class="q-thumb-container"></div>
-                            <div class="q-zoom-icon">🔍</div>
-                        </div>
-                        
-                        <!-- Right: Secondary Nav -->
-                        <div class="q-nav-box">
-                            <div class="q-label">QUEEN'S FEEDBACK</div>
-                            <button class="q-nav-btn" onclick="setHistoryMode('comment', event)">SEE COMMENT</button>
-                            <button class="q-nav-btn" onclick="setHistoryMode('queen_media', event)">SEE PHOTO</button>
-                        </div>
-                    </div>
-            
-                    <!-- Queen's Comment Text (Hidden by default, shown in 'comment' mode) -->
-                    <div id="modalFeedbackText" class="q-comment-bubble hidden"></div>
-                </div>
-            
-                <!-- LAYER 2: THE TASK ORDER (Hidden by default) -->
-                <div id="modalOrderText" class="order-overlay-centered hidden"></div>
-            
-                <!-- LAYER 3: MAIN NAVIGATION BUTTONS (Stays at the bottom) -->
-                <div class="modal-footer-nav">
-                    <button onclick="setHistoryMode('task', event)" class="nav-main-btn">SEE TASK</button>
-                    <button onclick="setHistoryMode('proof', event)" class="nav-main-btn">SEE PROOF</button>
-                    <button onclick="closeModal(null)" class="nav-main-btn close-red">CLOSE</button>
-                </div>
-            </div>
-
-            <div id="historyGrid" class="gallery-grid"></div>
-            <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="width: 200px; margin: 20px auto; display: none; background: #222; color: #888;">LOAD MORE</button>
+          <!-- THE MEDIA BACKGROUND (Sub Proof or Queen Media) -->
+          <div id="modalMediaContainer" class="modal-bg-photo"></div>
+      
+          <!-- THE FROSTED GLASS REVIEW CARD -->
+          <div id="reviewCard" class="review-details-card">
+              <!-- Status Badge -->
+              <div id="modalStatus" class="m-status-badge-big">APPROVED</div>
+      
+              <!-- Points & Sticker Row -->
+              <div style="display:flex; align-items:center; gap:20px; margin-bottom:10px;">
+                  <div id="modalPoints" class="m-points-val">+0 PTS</div>
+                  <div id="modalSticker"></div>
+              </div>
+      
+              <!-- Queen's Feedback Split Row -->
+              <div id="feedbackRow" class="q-feedback-split">
+                  <!-- Left: Queen's Media Thumb -->
+                  <div class="q-thumb-box" onclick="toggleHistoryView('queen_media', event)">
+                      <div id="modalFeedbackMedia" class="q-thumb-fill"></div>
+                      <div class="q-zoom-hint">🔍</div>
+                  </div>
+                  
+                  <!-- Right: Secondary Nav -->
+                  <div class="q-nav-stack">
+                      <div class="q-label">QUEEN'S FEEDBACK</div>
+                      <button class="q-nav-btn" onclick="toggleHistoryView('comment', event)">SEE COMMENT</button>
+                      <button class="q-nav-btn" onclick="toggleHistoryView('queen_media', event)">SEE PHOTO</button>
+                  </div>
+              </div>
+      
+              <!-- The Text Comment (Hidden by default) -->
+              <div id="modalFeedbackText" class="q-comment-area hidden"></div>
           </div>
-  
-        </div>
+      
+          <!-- Task text overlay -->
+          <div id="modalOrderText" class="order-overlay-centered hidden"></div>
+      
+          <!-- Bottom Nav Buttons -->
+          <div class="modal-footer-nav">
+              <button onclick="toggleHistoryView('task', event)" class="view-btn">SEE TASK</button>
+              <button onclick="toggleHistoryView('proof', event)" class="view-btn">SEE PROOF</button>
+              <button onclick="toggleHistoryView('info', event)" class="view-btn">SEE STATUS</button>
+              <button onclick="closeModal(null)" class="view-btn close-btn">CLOSE</button>
+          </div>
+      </div>
     </div> <!-- Closes app-container -->
 </div> <!-- Closes layout-right or main wrapper depending on your exact nesting -->
 
@@ -1193,133 +1186,132 @@
   
                 let currentHistoryIndex = 0;
                 let touchStartX = 0;
-
+                let activeHistoryItem = null; // New: Stores the current item for mode switching
+                
                 // 1. MAIN FUNCTION: Open Modal by Index with Layered UI
                 function openHistoryModal(index) {
-                    // Filter history items only
                     const historyItems = galleryData.filter(i => (i.status === 'approve' || i.status === 'reject') && i.proofUrl);
-
                     if (historyItems.length === 0) return;
-
-                    // --- LOOP LOGIC: Allows continuous swiping ---
+                
                     if (index < 0) index = historyItems.length - 1; 
                     if (index >= historyItems.length) index = 0;     
-
+                
                     currentHistoryIndex = index;
                     const item = historyItems[index];
-
-                    // Detect media type for background
-                    const isVideo = item.proofType === 'video' || (item.proofUrl && item.proofUrl.match(/\.(mp4|webm|mov)$/i));
-
-                    // LAYER 0: Set Background Media
-                    const mediaContainer = document.getElementById('modalMediaContainer');
-                    if (mediaContainer) {
-                        mediaContainer.innerHTML = isVideo ?
-                            `<video src="${item.proofUrl}" autoplay loop muted style="width:100%; height:100%; object-fit:cover;"></video>` :
-                            `<img src="${item.proofUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                    }
-
-                    // LAYER 1: Set Status Badge & Points
+                    activeHistoryItem = item; // Save this so buttons can use it later
+                
+                    // A. SET BACKGROUND (Default to Sub Proof)
+                    setMediaLayer(item.proofUrl);
+                
+                    // B. POPULATE STATUS (Big at top)
                     const statusEl = document.getElementById('modalStatus');
                     if (statusEl) {
                         statusEl.innerText = (item.status || "STATUS").toUpperCase();
-                        statusEl.style.backgroundColor = item.status === 'approve' ? 'var(--neon-green)' : 'var(--neon-red)';
+                        statusEl.style.color = item.status === 'approve' ? 'var(--neon-green)' : 'var(--neon-red)';
                     }
-
+                
+                    // C. POPULATE POINTS
                     const pointsEl = document.getElementById('modalPoints');
                     if (pointsEl) {
                         pointsEl.innerText = `+${item.points || 0} PTS`;
                     }
-
-                    // LAYER 1.5: Set Sticker
+                
+                    // D. POPULATE STICKER
                     const stickerEl = document.getElementById('modalSticker');
                     if (stickerEl) {
-                        stickerEl.innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:60px; filter:drop-shadow(0 0 5px white);">` : "";
+                        stickerEl.innerHTML = item.sticker ? `<img src="${item.sticker}" style="width:70px; filter:drop-shadow(0 0 10px white);">` : "";
                     }
-
-                    // LAYER 2: Set Feedback Bubble (Small floating bubble)
-                    const bubble = document.getElementById('modalFeedbackBubble');
+                
+                    // E. POPULATE QUEEN FEEDBACK (Media Left, Buttons Right)
                     const fMedia = document.getElementById('modalFeedbackMedia');
                     const fText = document.getElementById('modalFeedbackText');
-
-                    if (bubble) {
-                        if (item.adminComment || item.adminMedia) {
-                            bubble.classList.remove('hidden');
-                            if (fText) fText.innerText = item.adminComment || "";
-                            if (fMedia) {
-                                if (item.adminMedia) {
-                                    const isAdmVideo = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
-                                    fMedia.innerHTML = isAdmVideo ?
-                                        `<video src="${item.adminMedia}" controls style="max-height:100px; border-radius:8px; width:auto;"></video>` :
-                                        `<img src="${item.adminMedia}" style="max-height:100px; border-radius:8px; width:auto;">`;
-                                } else { fMedia.innerHTML = ""; }
-                            }
-                        } else {
-                            bubble.classList.add('hidden');
+                    const feedbackRow = document.getElementById('feedbackRow');
+                
+                    if (item.adminComment || item.adminMedia) {
+                        if (feedbackRow) feedbackRow.style.display = "flex";
+                        if (fText) fText.innerText = item.adminComment || "";
+                        
+                        if (fMedia) {
+                            if (item.adminMedia) {
+                                const isVid = item.adminMedia.match(/\.(mp4|webm|mov)$/i);
+                                fMedia.innerHTML = isVid ? `<video src="${item.adminMedia}"></video>` : `<img src="${item.adminMedia}">`;
+                            } else { fMedia.innerHTML = ""; }
                         }
+                    } else {
+                        if (feedbackRow) feedbackRow.style.display = "none";
                     }
-
-                    // LAYER 3: Set Order Overlay Text
+                
+                    // F. POPULATE TASK TEXT (Hidden by default)
                     const orderEl = document.getElementById('modalOrderText');
                     if (orderEl) {
-                        orderEl.innerText = item.text || "No details available.";
+                        orderEl.innerText = item.text || "No task details found.";
                     }
-
-                    // Reset view to 'info' state whenever a new photo opens
+                
+                    // RESET TO DEFAULT VIEW
                     toggleHistoryView('info');
-
-                    // Show the Modal
+                
                     const glassModal = document.getElementById('glassModal');
                     if (glassModal) {
                         glassModal.classList.add('active');
                         glassModal.style.display = 'flex'; 
                     }
                 }
-
-                // 2. VIEW CONTROLLER: Logic for "See Order", "See Photo", etc.
-                function toggleHistoryView(view) {
-                    const infoLayer = document.getElementById('modalOverlayInfo');
-                    const feedbackBubble = document.getElementById('modalFeedbackBubble');
+                
+                // 2. VIEW MODES: Handles switching between Card, Task, Proof, and Queen Media
+                function toggleHistoryView(view, event) {
+                    if (event) event.stopPropagation(); // Stop modal from closing when clicking internal buttons
+                
+                    const card = document.getElementById('reviewCard');
                     const orderOverlay = document.getElementById('modalOrderText');
-
-                    if (!infoLayer || !orderOverlay) return;
-
-                    // Default: Hide all floating layers
-                    infoLayer.style.display = "none";
-                    if (feedbackBubble) feedbackBubble.style.display = "none";
-                    orderOverlay.classList.add('hidden');
-
+                    const feedbackText = document.getElementById('modalFeedbackText');
+                
+                    // Default: Hide everything
+                    if(card) card.classList.add('hidden');
+                    if(orderOverlay) orderOverlay.classList.add('hidden');
+                    if(feedbackText) feedbackText.classList.add('hidden');
+                
                     if (view === 'info') {
-                        // Show Status, Points, Sticker, and Feedback
-                        infoLayer.style.display = "flex";
-                        if (feedbackBubble && feedbackBubble.innerHTML.trim() !== "") {
-                            feedbackBubble.style.display = "block";
-                        }
-                    } else if (view === 'order') {
-                        // Show only the Task Description centered
-                        orderOverlay.classList.remove('hidden');
+                        // Show the Review Card (Status, Points, Sticker, Feedback Thumb)
+                        if(card) card.classList.remove('hidden');
+                        setMediaLayer(activeHistoryItem.proofUrl);
+                    } 
+                    else if (view === 'comment') {
+                        // Show the Comment Bubble inside the card
+                        if(card) card.classList.remove('hidden');
+                        if(feedbackText) feedbackText.classList.remove('hidden');
                     }
-                    // 'clear' view leaves everything hidden (See Photo only)
+                    else if (view === 'task') {
+                        // Hide card, show only original Task Orders centered
+                        if(orderOverlay) orderOverlay.classList.remove('hidden');
+                    }
+                    else if (view === 'proof') {
+                        // Pure proof view: Hide everything overlayed
+                    }
+                    else if (view === 'queen_media') {
+                        // Switch background media from Sub's photo to Queen's photo/video
+                        setMediaLayer(activeHistoryItem.adminMedia);
+                    }
                 }
-
-                // 3. SWIPE DETECTION: Core Listeners
+                
+                // Helper to switch the background media correctly
+                function setMediaLayer(url) {
+                    const mediaContainer = document.getElementById('modalMediaContainer');
+                    if (!mediaContainer || !url) return;
+                    const isVid = url.match(/\.(mp4|webm|mov)$/i);
+                    mediaContainer.innerHTML = isVid ?
+                        `<video src="${url}" autoplay loop muted style="width:100%; height:100%; object-fit:contain;"></video>` :
+                        `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
+                }
+                
+                // 3. SWIPE DETECTION: Core Listeners (Logic preserved)
                 const modalEl = document.getElementById('glassModal');
-
-                modalEl.addEventListener('touchstart', e => {
-                    touchStartX = e.changedTouches[0].screenX;
-                }, { passive: true });
-
+                modalEl.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
                 modalEl.addEventListener('touchend', e => {
                     const touchEndX = e.changedTouches[0].screenX;
                     const diff = touchStartX - touchEndX;
-
-                    // 70px threshold to verify swipe vs tap
                     if (Math.abs(diff) > 70) {
-                        if (diff > 0) {
-                            openHistoryModal(currentHistoryIndex + 1); // Swipe Left -> Next
-                        } else {
-                            openHistoryModal(currentHistoryIndex - 1); // Swipe Right -> Prev
-                        }
+                        if (diff > 0) { openHistoryModal(currentHistoryIndex + 1); } 
+                        else { openHistoryModal(currentHistoryIndex - 1); }
                     }
                 }, { passive: true });
 
