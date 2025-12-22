@@ -72,7 +72,7 @@ $w("#html2").onMessage(async (event) => {
         await checkDomOnlineStatus();
     }
 
-    else if (data.type === "WORSHIP") {
+    /*else if (data.type === "WORSHIP") {
         const results = await wixData.query("Tasks")
             .eq("memberId", currentUserEmail)
             .find({ suppressAuth: true });
@@ -148,25 +148,78 @@ $w("#html2").onMessage(async (event) => {
                 });
             }
         }
-    }
+    }*/
 
-    if (data.type === "heartbeat") {
+    else if (data.type === "heartbeat") {
         if (data.view === 'serve') await checkDomOnlineStatus();
     }
 
-    if (data.type === "LOAD_Q_FEED") {
+    else if (data.type === "LOAD_Q_FEED") {
         try {
-            const cmsResults = await wixData.query("QKarinonline").descending("_createdDate").limit(20).find({suppressAuth: true});
-            $w("#html2").postMessage({ type: "UPDATE_Q_FEED", domVideos: cmsResults.items });
-        } catch(e) { console.log("Feed Error", e); }
+            const cmsResults = await wixData.query("QKarinonline")
+                .descending("_createdDate")
+                .limit(24)
+                .find({ suppressAuth: true });
+
+            const processedItems = cmsResults.items.map(item => {
+                // FIXED: Specifically looking for the "page" field key
+                const rawLink = item.page || item.url || item.media;
+                
+                return {
+                    ...item,
+                    url: getPublicUrl(rawLink) 
+                };
+            });
+
+            $w("#html2").postMessage({ 
+                type: "UPDATE_Q_FEED", 
+                domVideos: processedItems 
+            });
+        } catch(e) { console.error("Feed Error", e); }
     }
 
-    if (data.type === "savePendingState") {
+    else if (data.type === "savePendingState") {
         await secureUpdateTaskAction(currentUserEmail, { pendingState: data.pendingState, consumeQueue: data.consumeQueue });
         await syncProfileAndTasks(); 
     }
 
-    if (data.type === "uploadEvidence") {
+    else if (data.type === "CLAIM_KNEEL_REWARD") {
+        const results = await wixData.query("Tasks")
+            .eq("memberId", currentUserEmail)
+            .find({ suppressAuth: true });
+
+        if (results.items.length > 0) {
+            let item = results.items[0];
+            const amount = data.rewardValue;
+            const type = data.rewardType; // 'coins' or 'points'
+
+            // Update Database
+            if (type === 'coins') {
+                item.wallet = (item.wallet || 0) + amount;
+            } else {
+                item.score = (item.score || 0) + amount;
+            }
+            
+            item.lastWorship = new Date();
+            item.kneelCount = (item.kneelCount || 0) + 1;
+
+            await wixData.update("Tasks", item, { suppressAuth: true });
+
+            // Send custom message to chat
+            const label = type === 'coins' ? "COINS 🪙" : "POINTS ⭐";
+            await insertMessage({
+                memberId: currentUserEmail,
+                message: `${item.title_fld || "Slave"} earned ${amount} ${label} for his kneeling.`,
+                sender: "system",
+                read: false
+            });
+
+            // Sync UI
+            await syncProfileAndTasks();
+        }
+    }
+    
+    else if (data.type === "uploadEvidence") {
         const proofType = data.mimeType && data.mimeType.startsWith('video') ? "video" : "image";
         await secureUpdateTaskAction(currentUserEmail, {
             addToQueue: { id: Date.now().toString(), text: data.task, proofUrl: data.fileUrl, proofType: proofType, status: "pending" }
@@ -175,7 +228,7 @@ $w("#html2").onMessage(async (event) => {
         await syncProfileAndTasks(); 
     }
 
-    if (data.type === "SEND_CHAT_TO_BACKEND") {
+    else if (data.type === "SEND_CHAT_TO_BACKEND") {
         const profileResult = await secureGetProfile(currentUserEmail);
         if (profileResult.success) {
             const messageCoins = (profileResult.profile.parameters || {}).MessageCoins || 10;
@@ -186,15 +239,31 @@ $w("#html2").onMessage(async (event) => {
         }
     }
 
-    if (data.type === "PURCHASE_ITEM") {
-        const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), `Store: ${data.itemName}`);
+    else if (data.type === "PURCHASE_ITEM") {
+        const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), `Tribute: ${data.itemName}`);
         if (result.success) {
-            await insertMessage({ memberId: currentUserEmail, message: `🎁 PURCHASED: ${data.itemName} (-${data.cost})`, sender: "system", type: "system_gold", read: true });
+            // 1. Send the Reason and Note text
+            await insertMessage({ 
+                memberId: currentUserEmail, 
+                message: data.messageToDom, 
+                sender: "user", 
+                read: false 
+            });
+
+            // 2. Send the Picture of the item
+            await insertMessage({ 
+                memberId: currentUserEmail, 
+                message: data.itemImg, // The URL of the photo
+                sender: "user", 
+                read: false 
+            });
+            
             await syncProfileAndTasks();
+            await syncChat();
         }
     }
 
-    if (data.type === "SESSION_REQUEST") {
+    else if (data.type === "SESSION_REQUEST") {
         const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), "Session Hold");
         if (result.success) {
             const msg = `📅 REQUEST: ${data.sessionType.toUpperCase()} SESSION\nTime: ${data.requestedTimeLabel}\nFocus: ${data.focus}`;
@@ -204,7 +273,7 @@ $w("#html2").onMessage(async (event) => {
         }
     }
 
-    if (data.type === "SEND_COINS") {
+    else if (data.type === "SEND_COINS") {
         const amount = Number(data.amount);
         const saying = funnySayings[Math.floor(Math.random() * funnySayings.length)];
         const result = await processCoinTransaction(currentUserEmail, -Math.abs(amount), data.category);
@@ -214,14 +283,14 @@ $w("#html2").onMessage(async (event) => {
         }
     }
 
-    if (data.type === "INITIATE_STRIPE_PAYMENT") {
+    else if (data.type === "INITIATE_STRIPE_PAYMENT") {
         try {
             const paymentUrl = await getPaymentLink(Number(data.amount));
             wixLocation.to(paymentUrl);
         } catch (err) { console.error("Payment Failed", err); }
     }
 
-    if (data.type === "taskSkipped") {
+    else if (data.type === "taskSkipped") {
         await secureUpdateTaskAction(currentUserEmail, { clear: true, wasSkipped: true, taskTitle: data.taskTitle });
         const result = await processCoinTransaction(currentUserEmail, -300, "TAX");
         if (result.success) { await insertMessage({ memberId: currentUserEmail, message: `SKIPPED TASK: ${data.taskTitle}`, sender: "system", read: false }); } 
@@ -232,13 +301,25 @@ $w("#html2").onMessage(async (event) => {
 
 async function loadStaticData() {
     try {
+        // 1. Load Tasks (Keep this as is)
         const taskResults = await wixData.query("DailyTasks").limit(500).find({ suppressAuth: true });
         staticTasksPool = taskResults.items.map(item => item.taskText || item.title || "Serve me.");
         $w("#html2").postMessage({ type: "INIT_TASKS", tasks: staticTasksPool });
 
+        // 2. Load Wishlist (Tributes) - FIXED FOR YOUR FIELDS
         const wishResults = await wixData.query("Wishlist").limit(500).find({ suppressAuth: true });
-        const wishlist = wishResults.items.map(item => ({ id: item.title, name: item.title, price: item.price, cat: item.category, img: getPublicUrl(item.image) }));
+        
+        const wishlist = wishResults.items.map(item => ({ 
+            id: item._id, // Wix internal ID
+            name: item.title || "GIFT", // Your 'title' field
+            price: Number(item.price || 0), // Your 'price' field
+            cat: "all", // Default to 'all' since you have no categories
+            img: getPublicUrl(item.image) // Your 'image' field
+        }));
+
         $w("#html2").postMessage({ type: "INIT_WISHLIST", wishlist });
+        console.log("Wix: Successfully sent " + wishlist.length + " tributes.");
+
     } catch (e) { console.error("Static Data Error", e); }
 }
 
