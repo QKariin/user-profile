@@ -60,9 +60,11 @@ initDomProfile();
 
 
 // --- 3. THE MESSAGE LISTENER (CORE BRIDGE) ---
+// --- 3. THE MESSAGE LISTENER (CORE BRIDGE) ---
 window.addEventListener("message", (event) => {
     const data = event.data;
 
+    // YOUR CHAT ECHO LOGIC
     if (data.type === "CHAT_ECHO") {
         const chatContent = document.getElementById('chatContent');
         if (chatContent && data.msgObj) {
@@ -76,6 +78,7 @@ window.addEventListener("message", (event) => {
         }
     }
 
+    // YOUR RULES LOGIC
     if (data.type === 'UPDATE_RULES') {
         const rules = data.payload || {};
         for (let i = 1; i <= 8; i++) {
@@ -84,10 +87,8 @@ window.addEventListener("message", (event) => {
         }
     }
 
-    if (data.type === "INIT_TASKS" || data.dailyTasks) {
-        setTaskDatabase(data.dailyTasks || data.tasks || []);
-    }
-
+    // YOUR TASK & WISHLIST INIT
+    if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
     if (data.type === "INIT_WISHLIST" || data.wishlist) {
         const items = data.wishlist || [];
         if (Array.isArray(items) && items.length > 0) {
@@ -97,6 +98,7 @@ window.addEventListener("message", (event) => {
         }
     }
 
+    // YOUR DOM STATUS LOGIC
     if (data.type === "UPDATE_DOM_STATUS") {
         const badge = document.getElementById('chatStatusBadge');
         const ring = document.getElementById('chatStatusRing');
@@ -106,6 +108,7 @@ window.addEventListener("message", (event) => {
         if(domBadge) { domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; domBadge.className = data.online ? "dom-status status-online" : "dom-status"; }
     }
 
+    // YOUR Q-FEED LOGIC
     if (data.type === "UPDATE_Q_FEED") {
         const feedData = data.domVideos || data.posts || data.feed;
         if (feedData && Array.isArray(feedData)) {
@@ -116,9 +119,12 @@ window.addEventListener("message", (event) => {
         }
     }
 
+    // --- YOUR COMPLEX PAYLOAD LOGIC (RECOUPLED & SHIELDED) ---
     const payload = data.profile || data.galleryData || data.pendingState ? data : (data.type === "UPDATE_FULL_DATA" ? data : null);
+    
     if (payload) {
-        if (payload.profile) {
+        // 1. Profile Sync (Added the !ignoreBackendUpdates shield here)
+        if (payload.profile && !ignoreBackendUpdates) {
             setGameStats(payload.profile);
             setUserProfile({
                 name: payload.profile.name || "Slave",
@@ -132,6 +138,7 @@ window.addEventListener("message", (event) => {
             updateStats();
         }
 
+        // 2. Gallery Data Logic (Exactly as you sent it)
         if (payload.galleryData) {
             const currentGalleryJson = JSON.stringify(payload.galleryData);
             if (currentGalleryJson !== lastGalleryJson) {
@@ -142,6 +149,7 @@ window.addEventListener("message", (event) => {
             }
         }
 
+        // 3. Pending Task Logic (Exactly as you sent it)
         if (payload.pendingState !== undefined) {
             if (!taskJustFinished && !ignoreBackendUpdates) {
                 setPendingTaskState(payload.pendingState);
@@ -159,7 +167,7 @@ window.addEventListener("message", (event) => {
     }
 
     if (data.type === "UPDATE_CHAT" || data.chatHistory) renderChat(data.chatHistory || data.messages);
-    setTimeout(styleTributeMessages, 100); // Small delay to let chat render first
+    setTimeout(styleTributeMessages, 100); 
 });
 
 // --- 4. LOGIC FUNCTIONS ---
@@ -473,8 +481,14 @@ function finalizeSacrifice() {
 let holdTimer = null;
 const REQUIRED_HOLD_TIME = 2000; 
 
-function handleHoldStart() {
+function handleHoldStart(e) {
     if (isLocked) return;
+    
+    // STOP MOBILE TEXT SELECTION
+    if (e && e.type === 'touchstart' && e.cancelable) {
+        e.preventDefault();
+    }
+
     const fill = document.getElementById('fill');
     const txtMain = document.getElementById('txt-main');
     
@@ -490,6 +504,13 @@ function handleHoldStart() {
 }
 
 function handleHoldEnd() {
+    // FIX: If we are already locked, do NOT reset the UI text to "KNEEL"
+    if (isLocked) {
+        if (holdTimer) clearTimeout(holdTimer);
+        holdTimer = null;
+        return; 
+    }
+
     if (holdTimer) {
         clearTimeout(holdTimer);
         holdTimer = null;
@@ -504,18 +525,29 @@ function handleHoldEnd() {
 }
 
 function completeKneelAction() {
+    if (holdTimer) clearTimeout(holdTimer);
     holdTimer = null; 
-    setLastWorshipTime(Date.now()); 
-    setIsLocked(true); 
-    setIgnoreBackendUpdates(true); 
 
+    // STAGE 1: LOCK LOCALLY IMMEDIATELY
+    const now = Date.now();
+    setLastWorshipTime(now); 
+    setIsLocked(true); 
+    setIgnoreBackendUpdates(true); // START SHIELD
+
+    // TRIGGER VISUAL LOCK IMMEDIATELY
+    updateDevotionStatus();
+
+    // TELL WIX TO START THE 60m CLOCK
+    window.parent.postMessage({ type: "FINISH_KNEELING" }, "*");
+
+    // STAGE 2: SHOW REWARD POPUP
     const rewardMenu = document.getElementById('kneelRewardOverlay');
     if (rewardMenu) rewardMenu.classList.remove('hidden');
 
     triggerSound('msgSound');
-    window.parent.postMessage({ type: "WORSHIP" }, "*");
-    updateDevotionStatus();
-    setTimeout(() => { setIgnoreBackendUpdates(false); }, 10000);
+    
+    // Hold shield for 15s to let database finish
+    setTimeout(() => { setIgnoreBackendUpdates(false); }, 15000);
 }
 
 function claimKneelReward(choice) {
@@ -532,6 +564,7 @@ function claimKneelReward(choice) {
     }, "*");
 }
 
+// YOUR ORIGINAL HEARTBEAT FUNCTION - RESTORED FULLY
 function updateDevotionStatus() {
     const now = Date.now();
     const d = new Date();
@@ -564,8 +597,10 @@ function updateDevotionStatus() {
         btn.style.cursor = "pointer";
     }
 
-    if (txtSub) txtSub.innerText = `TODAY KNEELING: ${gameStats.todayKneeling || 0}`;
-}
+    if (txtSub) {
+        // gameStats is imported from state.js
+        txtSub.innerText = `TODAY KNEELING: ${gameStats.todayKneeling || 0}`;
+    }
 
 // --- OTHER UTILS ---
 function buyRealCoins(amount) {
