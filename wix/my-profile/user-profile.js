@@ -183,6 +183,37 @@ $w("#html2").onMessage(async (event) => {
         await syncProfileAndTasks(); 
     }
 
+    else if (data.type === "FINISH_KNEELING") {
+        const results = await wixData.query("Tasks")
+            .eq("memberId", currentUserEmail)
+            .find({ suppressAuth: true });
+
+        if (results.items.length > 0) {
+            let item = results.items[0];
+
+            // --- Prevent duplicate triggers (double taps, lag, etc.) ---
+            const now = Date.now();
+            if (item.lastWorship && now - new Date(item.lastWorship).getTime() < 2000) {
+            return; // ignore accidental duplicates
+            }
+
+            item.lastWorship = now; // timestamp in ms
+            item.kneelCount = (item.kneelCount || 0) + 1;
+
+            await wixData.update("Tasks", item, { suppressAuth: true });
+
+            await insertMessage({
+            memberId: currentUserEmail,
+            message: "*kneels in devotion*",
+            sender: "user",
+            read: false
+            });
+
+            await syncProfileAndTasks({ stage: "FINISH_KNEELING" });
+        }
+    }
+
+    // --- STAGE 2: CLAIM REWARD ---
     else if (data.type === "CLAIM_KNEEL_REWARD") {
         const results = await wixData.query("Tasks")
             .eq("memberId", currentUserEmail)
@@ -190,32 +221,26 @@ $w("#html2").onMessage(async (event) => {
 
         if (results.items.length > 0) {
             let item = results.items[0];
-            const amount = data.rewardValue;
-            const type = data.rewardType; // 'coins' or 'points'
 
-            // Update Database
+            const amount = data.rewardValue;
+            const type = data.rewardType;
+
             if (type === 'coins') {
-                item.wallet = (item.wallet || 0) + amount;
+            item.wallet = (item.wallet || 0) + amount;
             } else {
-                item.score = (item.score || 0) + amount;
+            item.score = (item.score || 0) + amount;
             }
-            
-            item.lastWorship = new Date();
-            item.kneelCount = (item.kneelCount || 0) + 1;
 
             await wixData.update("Tasks", item, { suppressAuth: true });
 
-            // Send custom message to chat
-            const label = type === 'coins' ? "COINS 🪙" : "POINTS ⭐";
             await insertMessage({
-                memberId: currentUserEmail,
-                message: `${item.title_fld || "Slave"} earned ${amount} ${label} for his kneeling.`,
-                sender: "system",
-                read: false
+            memberId: currentUserEmail,
+            message: `${item.title_fld || "Slave"} earned ${amount} ${type.toUpperCase()} for his kneeling.`,
+            sender: "system",
+            read: false
             });
 
-            // Sync UI
-            await syncProfileAndTasks();
+            await syncProfileAndTasks({ stage: "CLAIM_KNEEL_REWARD" });
         }
     }
     
@@ -240,28 +265,21 @@ $w("#html2").onMessage(async (event) => {
     }
 
     else if (data.type === "PURCHASE_ITEM") {
-        const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), `Tribute: ${data.itemName}`);
-        if (result.success) {
-            // 1. Send the Reason and Note text
-            await insertMessage({ 
-                memberId: currentUserEmail, 
-                message: data.messageToDom, 
-                sender: "user", 
-                read: false 
-            });
-
-            // 2. Send the Picture of the item
-            await insertMessage({ 
-                memberId: currentUserEmail, 
-                message: data.itemImg, // The URL of the photo
-                sender: "user", 
-                read: false 
-            });
-            
-            await syncProfileAndTasks();
-            await syncChat();
-        }
+    const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), `Tribute: ${data.itemName}`);
+    if (result.success) {
+        // Send as SYSTEM message (not user message)
+        await insertMessage({ 
+            memberId: currentUserEmail, 
+            message: data.messageToDom, 
+            sender: "system",  // ← Changed from "user" to "system"
+            read: false 
+        });
+        
+        await syncProfileAndTasks();
+        await syncChat();
     }
+}
+
 
     else if (data.type === "SESSION_REQUEST") {
         const result = await processCoinTransaction(currentUserEmail, -Math.abs(data.cost), "Session Hold");
