@@ -29,7 +29,7 @@ export let userProfile = {
 
 // --- 2. APP STATE VARIABLES ---
 export let isLocked = false;
-export const COOLDOWN_MINUTES = 60;
+export const COOLDOWN_MINUTES = 1;
 export let currentTask = null;
 export let taskDatabase = [];
 export let galleryData = [];
