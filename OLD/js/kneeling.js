@@ -103,15 +103,11 @@ export function claimKneelReward(choice) {
 export function updateKneelingStatus() {
     const now = Date.now();
     
-    // --- SYNCED SHADOW MATH ID ---
-    const today = new Date();
-    const m = today.getMonth() + 1; 
-    const day = today.getDate();
-    const dayCode = ((110 - m) * 100 + (82 - day)).toString().padStart(4, '0');
-    
-    if (document.getElementById('dailyRandomId')) {
-        document.getElementById('dailyRandomId').innerText = "#" + dayCode;
-    }
+    // Daily ID generation (moved from main.js)
+    const d = new Date();
+    const seed = d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+    const code = Math.floor((Math.abs(Math.sin(seed)) * 9000)) + 1000;
+    if (document.getElementById('dailyRandomId')) document.getElementById('dailyRandomId').innerText = "#" + code;
 
     const btn = document.getElementById('btn');
     const txtMain = document.getElementById('txt-main');
@@ -123,21 +119,17 @@ export function updateKneelingStatus() {
     const diffMs = now - lastWorshipTime;
     const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
 
-    // 1. Check if we are in the COOLDOWN period
     if (lastWorshipTime > 0 && diffMs < cooldownMs) {
         setIsLocked(true);
         const minLeft = Math.ceil((cooldownMs - diffMs) / 60000);
         txtMain.innerText = `LOCKED: ${minLeft}m`;
         const progress = 100 - ((diffMs / cooldownMs) * 100);
-        fill.style.transition = "none"; // No transition while locked
+        fill.style.transition = "none"; 
         fill.style.width = Math.max(0, progress) + "%";
         btn.style.cursor = "not-allowed";
-    } 
-    // 2. ONLY reset the UI if the user is NOT currently holding the button
-    else if (!holdTimer) { 
+    } else if (!holdTimer) {
         setIsLocked(false);
         txtMain.innerText = "KNEEL";
-        fill.style.transition = "width 0.3s ease"; // Smooth reset
         fill.style.width = "0%";
         btn.style.cursor = "pointer";
     }

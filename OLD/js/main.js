@@ -22,7 +22,6 @@ import { renderChat, sendChatMessage, handleChatKey, sendCoins, loadMoreChat, op
 import { renderGallery, loadMoreHistory, initModalSwipeDetection, closeModal, toggleHistoryView, openHistoryModal, openModal } from './gallery.js';
 import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './uploads.js';
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from './kneeling.js';
-import { Bridge } from './bridge.js';
 
 // --- 2. INITIALIZATION ---
 document.addEventListener('click', () => {
@@ -52,18 +51,7 @@ resizer.observe(document.body);
 function initDomProfile() {
     const frame = document.getElementById('twitchFrame');
     if(frame && !frame.src) {
-        // ADD YOUR VERCEL LINK TO THIS LIST:
-        const parents = [
-            "qkarin.com", 
-            "www.qkarin.com", 
-            "entire-ecosystem.vercel.app", 
-            "html-components.wixusercontent.com", 
-            "filesusr.com", 
-            "editor.wix.com", 
-            "manage.wix.com", 
-            "localhost"
-        ];
-        
+        const parents = ["qkarin.com", "www.qkarin.com", "html-components.wixusercontent.com", "filesusr.com", "editor.wix.com", "manage.wix.com", "localhost"];
         let parentString = "";
         parents.forEach(p => parentString += `&parent=${p}`);
         frame.src = `https://player.twitch.tv/?channel=${CONFIG.TWITCH_CHANNEL}${parentString}&muted=true&autoplay=true`;
@@ -71,13 +59,8 @@ function initDomProfile() {
 }
 initDomProfile();
 
-// Listen to the Ecosystem Bridge (The Radio)
-// This forwards Dashboard commands directly into the Profile logic
-Bridge.listen((data) => {
-    console.log("Bridge Message Received:", data.type);
-    window.postMessage(data, "*"); 
-});
 
+// --- 3. THE MESSAGE LISTENER (CORE BRIDGE) ---
 // --- 3. THE MESSAGE LISTENER (CORE BRIDGE) ---
 window.addEventListener("message", (event) => {
     const data = event.data;
