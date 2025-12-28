@@ -207,11 +207,14 @@ export function confirmReward() {
 
 // --- 3. DIRECTIVE WORKSHOP (MIRROR DESIGN) ---
 
-export function openTaskGallery() {
+export function openTaskGallery(mode = "queue") {
+    setArmoryTarget(mode); // Sets to 'queue' or 'active' based on what clicked it
     const u = users.find(x => x.memberId === currId);
     if (!u) return;
+
     const titleEl = document.getElementById('armoryTitle');
     if (titleEl) titleEl.innerText = `${u.name.toUpperCase()} TASKS`;
+
     renderWorkshopLiveQueue(u);
     renderWorkshopLibrary(availableDailyTasks);
     document.getElementById('taskGalleryModal').classList.add('active');
@@ -274,10 +277,28 @@ export function toggleTaskExpansion(btn, taskText) {
 // --- 4. ENFORCE & PICKER LOGIC ---
 
 export function enforceDirectiveFromArmory(text) {
+    // 1. IF TARGETING ACTIVE SLOT (The SEND/SKIP Flow)
+    if (armoryTarget === "active") {
+        const u = users.find(x => x.memberId === currId);
+        if (!u) return;
+
+        window.parent.postMessage({ 
+            type: "forceActiveTask", 
+            memberId: u.memberId, 
+            taskText: text 
+        }, "*");
+
+        closeTaskGallery();
+        return; 
+    }
+
+    // 2. IF TARGETING QUEUE (The normal flow)
     pendingDirectiveText = text;
     const grid = document.getElementById('slotGrid');
     if (!grid) return;
-    grid.innerHTML = Array.from({length: 10}, (_, i) => i + 1).map(num => `<div class="slot-btn" onclick="executeManualEnforce(${num})">${num}</div>`).join('');
+    grid.innerHTML = Array.from({length: 10}, (_, i) => i + 1).map(num => 
+        `<div class="slot-btn" onclick="executeManualEnforce(${num})">${num}</div>`
+    ).join('');
     document.getElementById('slotPickerModal').classList.add('active');
 }
 
