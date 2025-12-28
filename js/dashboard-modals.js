@@ -279,15 +279,16 @@ export function toggleTaskExpansion(btn, taskText) {
 // --- 4. ENFORCE & PICKER LOGIC ---
 
 export function enforceDirectiveFromArmory(text) {
-    // --- IF MODE IS ACTIVE: DIRECT INJECTION ---
-    if (armoryTargetMode === "active") {
+    // --- IF MODE IS ACTIVE: DIRECT INJECTION (SEND/SKIP FLOW) ---
+    // Fixed: Using armoryTarget to match your state file
+    if (armoryTarget === "active") {
         const u = users.find(x => x.memberId === currId);
         if (!u) return;
 
-        // Tell Wix: "Clear everything and make THIS the task right now"
-        // We set the endTime to 24 hours from THIS second
+        // Calculate 24 hours from THIS exact millisecond
         const newEndTime = Date.now() + (24 * 60 * 60 * 1000);
 
+        // Tell Wix: "Master Override. Ignore the slave, set this as active now."
         window.parent.postMessage({ 
             type: "forceActiveTask", 
             memberId: u.memberId, 
@@ -295,19 +296,19 @@ export function enforceDirectiveFromArmory(text) {
             endTime: newEndTime
         }, "*");
 
-        // Instant visual update for your dashboard
+        // Instant visual update so you see it work immediately
         u.activeTask = { text: text };
         u.endTime = newEndTime;
         
         import('./dashboard-users.js').then(m => m.updateDetail(u));
         closeTaskGallery();
         
-        // Reset mode back to default
-        setArmoryTargetMode("queue");
+        // Reset mode back to queue for next time
+        setArmoryTarget("queue");
         return; 
     }
 
-    // --- IF MODE IS QUEUE: SHOW SLOT PICKER (Original Logic) ---
+    // --- IF MODE IS QUEUE: SHOW SLOT PICKER (NORMAL FLOW) ---
     pendingDirectiveText = text;
     const grid = document.getElementById('slotGrid');
     if (!grid) return;
@@ -318,6 +319,7 @@ export function enforceDirectiveFromArmory(text) {
 
     document.getElementById('slotPickerModal').classList.add('active');
 }
+
 export function executeManualEnforce(slot) {
     const u = users.find(x => x.memberId === currId);
     if (!u) return;
