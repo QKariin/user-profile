@@ -150,7 +150,12 @@
                 <!-- Chat Card (CLEAN VERSION) -->
                 <div id="chatCard" class="glass-card" style="display: flex; flex-direction: column; height: 600px; padding: 0; overflow: hidden; position: relative;">
                     <div id="chatBadge">CHAT</div>
-                
+                    <div id="revealSection" style="display: none;">
+                      <div id="revealLevelLabel">Kneeling Reward</div>
+                      <div id="revealGridContainer"></div>
+                      <!-- Added a close button for the slave to get back to chat -->
+                      <button onclick="toggleRewardGrid()" style="margin-top:20px; background:none; border:1px solid #444; color:#666; font-size:0.6rem; padding:5px 15px; border-radius:15px; cursor:pointer;">CLOSE VIEW</button>
+                  </div>
                     <!-- Header -->
                     <!-- CHAT HEADER: ADDED THE TOGGLE ICON -->
                 <div class="chat-header-row" style="position: relative; z-index: 1001; background: rgba(15,15,15,0.9); backdrop-filter: blur(10px); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
@@ -177,13 +182,7 @@
                     <!-- Chat Body -->
                     <div id="chatBody" style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
                         
-                        <!-- BLESSING REWARD OVERLAY (Existing) -->
-                        <!-- THE REVEAL TARGET (3x3 Grid) -->
-                        <!-- Updated revealSection: Starts HIDDEN -->
-                    <div id="revealSection" style="display: none; padding: 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #222;">
-                        <div id="revealLevelLabel" style="font-family:'Orbitron'; font-size:0.6rem; color:#444; text-align:center; letter-spacing:3px; margin-bottom:5px;">LEVEL 1 CONTENT</div>
-                        <div id="revealGridContainer"></div>
-                    </div>
+                        <!-- BLESSING REWARD OVERLAY (Existing) -->                      
                         <div id="kneelRewardOverlay" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center;">
                             <div style="text-align: center; width: 100%; padding: 20px;">
                                 <h2 style="font-family:'Orbitron'; font-weight: 900; color: white; font-size: 1.1rem; letter-spacing: 5px; margin-bottom: 30px;">RECOGNITION GRANTED</h2>
