@@ -50,12 +50,35 @@ export function renderRewardGrid() {
     if (label) label.innerText = `LEVEL ${libraryProgressIndex} CONTENT`;
 }
 
+export function toggleRewardGrid() {
+    const section = document.getElementById('revealSection');
+    const btn = document.getElementById('toggleGridBtn');
+    if (!section || !btn) return;
+
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        btn.style.opacity = '1';
+        btn.style.filter = 'drop-shadow(0 0 5px var(--neon-blue))';
+    } else {
+        section.style.display = 'none';
+        btn.style.opacity = '0.6';
+        btn.style.filter = 'none';
+    }
+}
+
+// Global binding
+window.toggleRewardGrid = toggleRewardGrid;
+
 // --- 2. THE REVEAL FRAGMENT BUTTON (The 3rd Option) ---
 export function handleRevealFragment() {
-    // Sends the instruction to your Wix Velo to pick a random square
+    // 1. Force the grid to open so they see the result
+    const section = document.getElementById('revealSection');
+    if (section) section.style.display = 'block';
+    
+    // 2. Tell Wix to pick a square
     window.parent.postMessage({ type: "REVEAL_FRAGMENT" }, "*");
     
-    // Closes the window (separately as you wanted)
+    // 3. Close the choice menu
     const rewardMenu = document.getElementById('kneelRewardOverlay');
     if (rewardMenu) rewardMenu.classList.add('hidden');
     
