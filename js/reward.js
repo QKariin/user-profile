@@ -3,27 +3,49 @@ import { activeRevealMap, currentLibraryMedia, libraryProgressIndex } from './st
 import { getOptimizedUrl, triggerSound } from './utils.js';
 
 // --- 1. THE GRID RENDERER (Draws the 3x3 frosted glass) ---
+// js/reward.js - THE REVEAL ENGINE (REACTIVE VERSION)
+
 export function renderRewardGrid() {
     const gridContainer = document.getElementById('revealGridContainer');
-    if (!gridContainer || !currentLibraryMedia) return;
+    // Important: Use the imported state, not local copies
+    const { activeRevealMap, currentLibraryMedia, libraryProgressIndex } = 
+        require('./state.js'); 
 
+    if (!gridContainer || !currentLibraryMedia) {
+        // If no media, hide the section so it doesn't look empty
+        const section = document.getElementById('revealSection');
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    // 1. SHOW THE SECTION
+    const section = document.getElementById('revealSection');
+    if (section) section.style.display = 'block';
+
+    // 2. DETECT MEDIA
     const isVideo = currentLibraryMedia.match(/\.(mp4|mov|webm)/i);
     const mediaHtml = isVideo 
         ? `<video src="${currentLibraryMedia}" autoplay loop muted playsinline class="reveal-bg-media"></video>`
         : `<img src="${getOptimizedUrl(currentLibraryMedia, 800)}" class="reveal-bg-media">`;
 
+    // 3. BUILD THE GRID
     let gridHtml = '<div class="reveal-grid-overlay">';
     for (let i = 1; i <= 9; i++) {
+        // MATCHING: We use the 1-9 numbering from your Wix Velo math
         const isUnblurred = activeRevealMap.includes(i);
+        
         gridHtml += `
             <div class="reveal-square ${isUnblurred ? 'clear' : 'frosted'}" id="sq-${i}">
                 ${!isUnblurred ? `<span class="sq-num">${i}</span>` : ''}
+                <!-- This inner div handles the 'shatter' glow effect -->
+                <div class="shatter-effect"></div>
             </div>`;
     }
     gridHtml += '</div>';
 
     gridContainer.innerHTML = mediaHtml + gridHtml;
     
+    // Update the label
     const label = document.getElementById('revealLevelLabel');
     if (label) label.innerText = `LEVEL ${libraryProgressIndex} CONTENT`;
 }
