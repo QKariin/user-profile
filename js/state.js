@@ -5,8 +5,8 @@ export let gameStats = {
     currentStreak: 0, 
     points: 0, 
     coins: 0,
-    kneelCount: 0,
-    todayKneeling: 0
+    kneelCount: 0,      // Added for the Kneel button
+    todayKneeling: 0    // Added for the Kneel button
 };
 
 export let stats = { 
@@ -27,11 +27,11 @@ export let userProfile = {
     joined: null 
 };
 
-// --- REWARD SYSTEM DATA ---
-export let activeRevealMap = [];     
-export let vaultItems = [];          
-export let currentLibraryMedia = ""; 
-export let libraryProgressIndex = 1; 
+// --- NEW: REWARD SYSTEM DATA ---
+export let activeRevealMap = [];
+export let vaultItems = [];
+export let currentLibraryMedia = "";
+export let libraryProgressIndex = 1;
 
 // --- 2. APP STATE VARIABLES ---
 export let isLocked = false;
@@ -60,18 +60,21 @@ export let lastWorshipTime = 0;
 export let currentHistoryIndex = 0;
 export let touchStartX = 0;
 
-// --- 3. SETTERS (MERGED & FIXED) ---
+// --- 3. SETTERS (The "Phone Lines" for other files) ---
 
+// This matches the "setGameStats" import in your main.js
 export function setGameStats(newStats) {
-    Object.assign(gameStats, newStats); // Reconnects the UI
+    gameStats = { ...gameStats, ...newStats };
 }
 
+// This matches the "setStats" importY
 export function setStats(newStats) {
-    Object.assign(stats, newStats);
+    stats = { ...stats, ...newStats };
 }
 
+// This matches the "setUserProfile" import
 export function setUserProfile(newProfile) {
-    Object.assign(userProfile, newProfile);
+    userProfile = { ...userProfile, ...newProfile };
 }
 
 export function setCurrentTask(task) { currentTask = task; }
@@ -80,6 +83,8 @@ export function setTaskDatabase(tasks) { taskDatabase = tasks; }
 export function setGalleryData(data) { galleryData = data; }
 export function setWishlistItems(items) { WISHLIST_ITEMS = items; }
 export function setCmsHierarchyData(data) { cmsHierarchyData = data; }
+
+// CRITICAL: These were missing and caused your crash!
 export function setCooldownInterval(val) { cooldownInterval = val; }
 export function setTaskJustFinished(val) { taskJustFinished = val; }
 export function setIgnoreBackendUpdates(val) { ignoreBackendUpdates = val; }
@@ -97,6 +102,8 @@ export function setLastWorshipTime(val) { lastWorshipTime = val; }
 export function setIsLocked(val) { isLocked = val; }
 export function setCurrentHistoryIndex(val) { currentHistoryIndex = val; }
 export function setTouchStartX(val) { touchStartX = val; }
+
+// --- NEW: REWARD SETTERS ---
 export function setActiveRevealMap(val) { activeRevealMap = val || []; }
 export function setVaultItems(val) { vaultItems = val || []; }
 export function setCurrentLibraryMedia(val) { currentLibraryMedia = val || ""; }
