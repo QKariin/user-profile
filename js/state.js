@@ -60,16 +60,14 @@ export let lastWorshipTime = 0;
 export let currentHistoryIndex = 0;
 export let touchStartX = 0;
 
-// --- 3. SETTERS (The "Phone Lines" for other files) ---
-
 // This matches the "setGameStats" import in your main.js
 export function setGameStats(newStats) {
     Object.assign(gameStats, newStats);
 }
 
-// This matches the "setStats" importY
-export function setUserProfile(newProfile) {
-    userProfile = { ...userProfile, ...newProfile };
+// This matches the "setStats" import
+export function setStats(newStats) {
+    Object.assign(stats, newStats);
 }
 
 // This matches the "setUserProfile" import
