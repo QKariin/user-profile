@@ -152,31 +152,38 @@
                     <div id="chatBadge">CHAT</div>
                 
                     <!-- Header -->
-                    <div class="chat-header-row" style="position: relative; z-index: 1001; background: rgba(15,15,15,0.9); backdrop-filter: blur(10px); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="chat-avatar-container" style="position: relative; width: 50px; height: 50px;">
-                                <div id="chatStatusRing" class="dom-status-ring ring-inactive"></div>
-                                <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" style="width: 100%; border-radius: 50%;">
-                            </div>
-                            <div class="chat-header-info">
-                                <div class="chat-header-title">QUEEN KARIN</div>
-                                <div id="chatStatusBadge" class="chat-status-text">LAST SEEN: TODAY</div>
-                            </div>
+                    <!-- CHAT HEADER: ADDED THE TOGGLE ICON -->
+                <div class="chat-header-row" style="position: relative; z-index: 1001; background: rgba(15,15,15,0.9); backdrop-filter: blur(10px); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="chat-avatar-container" style="position: relative; width: 50px; height: 50px;">
+                            <div id="chatStatusRing" class="dom-status-ring ring-inactive"></div>
+                            <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" style="width: 100%; border-radius: 50%;">
                         </div>
-                        <button id="chatSessionBtn" onclick="openSessionUI()">📅 REQUEST SESSION</button>
+                        <div class="chat-header-info">
+                            <div class="chat-header-title">QUEEN KARIN</div>
+                            <div id="chatStatusBadge" class="chat-status-text">LAST SEEN: TODAY</div>
+                        </div>
                     </div>
+                    
+                    <!-- NEW: TOGGLE ICON FOR REWARD GRID -->
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div id="toggleGridBtn" onclick="toggleRewardGrid()" style="cursor:pointer; opacity: 0.6; transition: 0.3s;" title="Toggle Reward View">
+                            <svg style="width:20px; height:20px; fill:var(--neon-blue);"><use href="#icon-sparkles"></use></svg>
+                        </div>
+                        <button id="chatSessionBtn" onclick="openSessionUI()">📅</button>
+                    </div>
+                </div>
                 
                     <!-- Chat Body -->
                     <div id="chatBody" style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
                         
                         <!-- BLESSING REWARD OVERLAY (Existing) -->
                         <!-- THE REVEAL TARGET (3x3 Grid) -->
-                        <div id="revealSection" style="margin-bottom: 20px;">
-                            <div id="revealLevelLabel" style="font-family:'Orbitron'; font-size:0.6rem; color:#444; text-align:center; letter-spacing:3px; margin-bottom:5px;">LEVEL 1 CONTENT</div>
-                            <div id="revealGridContainer">
-                                <!-- Injected via js/reward.js -->
-                            </div>
-                        </div>
+                        <!-- Updated revealSection: Starts HIDDEN -->
+                    <div id="revealSection" style="display: none; padding: 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #222;">
+                        <div id="revealLevelLabel" style="font-family:'Orbitron'; font-size:0.6rem; color:#444; text-align:center; letter-spacing:3px; margin-bottom:5px;">LEVEL 1 CONTENT</div>
+                        <div id="revealGridContainer"></div>
+                    </div>
                         <div id="kneelRewardOverlay" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center;">
                             <div style="text-align: center; width: 100%; padding: 20px;">
                                 <h2 style="font-family:'Orbitron'; font-weight: 900; color: white; font-size: 1.1rem; letter-spacing: 5px; margin-bottom: 30px;">RECOGNITION GRANTED</h2>
