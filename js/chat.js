@@ -196,6 +196,7 @@ export function openChatPreview(url, isVideo) {
 
     if (!overlay || !content) return;
     content.innerHTML = isVideo ? `<video src="${decoded}" controls autoplay class="cmo-media"></video>` : `<img src="${decoded}" class="cmo-media">`;
+    overlay.classList.remove('hidden');
     overlay.style.display = 'flex';
 }
 
