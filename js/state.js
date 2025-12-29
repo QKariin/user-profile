@@ -27,6 +27,12 @@ export let userProfile = {
     joined: null 
 };
 
+// --- REWARD SYSTEM DATA ---
+export let activeRevealMap = [];     // Stores the 1-9 numbers for the current unblurred squares
+export let vaultItems = [];          // Stores the list of completed reward URLs
+export let currentLibraryMedia = ""; // The URL of the image/video currently being unblurred
+export let libraryProgressIndex = 1; // Tracks if they are on Day 1, Day 2, etc.
+
 // --- 2. APP STATE VARIABLES ---
 export let isLocked = false;
 export const COOLDOWN_MINUTES = 60;
@@ -96,3 +102,8 @@ export function setLastWorshipTime(val) { lastWorshipTime = val; }
 export function setIsLocked(val) { isLocked = val; }
 export function setCurrentHistoryIndex(val) { currentHistoryIndex = val; }
 export function setTouchStartX(val) { touchStartX = val; }
+
+export function setActiveRevealMap(val) { activeRevealMap = val || []; }
+export function setVaultItems(val) { vaultItems = val || []; }
+export function setCurrentLibraryMedia(val) { currentLibraryMedia = val || ""; }
+export function setLibraryProgressIndex(val) { libraryProgressIndex = val || 1; }
