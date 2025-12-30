@@ -1,45 +1,45 @@
-/* --- CHAT-INTEGRATED REVEAL SYSTEM --- */
+/* --- TACTICAL REVEAL SYSTEM: MASTER CSS --- */
 
-/* 1. THE FULL OVERLAY (Covers entire Chat Card) */
+/* 1. THE FULL OVERLAY (Covers entire Chat Card: Header to Footer) */
 #revealSection {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: rgba(0, 0, 0, 0.95) !important;
+    background: rgba(0, 0, 0, 0.9) !important;
     backdrop-filter: blur(25px) !important;
     -webkit-backdrop-filter: blur(25px) !important;
     z-index: 2000 !important;
     display: none; 
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* PERFECTLY CENTERED */
-    padding: 5px !important; /* CRUSH DEAD SPACE */
+    justify-content: center;
+    padding: 10px !important;
 }
 
-/* 2. THE HEADER LABEL (Serif / Tight) */
+/* 2. THE HEADER LABEL (High-Class Serif) */
 #revealLevelLabel {
     font-family: 'Georgia', serif !important;
     font-style: italic;
-    font-size: 0.9rem !important;
+    font-weight: bold;
+    font-size: 1.1rem !important;
     color: var(--neon-pink) !important;
     text-shadow: 0 0 10px rgba(255, 0, 222, 0.3);
-    margin-bottom: 5px !important;
-    letter-spacing: 2px;
+    margin-bottom: 10px !important;
+    letter-spacing: 3px;
     text-transform: uppercase;
     text-align: center;
-    opacity: 0.8;
 }
 
-/* 3. THE MASTER CONTAINER (Max Size) */
+/* 3. THE MASTER GRID CONTAINER (Hero Sizing) */
 #revealGridContainer {
     position: relative !important;
-    width: 98% !important;
-    max-width: 480px !important;
+    width: 95% !important; /* Spans almost full width */
+    max-width: 420px !important;
     aspect-ratio: 1 / 1 !important;
     margin: 0 auto !important;
-    border: 1px solid #1a1a1a;
-    border-radius: 4px;
+    border: 1px solid #222;
+    border-radius: 8px;
     overflow: hidden;
     background: #000;
     box-shadow: 0 10px 50px rgba(0,0,0,1);
@@ -65,51 +65,47 @@
     z-index: 2;
 }
 
-/* 6. THE FROSTED GLASS SQUARES */
+/* 6. THE FROSTED GLASS SQUARES (High-Class Texture) */
 .reveal-square {
     position: relative;
-    border: 0.2px solid rgba(255, 255, 255, 0.03);
+    box-sizing: border-box;
+    /* Elegant thin dividers between glass fragments */
+    border: 0.5px solid rgba(255, 255, 255, 0.08) !important;
     overflow: hidden;
 }
 
 .reveal-square.frosted {
-    background: rgba(5, 5, 5, 0.8) !important;
-    backdrop-filter: blur(80px) !important;
-    -webkit-backdrop-filter: blur(80px) !important;
+    /* Bright frost tint so it looks like real glass */
+    background: rgba(255, 255, 255, 0.03) !important; 
+    backdrop-filter: blur(60px) !important;
+    -webkit-backdrop-filter: blur(60px) !important;
 }
 
-.reveal-square.frosted::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 2px;
-    background: rgba(0, 243, 255, 0.1);
-    animation: scanline 3s linear infinite;
-}
-
-/* 7. THE SHATTER REVEAL ANIMATION */
-@keyframes squareShatter {
-    0% { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(80px); transform: scale(1); }
-    30% { background: rgba(0, 243, 255, 0.4); box-shadow: 0 0 30px var(--blue); }
-    100% { background: transparent; backdrop-filter: blur(0px); transform: scale(1); }
-}
-
+/* 7. THE REVEAL (Melt Effect - No Blinking) */
 .reveal-square.clear {
-    animation: squareShatter 1s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+    background: transparent !important;
+    backdrop-filter: blur(0px) !important;
+    -webkit-backdrop-filter: blur(0px) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.05) !important;
+    transition: backdrop-filter 1.2s ease, background 1.2s ease !important;
 }
 
-/* 8. THE NUMBERS (Technical Style) */
+/* 8. THE NUMBERS (Subtle Technical Style) */
 .sq-num {
     font-family: 'Share Tech Mono', monospace !important;
-    font-size: 0.8rem !important;
-    color: rgba(0, 243, 255, 0.2) !important;
-    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
-    z-index: 5;
+    font-size: 0.7rem !important;
+    color: rgba(255, 255, 255, 0.1) !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
 }
 
 /* 9. IPHONE STYLE SLIDERS */
-.reward-slider-container { display: flex; flex-direction: column; gap: 15px; width: 100%; padding: 10px; }
-.iphone-slider { position: relative; width: 100%; height: 55px; background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 30px; overflow: hidden; }
-.slider-track-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Georgia', serif; font-size: 0.8rem; color: #666; pointer-events: none; z-index: 2; }
+.reward-slider-container { display: flex; flex-direction: column; gap: 15px; width: 100%; padding: 10px; max-width: 400px; }
+.iphone-slider { position: relative; width: 100%; height: 55px; background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 30px; overflow: hidden; cursor: pointer; }
+.slider-track-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Georgia', serif; font-size: 0.8rem; color: #555; pointer-events: none; z-index: 2; }
 .slider-knob { position: absolute; left: 4px; top: 4px; bottom: 4px; aspect-ratio: 1 / 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3; }
 .slider-pink .slider-knob { background: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink); }
 .slider-gold .slider-knob { background: var(--neon-yellow); box-shadow: 0 0 15px var(--neon-yellow); }
@@ -117,49 +113,15 @@
 .slider-pink .slider-fill { background: rgba(255, 0, 222, 0.15); }
 .slider-gold .slider-fill { background: rgba(255, 215, 0, 0.15); }
 
-@keyframes scanline { 0% { top: 0%; } 100% { top: 100%; } }
-
-/* --- STEP 3: MOBILE PRECISION --- */
-
+/* --- 10. MOBILE PRECISION --- */
 @media (max-width: 768px) {
-    #revealGridContainer {
-        width: 95% !important;
-        max-width: 320px !important; /* Shrunk for phone screens */
-        margin: 10px auto !important;
-    }
-
-    #revealLevelLabel {
-        font-size: 0.8rem !important; /* Smaller text for mobile */
-        margin-top: 20px;
-    }
-
-    #revealSection {
-        padding: 10px !important;
-    }
+    #revealGridContainer { width: 95% !important; max-width: 340px !important; margin: 10px auto !important; }
+    #revealLevelLabel { font-size: 0.9rem !important; margin-top: 15px; }
+    #revealSection { padding: 10px !important; }
+    .dr-close-glass { margin-top: 15px; font-size: 0.55rem; padding: 5px 12px; }
 }
 
-/* Pulse effect for the Sparkle Icon so they know it's active */
-#toggleGridBtn:hover svg {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 8px var(--neon-pink));
-}
-
-/* Style for the "Close" link inside the glass */
 .dr-close-glass {
-    margin-top: 20px;
-    background: transparent;
-    border: 1px solid #333;
-    color: #444;
-    font-family: 'Rajdhani';
-    font-size: 0.6rem;
-    padding: 5px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    letter-spacing: 2px;
-    transition: 0.3s;
+    margin-top: 20px; background: transparent; border: 1px solid #333; color: #444; font-family: 'Rajdhani'; font-size: 0.6rem; padding: 5px 15px; border-radius: 20px; cursor: pointer; letter-spacing: 2px; transition: 0.3s;
 }
-
-.dr-close-glass:hover {
-    border-color: #666;
-    color: #888;
-}
+.dr-close-glass:hover { border-color: #666; color: #888; }
