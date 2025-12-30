@@ -154,6 +154,54 @@
     box-shadow: 0 0 20px #00f3ff, inset 0 0 20px #00f3ff !important;
 }
 
+/* --- INTEGRATED COMMAND BLOCK --- */
+.reveal-market-row {
+    display: flex !important;
+    flex-direction: column !important; /* Stacks them in the center */
+    align-items: center !important;
+    gap: 6px;
+    width: 100%;
+    margin-top: 10px;
+    z-index: 2010;
+}
+
+/* Base style for all buttons in the block */
+.reveal-market-row .dr-enforce-btn {
+    background: rgba(0, 0, 0, 0.6) !important;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.55rem !important; /* Micro font */
+    padding: 6px 20px !important;
+    width: 220px !important; /* Locked width for clean alignment */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+
+/* Yellow style for the Buy buttons */
+.market-btn {
+    border: 1px solid var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+}
+
+.market-btn:hover {
+    background: rgba(255, 215, 0, 0.1) !important;
+    box-shadow: 0 0 10px var(--neon-yellow);
+}
+
+/* Grey/White style for the Close button */
+.close-btn {
+    border: 1px solid #444 !important;
+    color: #666 !important;
+    margin-top: 5px;
+}
+
+.close-btn:hover {
+    border-color: #888 !important;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
 /* 2. The Final Lock-In Flash (3 fast pulses) */
 @keyframes lockInPulse {
     0% { background: #00f3ff; }
