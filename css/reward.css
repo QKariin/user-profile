@@ -157,57 +157,48 @@
     box-shadow: 0 0 20px #00f3ff, inset 0 0 20px #00f3ff !important;
 }
 
-/* --- INTEGRATED COMMAND BLOCK --- */
-/* 1. THE ROW: Covers the photo but lets clicks pass through the empty spaces */
+/* 1. THE ROW: Now floats OVER the grid container */
 .reveal-market-row {
     position: absolute !important;
-    inset: 0 !important;
+    top: 55% !important; /* Pushed slightly down from center to show your face/top */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 100% !important;
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
-    /* THIS IS THE KEY: High Z-index and PASS-THROUGH events */
-    z-index: 5050 !important; 
-    pointer-events: none !important; 
+    z-index: 5050 !important; /* Master Layer */
+    pointer-events: none !important;
 }
 
-/* 2. THE MENU BOX: This is the solid box that CATCHES the click */
-/* Target the IDs physically present in your HTML */
+/* 2. THE MENUS: No background, wider size */
 #reward-main-menu, #reward-buy-menu {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
-    width: 220px !important;
-    padding: 20px !important;
-    
-    /* THE VITAL FIX: WAKES UP THE BUTTONS */
-    pointer-events: auto !important; 
-    z-index: 6000 !important;
-
-    /* Styling */
-    background: rgba(0, 0, 0, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 15px !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    gap: 12px !important;
+    width: 280px !important; /* MUCH WIDER */
+    padding: 0 !important;
+    background: transparent !important; /* NO BACKGROUND BOX */
+    border: none !important;
+    pointer-events: auto !important;
 }
 
-
-/* Base style for all buttons in the block */
-.reveal-market-row .dr-enforce-btn {
-    background: rgba(0, 0, 0, 0.6) !important;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.55rem !important; /* Micro font */
-    padding: 6px 20px !important;
-    width: 220px !important; /* Locked width for clean alignment */
-    border-radius: 4px;
-    cursor: pointer;
-    transition: 0.2s;
-    text-align: center;
+/* 3. THE BUTTON STYLE: Professional High-Class */
+#reward-main-menu .dr-enforce-btn, 
+#reward-buy-menu .dr-enforce-btn {
+    background: rgba(0, 0, 0, 0.7) !important; /* Subtle glass button background */
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--neon-blue) !important;
+    color: var(--neon-blue) !important;
+    font-size: 0.8rem !important; /* Better reading size */
+    padding: 12px !important;
+    border-radius: 30px !important; /* iPhone Style Pill */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 
-/* Yellow style for the Buy buttons */
+/* Buy buttons stay Gold */
 .market-btn {
-    border: 1px solid var(--neon-yellow) !important;
+    border-color: var(--neon-yellow) !important;
     color: var(--neon-yellow) !important;
 }
 
