@@ -157,28 +157,32 @@
 /* --- INTEGRATED COMMAND BLOCK --- */
 .reveal-market-row {
     position: absolute !important;
-    top: 50% !important; /* Move to middle vertically */
-    left: 50% !important; /* Move to middle horizontally */
-    transform: translate(-50%, -50%) !important; /* Perfectly center based on its own size */
-    width: 100% !important;
+    inset: 0 !important;
     display: flex !important;
-    justify-content: center !important;
     align-items: center !important;
-    z-index: 1000 !important;
-    pointer-events: none; /* Let the grid show through the gaps */
+    justify-content: center !important;
+    /* This MUST be higher than the 3x3 grid (z-index 2) and Section (z-index 5000) */
+    z-index: 5050 !important; 
+    pointer-events: none !important; /* Let clicks pass through the gaps */
 }
 
 .market-menu-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 220px; /* Locked width for high-class look */
-    background: rgba(0, 0, 0, 0.7); /* Dark glass for readability */
-    padding: 20px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    poin
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 240px !important;
+    padding: 25px !important;
+    
+    /* THE HIGH-CLASS LOOK */
+    background: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 1) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    
+    pointer-events: auto !important; /* ALLOWS CLICKS ON BUTTONS */
+}
 
 
 /* Base style for all buttons in the block */
@@ -231,6 +235,18 @@
     border: 2px solid white !important;
     z-index: 101 !important;
 }
+
+.market-menu-group .dr-enforce-btn {
+    font-size: 0.65rem !important;
+    padding: 10px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    background: transparent !important;
+}
+
+.market-btn { border-color: var(--neon-yellow) !important; color: var(--neon-yellow) !important; }
+.close-btn { border-color: #444 !important; color: #888 !important; }
+.back-btn { border-color: #222 !important; color: #444 !important; font-size: 0.5rem !important; }
 
 /* 3. Smooth Melt for the Winner */
 .reveal-square.clear {
