@@ -89,9 +89,17 @@ export function claimKneelReward(choice) {
     const rewardMenu = document.getElementById('kneelRewardOverlay');
     if (rewardMenu) rewardMenu.classList.add('hidden');
 
+    // Handle fragment reveal differently
+    if (choice === 'fragment') {
+        // Import and call the fragment reveal function
+        import('./reward.js').then(({ handleRevealFragment }) => {
+            handleRevealFragment();
+        });
+        return; // Don't do the coin shower or normal reward flow
+    }
+
+    // Normal coin/points flow
     triggerSound('coinSound');
-    
-    // Coin shower effect
     triggerCoinShower();
 
     window.parent.postMessage({ 
@@ -100,6 +108,7 @@ export function claimKneelReward(choice) {
         rewardValue: choice === 'coins' ? 10 : 50
     }, "*");
 }
+
 
 // --- STATUS UPDATE LOGIC ---
 export function updateKneelingStatus() {
