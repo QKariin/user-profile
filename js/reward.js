@@ -220,6 +220,7 @@ export function initSlider(e, choice) {
 export function runTargetingAnimation(winnerId, finalCallback) {
     // 1. Find only the squares that are still blurry (frosted)
     const availableSquares = Array.from(document.querySelectorAll('.reveal-square.frosted'));
+    const allSquares = Array.from(document.querySelectorAll('.reveal-square')); // FIX: Define allSquares
     
     if (availableSquares.length === 0) {
         return finalCallback(); // No squares left? Just show the photo.
@@ -241,7 +242,7 @@ export function runTargetingAnimation(winnerId, finalCallback) {
         // 2. CHECK IF WE ARE AT THE END
         if (jumps >= maxJumps) {
             clearInterval(interval);
-            allSquares.forEach(sq => sq.classList.remove('is-targeting'));
+            allSquares.forEach(sq => sq.classList.remove('is-targeting')); // FIX: Now allSquares is defined
 
             // 1. FIND THE WINNER
             const actualWinner = document.getElementById(`sq-${winnerId}`);
@@ -300,10 +301,14 @@ window.openVaultMedia = function(url, isVideo) {
 };
 // --- STEP 2: TIERED MENU TOGGLE ---
 export function toggleRewardSubMenu(show) {
+    console.log("TOGGLE SUBMENU CLICKED:", show); // DEBUG LOG
     const mainMenu = document.getElementById('reward-main-menu');
     const buyMenu = document.getElementById('reward-buy-menu');
     
-    if (!mainMenu || !buyMenu) return;
+    if (!mainMenu || !buyMenu) {
+        console.log("MENU ELEMENTS NOT FOUND:", { mainMenu: !!mainMenu, buyMenu: !!buyMenu });
+        return;
+    }
 
     if (show) {
         // HIDE MAIN
