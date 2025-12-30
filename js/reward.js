@@ -39,7 +39,12 @@ export function renderRewardGrid() {
     }
     gridHtml += '</div>';
 
-    gridContainer.innerHTML = mediaHtml + gridHtml;
+    // 1. Manually clear only the old image/grid
+        const oldElements = gridContainer.querySelectorAll('.reveal-bg-media, .reveal-grid-overlay');
+        oldElements.forEach(el => el.remove());
+        
+        // 2. Add the new image/grid WITHOUT deleting the buttons
+        gridContainer.insertAdjacentHTML('afterbegin', mediaHtml + gridHtml);
     
     const label = document.getElementById('revealLevelLabel');
     if (label) label.innerText = `LEVEL ${libraryProgressIndex} CONTENT`;
