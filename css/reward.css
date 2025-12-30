@@ -156,14 +156,30 @@
 
 /* --- INTEGRATED COMMAND BLOCK --- */
 .reveal-market-row {
+    position: absolute !important;
+    top: 50% !important; /* Move to middle vertically */
+    left: 50% !important; /* Move to middle horizontally */
+    transform: translate(-50%, -50%) !important; /* Perfectly center based on its own size */
+    width: 100% !important;
     display: flex !important;
-    flex-direction: column !important; /* Stacks them in the center */
+    justify-content: center !important;
     align-items: center !important;
-    gap: 6px;
-    width: 100%;
-    margin-top: 10px;
-    z-index: 2010;
+    z-index: 1000 !important;
+    pointer-events: none; /* Let the grid show through the gaps */
 }
+
+.market-menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 220px; /* Locked width for high-class look */
+    background: rgba(0, 0, 0, 0.7); /* Dark glass for readability */
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    poin
+
 
 /* Base style for all buttons in the block */
 .reveal-market-row .dr-enforce-btn {
