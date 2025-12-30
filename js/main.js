@@ -266,6 +266,26 @@ window.addEventListener("message", (event) => {
 
     if (data.type === "UPDATE_CHAT" || data.chatHistory) renderChat(data.chatHistory || data.messages);
     setTimeout(styleTributeMessages, 100); 
+
+        // Handle fragment reveal animation response from Velo
+    if (data.type === "FRAGMENT_REVEALED") {
+        const { fragmentNumber, day, totalRevealed, isComplete } = data;
+        
+        // Import and run the targeting animation
+        import('./reward.js').then(({ runTargetingAnimation, renderRewardGrid }) => {
+            runTargetingAnimation(fragmentNumber, () => {
+                // After animation completes, update the grid
+                renderRewardGrid();
+                
+                // Show completion message if all 9 squares are done
+                if (isComplete) {
+                    triggerSound('coinSound');
+                    console.log(`Level ${day} completed! Added to vault.`);
+                }
+            });
+        });
+    }
+
 });
 
 // --- 4. LOGIC FUNCTIONS ---
