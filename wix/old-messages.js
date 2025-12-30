@@ -1,40 +1,88 @@
-import wixData from 'wix-data';
+/**
+ * Autocomplete function declaration, do not delete
+ * @param {import('./__schema__.js').Payload} options
+ */
+import wixData from "wix-data";
 
-export async function cleanupOldMessages() {
-    console.log("Starting cleanup of old SlaveMessages…");
+export const invoke = async ({ payload }) => {
+    const COLLECTION = "SlaveMessages";
 
-    // 1. Get all unique member IDs
-    const members = await wixData.query("SlaveMessages")
-        .distinct("memberId");
+    console.log("=== Automation started: Cleaning old messages ===");
 
-    const memberIds = members.items || [];
+    // 1. Fetch only messages missing createdAt
+    const missingDate = await wixData.query(COLLECTION)
+        .isEmpty("createdAt")
+        .limit(1000)
+        .find({ suppressAuth: true });
 
-    for (const memberId of memberIds) {
-        console.log(`Cleaning messages for member: ${memberId}`);
+    console.log("Messages missing createdAt:", missingDate.items.length);
 
-        // 2. Fetch all messages for this member, newest first
-        const result = await wixData.query("SlaveMessages")
-            .eq("memberId", memberId)
-            .descending("_createdDate")
-            .limit(1000) // enough for most cases
-            .find();
-
-        const messages = result.items;
-
-        if (messages.length <= 50) {
-            console.log(`Member ${memberId} has ${messages.length} messages — nothing to delete.`);
-            continue;
-        }
-
-        // 3. Keep the first 50, delete the rest
-        const toDelete = messages.slice(50);
-
-        console.log(`Deleting ${toDelete.length} old messages for ${memberId}`);
-
-        for (const msg of toDelete) {
-            await wixData.remove("SlaveMessages", msg._id);
-        }
+    // 2. Copy _createdDate → createdAt ONLY for those
+    for (const item of missingDate.items) {
+        item.createdAt = new Date(item._createdDate);
+        await wixData.update(COLLECTION, item, { suppressAuth: true });
     }
 
-    console.log("Cleanup complete.");
+    console.log("Missing createdAt fields have been filled");
+
+
+    // 3. Re-query using createdA for stable sorting
+    const res2 = await wixData.query(COLLECTION)
+        .descending("createdAt")
+        .limit(1000)
+        .find({ suppressAuth: true });
+
+    const sortedMessages = res2.items;
+
+    // 4. Extract unique user IDs
+    const userIds = [...new Set(sortedMessages.map(m => m.memberId))];
+    console.log("Unique users found:", userIds.length, userIds);
+
+    let totalMarked = 0;
+
+    // 5. Cleanup per user
+    for (const userId of userIds) {
+        const marked = await cleanupUserMessages(userId);
+        totalMarked += marked;
+        console.log(`User ${userId}: marked ${marked} messages`);
+    }
+
+    console.log("=== Automation finished ===");
+    console.log("Total messages marked across all users:", totalMarked);
+
+    return {};
+};
+
+
+// Helper: cleanup messages for a single user
+async function cleanupUserMessages(userId) {
+    const COLLECTION = "SlaveMessages";
+
+    // Fetch messages for this user, sorted by createdA
+    const res = await wixData.query(COLLECTION)
+        .eq("memberId", userId)
+        .descending("createdAt")
+        .limit(1000)
+        .find({ suppressAuth: true });
+
+    const items = res.items;
+    console.log(`User ${userId} has ${items.length} messages`);
+
+    if (items.length <= 50) {
+        console.log(`User ${userId}: nothing to clean (<= 50 messages)`);
+        return 0;
+    }
+
+    const toMark = items.slice(50);
+    console.log(`User ${userId}: will mark ${toMark.length} old messages`);
+
+    let count = 0;
+
+    for (const item of toMark) {
+        item.delete = "YES2";
+        await wixData.update(COLLECTION, item, { suppressAuth: true });
+        count++;
+    }
+
+    return count;
 }
