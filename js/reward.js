@@ -78,53 +78,20 @@ export function buyRewardFragment(cost) {
 }
 
 export function toggleRewardGrid() {
-    console.log("EXECUTION: toggleRewardGrid fired"); // <--- LOG 1
     const section = document.getElementById('revealSection');
     const btn = document.getElementById('toggleGridBtn');
-    if (!section || !btn) {
-        console.log("ERROR: revealSection or toggleGridBtn missing in DOM");
-        return;
-    }
+    if (!section || !btn) return;
 
-    if (section.style.display === 'none' || section.style.display === '') {
-        section.style.display = 'flex'; 
+    if (section.style.display === 'none') {
+        section.style.display = 'flex'; // Use flex for centering
         btn.style.opacity = '1';
     } else {
         section.style.display = 'none';
         btn.style.opacity = '0.6';
+        
+        // --- THE RESET: Move back to Tier 1 menu on close ---
         toggleRewardSubMenu(false);
     }
-}
-
-export function toggleRewardSubMenu(show) {
-    console.log("EXECUTION: toggleRewardSubMenu fired with:", show); // <--- LOG 2
-    const mainMenu = document.getElementById('reward-main-menu');
-    const buyMenu = document.getElementById('reward-buy-menu');
-    
-    if (!mainMenu || !buyMenu) {
-        console.log("ERROR: Menu containers missing");
-        return;
-    }
-
-    if (show) {
-        mainMenu.style.display = 'none';
-        buyMenu.style.display = 'flex';
-        buyMenu.classList.remove('hidden');
-    } else {
-        mainMenu.style.display = 'flex';
-        buyMenu.style.display = 'none';
-    }
-}
-
-export function buyRewardFragment(cost) {
-    console.log("EXECUTION: buyRewardFragment fired for cost:", cost); // <--- LOG 3
-    if (gameStats.coins < cost) {
-        triggerSound('sfx-deny');
-        alert("INSUFFICIENT COINS.");
-        return;
-    }
-    window.parent.postMessage({ type: "PURCHASE_REVEAL", cost: cost }, "*");
-    triggerSound('coinSound');
 }
 
 
@@ -220,7 +187,6 @@ export function initSlider(e, choice) {
 export function runTargetingAnimation(winnerId, finalCallback) {
     // 1. Find only the squares that are still blurry (frosted)
     const availableSquares = Array.from(document.querySelectorAll('.reveal-square.frosted'));
-    const allSquares = Array.from(document.querySelectorAll('.reveal-square')); // FIX: Define allSquares
     
     if (availableSquares.length === 0) {
         return finalCallback(); // No squares left? Just show the photo.
@@ -242,7 +208,7 @@ export function runTargetingAnimation(winnerId, finalCallback) {
         // 2. CHECK IF WE ARE AT THE END
         if (jumps >= maxJumps) {
             clearInterval(interval);
-            allSquares.forEach(sq => sq.classList.remove('is-targeting')); // FIX: Now allSquares is defined
+            allSquares.forEach(sq => sq.classList.remove('is-targeting'));
 
             // 1. FIND THE WINNER
             const actualWinner = document.getElementById(`sq-${winnerId}`);
@@ -301,14 +267,10 @@ window.openVaultMedia = function(url, isVideo) {
 };
 // --- STEP 2: TIERED MENU TOGGLE ---
 export function toggleRewardSubMenu(show) {
-    console.log("TOGGLE SUBMENU CLICKED:", show); // DEBUG LOG
     const mainMenu = document.getElementById('reward-main-menu');
     const buyMenu = document.getElementById('reward-buy-menu');
     
-    if (!mainMenu || !buyMenu) {
-        console.log("MENU ELEMENTS NOT FOUND:", { mainMenu: !!mainMenu, buyMenu: !!buyMenu });
-        return;
-    }
+    if (!mainMenu || !buyMenu) return;
 
     if (show) {
         // HIDE MAIN
