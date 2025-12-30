@@ -152,43 +152,49 @@ export function initSlider(e, choice) {
 }
 
 // --- STEP 2: THE DIGITAL ROULETTE ENGINE ---
+// --- STEP 2: THE DIGITAL ROULETTE ENGINE ---
 export function runTargetingAnimation(winnerId, finalCallback) {
-    const frostedSquares = Array.from(document.querySelectorAll('.reveal-square.frosted'));
-    if (frostedSquares.length === 0) return finalCallback();
+    // 1. Find only the squares that are still blurry (frosted)
+    const availableSquares = Array.from(document.querySelectorAll('.reveal-square.frosted'));
+    
+    if (availableSquares.length === 0) {
+        return finalCallback(); // No squares left? Just show the photo.
+    }
 
-    let currentIndex = 0;
     let jumps = 0;
-    const maxJumps = 15; // How many times the light jumps before stopping
+    const maxJumps = 18; // How many times the light jumps
 
     const interval = setInterval(() => {
-        // 1. Remove targeting from everyone
-        frostedSquares.forEach(sq => sq.classList.remove('is-expanded', 'is-targeting'));
+        // Remove the blue glow from everyone
+        availableSquares.forEach(sq => sq.classList.remove('is-targeting'));
 
-        // 2. Pick a random square for the "Scanning" look
-        const randomSq = frostedSquares[Math.floor(Math.random() * frostedSquares.length)];
-        randomSq.classList.add('is-targeting');
+        // Pick a random square from the hidden ones to light up
+        const randomIndex = Math.floor(Math.random() * availableSquares.length);
+        availableSquares[randomIndex].classList.add('is-targeting');
 
         jumps++;
 
-        // 3. Check if we are at the end
+        // 2. CHECK IF WE ARE AT THE END
         if (jumps >= maxJumps) {
             clearInterval(interval);
             
-            // 4. Lock onto the REAL winner
+            // Remove the random glows
+            availableSquares.forEach(sq => sq.classList.remove('is-targeting'));
+
+            // 3. LOCK ONTO THE REAL WINNER
             const actualWinner = document.getElementById(`sq-${winnerId}`);
             if (actualWinner) {
-                frostedSquares.forEach(sq => sq.classList.remove('is-targeting'));
-                actualWinner.classList.add('locked-item'); // Trigger the 3x flash
+                actualWinner.classList.add('locked-item'); // Triggers the 3x White Flash
                 
-                // Wait for the flashes to finish, then reveal
+                // Wait for the flash to finish (1.2s), then melt the frost
                 setTimeout(() => {
                     finalCallback();
-                }, 1500);
+                }, 1200);
             } else {
                 finalCallback();
             }
         }
-    }, 100); // Jump speed (100ms)
+    }, 80); // Speed: 80ms is a fast "Digital" jump
 }
 
 // Bind to window
