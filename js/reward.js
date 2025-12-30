@@ -193,7 +193,7 @@ export function runTargetingAnimation(winnerId, finalCallback) {
                 // 4. SHORTER TIMEOUT: Only wait 600ms for the flash to finish
                 setTimeout(() => {
                     finalCallback(); // This syncs the data in the background
-                }, 600); 
+                }, 100); 
             } else {
                 finalCallback();
             }
