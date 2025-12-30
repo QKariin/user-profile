@@ -273,21 +273,21 @@ export function toggleRewardSubMenu(show) {
     if (!mainMenu || !buyMenu) return;
 
     if (show) {
-        // 1. Hide main
+        // HIDE MAIN
+        mainMenu.style.setProperty('display', 'none', 'important');
         mainMenu.classList.add('hidden');
-        mainMenu.style.display = 'none';
-        
-        // 2. Show buy (Remove the class wall)
+
+        // SHOW BUY
         buyMenu.classList.remove('hidden');
-        buyMenu.style.display = 'flex';
+        buyMenu.style.setProperty('display', 'flex', 'important');
     } else {
-        // 1. Show main
+        // SHOW MAIN
         mainMenu.classList.remove('hidden');
-        mainMenu.style.display = 'flex';
-        
-        // 2. Hide buy
+        mainMenu.style.setProperty('display', 'flex', 'important');
+
+        // HIDE BUY
+        buyMenu.style.setProperty('display', 'none', 'important');
         buyMenu.classList.add('hidden');
-        buyMenu.style.display = 'none';
     }
 }
 
