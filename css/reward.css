@@ -3,20 +3,22 @@
 /* 1. THE OVERLAY (The Boss) */
 #revealSection {
     position: absolute !important;
-    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: rgba(0, 0, 0, 0.95) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    z-index: 5000 !important;
-    display: none; 
+    background: rgba(0, 0, 0, 0.92) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    z-index: 5000 !important; /* Puts it on top of the header/footer */
+    display: none; /* Toggled to 'flex' by JS */
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Centers the photo vertically */
-    padding: 10px !important;
+    justify-content: center;
+    padding: 20px !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
 }
 
 /* 2. THE HEADER LABEL */
@@ -38,33 +40,32 @@
 #revealGridContainer {
     position: relative !important;
     width: fit-content !important; /* SNAPS TO PHOTO WIDTH */
-    height: 75% !important; /* Leaves room for the close button */
+    height: auto !important;
+    max-height: 75% !important; /* Leaves space for labels and buttons */
     margin: 0 auto !important;
     border: 1px solid #222;
     border-radius: 8px;
-    overflow: hidden;
     background: transparent !important;
-    display: flex !important;
-    flex-direction: column;
+    overflow: hidden;
+    display: inline-block !important; /* Kills the full-width box */
 }
 
 /* 4. THE MEDIA (Photo or Video)
    Sets the width for the container. */
-.reveal-bg-media {
-    position: relative !important;
-    height: 100% !important; /* Fills the container height */
-    width: auto !important;   /* Keeps proportions perfect */
-    max-width: 100% !important;
-    object-fit: contain !important;
+reveal-bg-media {
     display: block !important;
-    z-index: 1;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 65vh !important; /* Limits height on mobile */
+    object-fit: contain !important;
 }
 
 /* 5. THE 3x3 GRID OVERLAY 
    Pinned exactly to the photo. */
 .reveal-grid-overlay {
     position: absolute !important;
-    inset: 0 !important;
+    inset: 0 !important; /* Snaps to the relative parent (the photo) */
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     grid-template-rows: repeat(3, 1fr) !important;
