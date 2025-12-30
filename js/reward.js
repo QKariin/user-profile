@@ -177,24 +177,28 @@ export function runTargetingAnimation(winnerId, finalCallback) {
         // 2. CHECK IF WE ARE AT THE END
         if (jumps >= maxJumps) {
             clearInterval(interval);
-            
-            // Remove the random glows
-            availableSquares.forEach(sq => sq.classList.remove('is-targeting'));
+            allSquares.forEach(sq => sq.classList.remove('is-targeting'));
 
-            // 3. LOCK ONTO THE REAL WINNER
+            // 1. FIND THE WINNER
             const actualWinner = document.getElementById(`sq-${winnerId}`);
             if (actualWinner) {
-                actualWinner.classList.add('locked-item'); // Triggers the 3x White Flash
+                // 2. TRIGGER LOCK-IN FLASHES
+                actualWinner.classList.add('locked-item');
                 
-                // Wait for the flash to finish (1.2s), then melt the frost
+                // 3. THE LOCAL AUTHORITY FIX:
+                // We manually clear the square RIGHT NOW so we don't wait for Wix
+                actualWinner.classList.remove('frosted');
+                actualWinner.classList.add('clear');
+
+                // 4. SHORTER TIMEOUT: Only wait 600ms for the flash to finish
                 setTimeout(() => {
-                    finalCallback();
-                }, 1200);
+                    finalCallback(); // This syncs the data in the background
+                }, 600); 
             } else {
                 finalCallback();
             }
         }
-    }, 80); // Speed: 80ms is a fast "Digital" jump
+    }, 50); // Speed: 80ms is a fast "Digital" jump
 }
 
 // Bind to window
