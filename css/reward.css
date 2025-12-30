@@ -1,20 +1,22 @@
-/* --- TACTICAL REVEAL SYSTEM: MASTER CSS --- */
+/* --- TACTICAL REVEAL SYSTEM: FULL FIXED MASTER --- */
 
-/* 1. THE FULL OVERLAY (Covers entire Chat Card: Header to Footer) */
-#revealGridContainer {
-    position: relative !important;
-    width: 95% !important; /* Spans the width */
-    height: auto !important; /* ALLOWS VERTICAL GROWTH */
-    max-height: 70vh !important; /* Prevents it from being TOO long on giant screens */
-    margin: 0 auto !important;
-    border: 1px solid #222;
-    border-radius: 8px;
-    background: #000;
-    overflow: hidden;
-    display: flex;
+/* 1. THE OVERLAY (The Boss)
+   This covers the ENTIRE chat card (header to footer) without pushing elements. */
+#revealSection {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    z-index: 5000 !important; /* Higher than everything else */
+    display: none; /* Toggled by JS to 'flex' */
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px !important;
 }
-
 
 /* 2. THE HEADER LABEL (High-Class Serif) */
 #revealLevelLabel {
@@ -30,68 +32,68 @@
     text-align: center;
 }
 
-/* 3. THE MASTER GRID CONTAINER (Hero Sizing) */
+/* 3. THE MASTER GRID CONTAINER (Hero Sizing)
+   Unlocked height so it never crops your photos. */
 #revealGridContainer {
     position: relative !important;
-    width: 95% !important; /* Spans almost full width */
-    max-width: 420px !important;
-    aspect-ratio: 1 / 1 !important;
+    width: 100% !important; /* Fills width */
+    max-width: 500px !important;
+    height: auto !important; /* ADAPTS TO PHOTO HEIGHT */
     margin: 0 auto !important;
     border: 1px solid #222;
     border-radius: 8px;
     overflow: hidden;
     background: #000;
     box-shadow: 0 10px 50px rgba(0,0,0,1);
+    display: flex;
+    flex-direction: column;
 }
 
-/* 4. THE MEDIA (Photo or Video) */
+/* 4. THE MEDIA (Photo or Video)
+   Forced to show its actual size without cropping. */
 .reveal-bg-media {
-    position: relative !important; /* Not absolute anymore */
+    position: relative !important;
     width: 100% !important;
-    height: auto !important; /* Natural height of the file */
+    height: auto !important;
+    object-fit: contain !important; /* SAFETY LOCK: SHOWS FULL PHOTO */
     display: block !important;
     z-index: 1;
 }
 
-/* 5. THE 3x3 GRID OVERLAY */
+/* 5. THE 3x3 GRID OVERLAY
+   Stretches perfectly to match the image height. */
 .reveal-grid-overlay {
     position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; /* Forces the grid to the exact height of the photo */
+    inset: 0 !important; /* Pinned to the edges of the media */
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    grid-template-rows: repeat(3, 1fr) !important; /* 1fr makes each row 1/3 of the photo height */
+    grid-template-rows: repeat(3, 1fr) !important;
     z-index: 2;
 }
 
-/* 6. THE FROSTED GLASS SQUARES (High-Class Texture) */
+/* 6. THE FROSTED GLASS SQUARES */
 .reveal-square {
     position: relative;
     box-sizing: border-box;
-    /* Elegant thin dividers between glass fragments */
     border: 0.5px solid rgba(255, 255, 255, 0.08) !important;
     overflow: hidden;
 }
 
 .reveal-square.frosted {
-    /* Bright frost tint so it looks like real glass */
-    background: transparent !important; 
+    background: rgba(255, 255, 255, 0.03) !important; 
     backdrop-filter: blur(60px) !important;
     -webkit-backdrop-filter: blur(60px) !important;
 }
 
-/* 7. THE REVEAL (Melt Effect - No Blinking) */
+/* 7. THE REVEAL (Melt Effect) */
 .reveal-square.clear {
     background: transparent !important;
     backdrop-filter: blur(0px) !important;
     -webkit-backdrop-filter: blur(0px) !important;
-    border: 0.5px solid rgba(255, 255, 255, 0.05) !important;
     transition: backdrop-filter 1.2s ease, background 1.2s ease !important;
 }
 
-/* 8. THE NUMBERS (Subtle Technical Style) */
+/* 8. THE NUMBERS */
 .sq-num {
     font-family: 'Share Tech Mono', monospace !important;
     font-size: 0.7rem !important;
@@ -103,7 +105,7 @@
     pointer-events: none;
 }
 
-/* 9. IPHONE STYLE SLIDERS */
+/* 9. IPHONE STYLE SLIDERS (Reward Menu) */
 .reward-slider-container { display: flex; flex-direction: column; gap: 15px; width: 100%; padding: 10px; max-width: 400px; }
 .iphone-slider { position: relative; width: 100%; height: 55px; background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 30px; overflow: hidden; cursor: pointer; }
 .slider-track-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Georgia', serif; font-size: 0.8rem; color: #555; pointer-events: none; z-index: 2; }
@@ -114,12 +116,11 @@
 .slider-pink .slider-fill { background: rgba(255, 0, 222, 0.15); }
 .slider-gold .slider-fill { background: rgba(255, 215, 0, 0.15); }
 
-/* --- 10. MOBILE PRECISION --- */
+/* 10. MOBILE PRECISION */
 @media (max-width: 768px) {
-    #revealGridContainer { width: 95% !important; max-width: 340px !important; margin: 10px auto !important; }
-    #revealLevelLabel { font-size: 0.9rem !important; margin-top: 15px; }
-    #revealSection { padding: 10px !important; }
-    .dr-close-glass { margin-top: 15px; font-size: 0.55rem; padding: 5px 12px; }
+    #revealGridContainer { width: 100% !important; max-width: none !important; margin: 0 auto !important; border-radius: 0; }
+    #revealLevelLabel { font-size: 1rem !important; margin-top: 10px; }
+    .dr-close-glass { margin-top: 15px; font-size: 0.55rem; }
 }
 
 .dr-close-glass {
