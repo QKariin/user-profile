@@ -40,7 +40,7 @@ export const CMS_HIERARCHY = [
     { Title: "Queen's Champion", Icon: "⚔️", Order: 7, Points: "100000", Description: "Ultimate submissive!", StatusText: "You have made it!", ProtocolText: "2 bodies, 1 soul!", DutiesText: "Enjoy the love you earned.", ContactText: "LEGENDARY", CssClass: "legendary" }
 ];
 
-export const BYTESCALE_CONFIG = {
+/*export const BYTESCALE_CONFIG = {
   admin: {
     ACCOUNT_ID: "kW2K8hR",
     PUBLIC_KEY: "public_kW2K8hR6YbQXStTvMf5ZDYbVf1fQ",
@@ -53,6 +53,6 @@ export const BYTESCALE_CONFIG = {
     // ❌ DO NOT put secret key here
     SECRET_KEY_ENV: "BYTESCALE_SECRET_KEY_ADMIN" // just the ENV NAME, not the key
   }
-};
+};*/
 
 export const STREAM_PASSWORDS = ["QUEEN", "OBEY", "SESSION"];
