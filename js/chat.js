@@ -57,8 +57,8 @@ export async function renderChat(messages) {
         Math.max(sortedMessages.length - chatLimit, 0)
     );
 
-    // Sign Bytescale URLs
-    for (let m of visibleMessages) {
+    // Proxy Bytescale URLs for private access (in parallel)
+    const signingPromises = visibleMessages.map(async (m) => {
         if (m.message && m.message.startsWith('https://upcdn.io/')) {
             const parts = m.message.split('/raw/');
             if (parts.length === 2) {
@@ -66,11 +66,12 @@ export async function renderChat(messages) {
                 try {
                     m.mediaUrl = await getPrivateFile(filePath);
                 } catch (e) {
-                    console.error('Failed to sign URL', e);
+                    console.error('Failed to proxy URL', e);
                 }
             }
         }
-    }
+    });
+    await Promise.all(signingPromises);
 
     // 4. RENDER HTML
     chatContent.innerHTML = visibleMessages.map(m => {
