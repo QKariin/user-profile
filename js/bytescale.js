@@ -101,6 +101,7 @@ async function processMediaElement(el) {
 }
 
 export async function scanExisting() {
+  console.log("Scanning existing media elements for Bytescale URLs...");
   const elements = document.querySelectorAll("img, video");
   for (const el of elements) {
     await processMediaElement(el);
@@ -108,17 +109,31 @@ export async function scanExisting() {
 }
 
 export function observeNewElements() {
+  console.log("Setting up Bytescale URL observer...");
+
   const observer = new MutationObserver(async (mutations) => {
     for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (!(node instanceof HTMLElement)) continue;
 
-        if (node.matches?.("img, video")) {
-          await processMediaElement(node);
+      // Handle new elements being added
+      if (mutation.type === "childList") {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+
+          if (node.matches?.("img, video")) {
+            await processMediaElement(node);
+          }
+
+          const nested = node.querySelectorAll?.("img, video");
+          for (const el of nested) {
+            await processMediaElement(el);
+          }
         }
+      }
 
-        const nested = node.querySelectorAll?.("img, video");
-        for (const el of nested) {
+      // Handle src/poster attribute changes
+      if (mutation.type === "attributes") {
+        const el = mutation.target;
+        if (el.matches("img, video")) {
           await processMediaElement(el);
         }
       }
@@ -127,7 +142,9 @@ export function observeNewElements() {
 
   observer.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: true,              // ← THIS is the important part
+    attributeFilter: ["src", "poster"]
   });
 }
 
