@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   try {
     const fileUrl = `https://upcdn.io/${ACCOUNT_ID}/raw${filePath}`;
     const signedUrl = getSignedUrl(fileUrl, apiKeyId, hmacKey);
-    res.json({ url: signedUrl });
+    res.json(signedUrl);
   } catch (error) {
     console.error('Signing error:', error);
     res.status(500).json({ error: 'Internal server error' });
