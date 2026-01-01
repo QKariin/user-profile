@@ -20,7 +20,7 @@ export async function uploadToBytescale(subject, file) {
   const path = `/${subject}/${dateFolder}/${filename}`;
 
   const res = await fetch(
-    `https://api.bytescale.com/v2/accounts/${ACCOUNT_ID}/uploads/form_data?path=${path}`,
+    `https://api.bytescale.com/v2/accounts/${ACCOUNT_ID}/uploads/form_data?filePath=${encodeURIComponent(path)}`,
     {
       method: "POST",
       headers: { Authorization: `Bearer ${PUBLIC_KEY}` },
