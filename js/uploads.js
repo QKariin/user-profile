@@ -101,7 +101,7 @@ export async function handleAdminUpload(input) {
             const oldText = btn ? btn.innerText : "+";
             if (btn) btn.innerText = "⏳";
 
-            let finalUrl = await uploadToBytescale("Chat", file);
+            let finalUrl = await uploadToBytescale("chat", file);
             //const res = await fetch(
             //    `https://api.bytescale.com/v2/accounts/${CONFIG.ACCOUNT_ID}/uploads/form_data?path=/admin`,
             //    { 
