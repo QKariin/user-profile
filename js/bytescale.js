@@ -41,3 +41,74 @@ export async function getPrivateFile(filePath) {
   //const blob = await res.blob();
   //return URL.createObjectURL(blob);
 }
+
+function isUpcdnUrl(url) {
+  return typeof url === "string" 
+    && url.includes("upcdn.io")
+    && !url.includes("&sig=")   // exclude already-signed URLs
+    && !url.includes("?sig=");  // covers both patterns
+}
+
+async function signUrl(url) {
+  const { signedUrl } = await getPrivateFile(url);
+  return signedUrl;
+}
+
+async function processMediaElement(el) {
+  const attrs = ["src", "poster"];
+
+  for (const attr of attrs) {
+    const original = el.getAttribute(attr);
+    if (isUpcdnUrl(original)) {
+      const signed = await signUrl(original);
+      el.setAttribute(attr, signed);
+    }
+  }
+
+  // Handle <video><source></source></video>
+  if (el.tagName === "VIDEO") {
+    const sources = el.querySelectorAll("source");
+    for (const source of sources) {
+      const src = source.getAttribute("src");
+      if (isUpcdnUrl(src)) {
+        const signed = await signUrl(src);
+        source.setAttribute("src", signed);
+      }
+    }
+  }
+}
+
+async function scanExisting() {
+  const elements = document.querySelectorAll("img, video");
+  for (const el of elements) {
+    await processMediaElement(el);
+  }
+}
+
+function observeNewElements() {
+  const observer = new MutationObserver(async (mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue;
+
+        if (node.matches?.("img, video")) {
+          await processMediaElement(node);
+        }
+
+        const nested = node.querySelectorAll?.("img, video");
+        for (const el of nested) {
+          await processMediaElement(el);
+        }
+      }
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+// Run
+//scanExisting();
+//observeNewElements();

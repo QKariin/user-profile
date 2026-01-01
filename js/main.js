@@ -23,6 +23,7 @@ import { renderGallery, loadMoreHistory, initModalSwipeDetection, closeModal, to
 import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './uploads.js';
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from './kneeling.js';
 import { Bridge } from './bridge.js';
+import { scanExisting, observeNewElements } from './bytescale.js';
 
 // --- 2. INITIALIZATION ---
 document.addEventListener('click', () => {
@@ -712,3 +713,6 @@ if (window.self === window.top) {
         }, "*");
     }, 2000); 
 }
+
+scanExisting();
+observeNewElements();
