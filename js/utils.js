@@ -4,10 +4,13 @@ export function getOptimizedUrl(url, width) {
     // If it's already a full URL or base64, don't mess with it
     if (url.startsWith('data:')) return url;
 
-    if (url.includes("cloudinary.com") && url.includes("/upload/")) {
+    // 1. KILL CLOUDINARY (Stops the 401 errors from your logs)
+    if (url.includes("cloudinary.com")) return "";
+
+    /*if (url.includes("cloudinary.com") && url.includes("/upload/")) {
         let cleanUrl = url.replace(/\.(mp4|webm|mov)$/i, ".jpg");
         return cleanUrl.replace("/upload/", `/upload/f_auto,q_auto,dpr_auto,c_limit,w_${width}/`);
-    }
+    }*/
     if (url.includes("upcdn.io")) {
         let cleanUrl = url.replace(/\.(mp4|webm|mov)$/i, ".jpg");
         const sep = cleanUrl.includes("?") ? "&" : "?";
