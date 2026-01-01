@@ -29,10 +29,7 @@ export default function handler(req, res) {
   const signature = crypto
     .createHmac("sha256", secretKey)
     .update(stringToSign)
-    .digest("base64")
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .digest("hex");
 
   const url = `https://upcdn.io/${ACCOUNT_ID}/raw${filePath}?expires=${expires}&signature=${signature}`;
 
