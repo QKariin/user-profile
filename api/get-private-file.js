@@ -32,4 +32,6 @@ export default function handler(req, res) {
     .digest("hex");
 
   const url = `https://upcdn.io/${ACCOUNT_ID}/raw${filePath}?expires=${expires}&signature=${signature}`;
+
+  res.json({ url });
 }
