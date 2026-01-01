@@ -78,14 +78,14 @@ async function processMediaElement(el) {
   }
 }
 
-async function scanExisting() {
+export async function scanExisting() {
   const elements = document.querySelectorAll("img, video");
   for (const el of elements) {
     await processMediaElement(el);
   }
 }
 
-function observeNewElements() {
+export function observeNewElements() {
   const observer = new MutationObserver(async (mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
