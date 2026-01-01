@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { BYTESCALE_CONFIG } from "../js/config";
+import { BYTESCALE_CONFIG } from "../../js/config";
 
 export default function handler(req, res) {
   const { filePath } = req.query;
