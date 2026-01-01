@@ -18,6 +18,8 @@ export default function handler(req, res) {
 
   // ✔ Load secret key from Vercel environment
   const secretKey = process.env[SECRET_KEY_ENV];
+  console.log('SECRET_KEY_ENV:', SECRET_KEY_ENV);
+  console.log('secretKey exists:', !!secretKey);
 
   if (!secretKey) {
     return res.status(500).json({ error: "Missing secret key in environment" });
