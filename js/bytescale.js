@@ -51,8 +51,28 @@ function isUpcdnUrl(url) {
 }
 
 async function signUrl(url) {
-  const { signedUrl } = await getPrivateFile(url);
-  return signedUrl;
+  const filePath = extractFilePath(url);
+
+  if (!filePath) {
+    console.warn("Could not extract filePath from:", url);
+    return url; // fallback
+  }
+
+  const result = await getPrivateFile(filePath);
+
+  if (!result || !result.signedUrl) {
+    console.warn("Signing failed for:", url, "Result:", result);
+    return url; // fallback
+  }
+
+  return result.signedUrl;
+}
+
+function extractFilePath(url) {
+  // Example: https://upcdn.io/.../raw/folder/file.jpg
+  const parts = url.split('/raw/');
+  if (parts.length !== 2) return null;
+  return '/' + parts[1]; // "/folder/file.jpg"
 }
 
 async function processMediaElement(el) {
