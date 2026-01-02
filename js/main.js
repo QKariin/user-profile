@@ -121,6 +121,14 @@ window.addEventListener("message", (event) => {
 
     // YOUR TASK & WISHLIST INIT
     if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
+    
+    // TASK QUEUE UPDATE - THIS WAS MISSING!
+    if (data.type === "updateTaskQueue" || data.taskQueue !== undefined) {
+        const newQueue = data.taskQueue || data.queue || [];
+        setTaskQueue(newQueue);
+        console.log("Task queue updated:", newQueue);
+    }
+    
     if (data.type === "INIT_WISHLIST" || data.wishlist) {
         const items = data.wishlist || [];
         if (Array.isArray(items) && items.length > 0) {
@@ -176,6 +184,7 @@ window.addEventListener("message", (event) => {
     if (payload) {
         // 1. Profile Sync (Added the !ignoreBackendUpdates shield here)
         if (data.profile && !ignoreBackendUpdates) {
+        console.log("Profile sync - Full profile data:", data.profile);
         setGameStats(data.profile);
         setUserProfile({
             name: data.profile.name || "Slave",
@@ -183,6 +192,14 @@ window.addEventListener("message", (event) => {
             memberId: data.profile.memberId || "",
             joined: data.profile.joined
         });
+        
+        // SYNC TASK QUEUE - THIS WAS MISSING!
+        if (data.profile.taskQueue) {
+            setTaskQueue(data.profile.taskQueue);
+            console.log("Task queue synced from profile:", data.profile.taskQueue);
+        } else {
+            console.log("No task queue in profile data");
+        }
         // --- SYNC REWARD SYSTEM (SAFE VERSION) ---
         if (data.profile.activeRevealMap) {
             let map = [];
@@ -808,6 +825,12 @@ window.switchTab = switchTab;
 window.toggleStats = toggleStats;
 window.toggleSection = toggleSection;
 
+// Kneeling functions (imported from kneeling.js)
+window.handleHoldStart = handleHoldStart;
+window.handleHoldEnd = handleHoldEnd;
+window.claimKneelReward = claimKneelReward;
+window.updateKneelingStatus = updateKneelingStatus;
+
 // Tasks & Evidence
 window.getRandomTask = getRandomTask;
 window.cancelPendingTask = cancelPendingTask;
@@ -834,17 +857,6 @@ window.handleHoldEnd = handleHoldEnd;
 window.claimKneelReward = claimKneelReward;
 window.updateKneelingStatus = updateKneelingStatus;
 window.handleProfileUpload = handleProfileUpload;
-
-// Tribute & Economy
-window.toggleTributeHunt = toggleTributeHunt;
-window.toggleHuntNote = toggleHuntNote;
-window.sendCoins = sendCoins;
-window.buyRealCoins = buyRealCoins;
-window.triggerCoinShower = triggerCoinShower;
-window.selectTributeReason = selectTributeReason;
-window.filterByBudget = filterByBudget;
-window.finalizeSacrifice = finalizeSacrifice;
-window.showHuntStep = showHuntStep;
 
 // Sessions & Admin
 window.openSessionUI = openSessionUI;
