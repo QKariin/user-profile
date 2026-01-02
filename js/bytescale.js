@@ -118,42 +118,47 @@ export async function scanExisting() {
 }
 
 export function observeNewElements() {
-  console.log("Setting up Bytescale URL observer...");
-
-  const observer = new MutationObserver(async (mutations) => {
+  const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
+      if (mutation.type !== "attributes") continue;
+      if (mutation.attributeName !== "src" && mutation.attributeName !== "data-src") continue;
 
-      // Handle new elements being added
-      if (mutation.type === "childList") {
-        for (const node of mutation.addedNodes) {
-          if (!(node instanceof HTMLElement)) continue;
+      const el = mutation.target;
+      const url = el.getAttribute(mutation.attributeName);
 
-          if (node.matches?.("img, video")) {
-            await processMediaElement(node);
-          }
+      // Skip null/empty
+      if (!url || typeof url !== "string") continue;
 
-          const nested = node.querySelectorAll?.("img, video");
-          for (const el of nested) {
-            await processMediaElement(el);
-          }
+      // Skip already-signed URLs
+      if (url.includes("&sig=") || url.includes("?sig=")) continue;
+
+      // Skip non-Upcdn URLs
+      if (!url.includes("upcdn.io")) continue;
+
+      // Prevent feedback loop
+      observer.disconnect();
+
+      signUrlAsync(url).then(signedUrl => {
+        // Only update if still the same unsigned URL
+        const current = el.getAttribute(mutation.attributeName);
+        if (current === url) {
+          el.setAttribute(mutation.attributeName, signedUrl);
         }
-      }
 
-      // Handle src/poster attribute changes
-      if (mutation.type === "attributes") {
-        const el = mutation.target;
-        if (el.matches("img, video")) {
-          await processMediaElement(el);
-        }
-      }
+        // Reconnect observer
+        observer.observe(document.body, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["src", "data-src"]
+        });
+      });
     }
   });
 
   observer.observe(document.body, {
-    childList: true,
     subtree: true,
-    attributes: true,              // ← THIS is the important part
-    attributeFilter: ["src", "poster"]
+    attributes: true,
+    attributeFilter: ["src", "data-src"]
   });
 }
 
