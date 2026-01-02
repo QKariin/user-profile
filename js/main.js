@@ -342,13 +342,13 @@ let selectedReason = "";
 let selectedItem = null;
 
 function toggleTributeHunt() {
-    const chatContainer = document.querySelector('.app-container') || document.body;
+    const chatContainer = document.querySelector('.app-container');
     const overlay = document.getElementById('tributeHuntOverlay');
     
     if (overlay.classList.contains('hidden')) {
         overlay.classList.remove('hidden');
-        overlay.classList.add('tinder-focus'); // Adds the full-screen layout
-        chatContainer.classList.add('tribute-focus-mode'); // Hides everything else
+        overlay.classList.add('tinder-focus');
+        chatContainer.classList.add('tribute-focus-mode');
         showHuntStep(1);
     } else {
         overlay.classList.add('hidden');
@@ -359,7 +359,6 @@ function toggleTributeHunt() {
 }
 
 function renderHuntStore(budget) {
-    const grid = document.getElementById('huntStoreGrid');
     const items = window.WISHLIST_ITEMS || [];
     filteredItems = items.filter(item => Number(item.price || item.Price || 0) <= budget);
     currentHuntIndex = 0;
@@ -371,19 +370,18 @@ function showTinderCard() {
     const item = filteredItems[currentHuntIndex];
 
     if (!item) {
-        grid.innerHTML = `<div style="text-align:center;"><p>NO MORE ITEMS</p><button class="action-btn" onclick="toggleTributeHunt()">EXIT</button></div>`;
+        grid.innerHTML = `<div style="text-align:center; color:#666;"><p>TIER EMPTY</p><button class="action-btn" onclick="showHuntStep(2)">BACK</button></div>`;
         return;
     }
 
+    // We clear the grid and inject the Stage + Card
     grid.innerHTML = `
-        <div class="tinder-focus-wrapper">
+        <div class="tinder-stage">
             <div id="tinderCard" class="tinder-card-main">
                 <div id="likeLabel" class="swipe-indicator like">SACRIFICE</div>
                 <div id="nopeLabel" class="swipe-indicator nope">SKIP</div>
-                <div class="card-image-container" style="flex:1; display:flex; align-items:center; justify-content:center; padding:20px;">
-                    <img src="${item.img || item.image}" style="max-width:100%; max-height:100%; object-fit:contain;" draggable="false">
-                </div>
-                <div style="padding:20px; text-align:center; background:#000;">
+                <img src="${item.img || item.image}" draggable="false">
+                <div style="padding:20px; text-align:center;">
                     <div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div>
                     <div style="color:white; letter-spacing:2px; font-size:0.8rem;">${item.name.toUpperCase()}</div>
                 </div>
