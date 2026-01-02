@@ -172,8 +172,9 @@ export async function signUpcdnUrl(url) {
   const filePath = "/" + parts[1];
 
   try {
-    const result = await getPrivateFile(filePath);
-    return result?.signedUrl || url;
+    // Your backend returns the signed URL directly as a string
+    const signedUrl = await getPrivateFile(filePath);
+    return signedUrl || url;
   } catch (err) {
     console.error("Failed to sign Upcdn URL:", url, err);
     return url;
