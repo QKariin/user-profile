@@ -120,7 +120,7 @@ export async function scanExisting() {
 export function observeNewElements() {
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
-      console.log("MUTATION:", mutation.attributeName, el.getAttribute(mutation.attributeName));
+      console.log("MUTATION:", mutation);
       if (mutation.type !== "attributes") continue;
       if (mutation.attributeName !== "src" && mutation.attributeName !== "data-src") continue;
 
