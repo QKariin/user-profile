@@ -3,6 +3,7 @@
 
 import { users, currId, setCurrId } from './dashboard-state.js';
 import { getOptimizedUrl, clean } from './dashboard-utils.js';
+import { triggerSounds } from './sound.js';
 import { triggerSound } from './utils.js';
 
 // --- ADD THESE TWO LINES AT THE TOP ---
@@ -50,16 +51,18 @@ export function renderSidebar() {
         const msgTime = u.lastMessageTime ? new Date(u.lastMessageTime).getTime() : 0;
         const lastSoundLS = Number(localStorage.getItem('sound_' + u.memberId) || 0);
         const lastSoundRAM = soundMemory[u.memberId] || 0;
+        const hasMsgCurrent = hasUnreadMessageCurrentUser(u);
 
         const lastSound = Math.max(lastSoundLS, lastSoundRAM);
 
+        const isNewMessage = hasMsgCurrent && msgTime > lastSound;
         //const isNewMessage = hasMsg && msgTime > lastSound;
-        const isNewMessage = msgTime > lastSound;
 
         if (isNewMessage) {
             soundMemory[u.memberId] = msgTime; // update RAM immediately
             localStorage.setItem('sound_' + u.memberId, msgTime); // update disk
             triggerSound('sfx-notify');
+            triggerSounds("ding");
         }
 
         // B. ENTRANCE: Just logged on (Join BACK of Online group)
@@ -166,6 +169,15 @@ function hasUnreadMessage(u) {
     // 1. If I am currently viewing this person, the icon must be grey
     if (u.memberId === currId) return false;
 
+    // 2. Otherwise, check the last message time against the last click time
+    const readTime = localStorage.getItem('read_' + u.memberId);
+    if (!readTime) return u.lastMessageTime > 0;
+    
+    // If the message is newer than the last time I clicked the user, light it up
+    return u.lastMessageTime > parseInt(readTime);
+}
+
+function hasUnreadMessageCurentUser(u) {
     // 2. Otherwise, check the last message time against the last click time
     const readTime = localStorage.getItem('read_' + u.memberId);
     if (!readTime) return u.lastMessageTime > 0;
