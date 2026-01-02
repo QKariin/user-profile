@@ -338,6 +338,8 @@ function updateStats() {
 // --- TRIBUTE HUNT LOGIC ---
 let currentHuntIndex = 0;
 let filteredItems = [];
+let selectedReason = "";
+let selectedItem = null;
 
 function toggleTributeHunt() {
     const chatContainer = document.querySelector('.app-container') || document.body;
@@ -459,9 +461,6 @@ function filterByBudget(max) {
     renderHuntStore(max); 
     showHuntStep(3);
 }
-
-let currentHuntIndex = 0;
-let filteredItems = [];
 
 function renderHuntStore(budget) {
     const grid = document.getElementById('huntStoreGrid');
@@ -808,6 +807,15 @@ function submitSessionRequest() {
 setInterval(updateKneelingStatus, 1000);
 setInterval(() => { window.parent.postMessage({ type: "heartbeat", view: currentView }, "*"); }, 5000);
 
+// Tribute functions
+window.toggleTributeHunt = toggleTributeHunt;
+window.selectTributeReason = selectTributeReason;
+window.filterByBudget = filterByBudget;
+window.showHuntStep = showHuntStep;
+window.toggleHuntNote = toggleHuntNote;
+window.finalizeSacrifice = finalizeSacrifice;
+window.resetTributeFlow = resetTributeFlow;
+
 // Navigation & Stats
 window.switchTab = switchTab;
 window.toggleStats = toggleStats;
@@ -852,6 +860,12 @@ window.closeSessionUI = closeSessionUI;
 window.updateSessionCost = updateSessionCost;
 window.submitSessionRequest = submitSessionRequest;
 window.handleAdminUpload = handleAdminUpload;
+
+window.WISHLIST_ITEMS = WISHLIST_ITEMS;
+window.gameStats = gameStats;
+
+// --- 8. THE HANDSHAKE ---
+window.parent.postMessage({ type: "UI_READY" }, "*");
 
 window.WISHLIST_ITEMS = WISHLIST_ITEMS;
 window.gameStats = gameStats;
