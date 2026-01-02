@@ -703,6 +703,59 @@ html, body {
   overflow: hidden;
 }
 
+/* --- TRIBUTE TINDER FOCUS MODE --- */
+.tribute-focus-mode #chatBadge,
+.tribute-focus-mode #chatCard,
+.tribute-focus-mode footer,
+.tribute-focus-mode .top-section-split,
+.tribute-focus-mode .bottom-section-full,
+.tribute-focus-mode .app-container > *:not(#tributeHuntOverlay) {
+    display: none !important;
+}
+
+#tributeHuntOverlay.tinder-focus {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%) !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.tinder-card-main {
+    width: 320px;
+    height: 480px;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.swipe-indicator {
+    position: absolute;
+    top: 50px;
+    padding: 8px 15px;
+    border: 4px solid;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    opacity: 0;
+    z-index: 100;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
+.swipe-indicator.like { left: 20px; color: var(--neon-green); border-color: var(--neon-green); transform: rotate(-15deg); }
+.swipe-indicator.nope { right: 20px; color: var(--neon-pink); border-color: var(--neon-pink); transform: rotate(15deg); }
+
 /* Animations */
 @keyframes tributeCardAppear {
   0% {
@@ -2507,6 +2560,8 @@ html, body {
     height: 100%;
     object-fit: cover;
 }
+
+
 
 /* --- 9. MOBILE FIXES (UNDER 1023px) --- */
 @media (max-width: 1023px) {
