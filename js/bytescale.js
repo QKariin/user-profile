@@ -43,12 +43,21 @@ export async function getPrivateFile(filePath) {
 }
 
 function isUpcdnUrl(url) {
-  console.log("isUpcdnUrl check:", url);
   if (!url || typeof url !== "string") return false;
   if (!url.includes("upcdn.io")) return false;
   if (!url.includes("/raw/")) return false;
-  if (url.includes("?")) return false; // reject ALL query params
-  return true;
+
+  const hasQuery = url.includes("?");
+  if (!hasQuery) return true; // raw, unsigned
+
+  // If it has a query, only allow it if it's already signed
+  const params = new URL(url).searchParams;
+
+  // Already signed → ignore
+  if (params.has("sig")) return false;
+
+  // Any other query param → transformed → DO NOT SIGN
+  return false;
 }
 
 function extractQueryString(url) {
