@@ -704,58 +704,81 @@ html, body {
 }
 
 /* --- TRIBUTE TINDER FOCUS MODE --- */
+
+/* 1. Hide the left column and the other main layout pieces */
+.tribute-focus-mode .layout-left,
 .tribute-focus-mode #chatBadge,
-.tribute-focus-mode #chatCard,
-.tribute-focus-mode footer,
-.tribute-focus-mode .top-section-split,
-.tribute-focus-mode .bottom-section-full,
-.tribute-focus-mode .app-container > *:not(#tributeHuntOverlay) {
+.tribute-focus-mode .chat-footer,
+.tribute-focus-mode .section-header,
+.tribute-focus-mode #taskCard {
     display: none !important;
 }
 
+/* 2. Hide all chat messages so the screen is empty */
+.tribute-focus-mode #chatContent {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* 3. Force the Overlay to take over the entire screen */
 #tributeHuntOverlay.tinder-focus {
+    display: flex !important;
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%) !important;
-    z-index: 99999 !important;
-    display: flex !important;
+    background: radial-gradient(circle at center, #111 0%, #000 100%) !important;
+    z-index: 999999 !important;
     align-items: center !important;
     justify-content: center !important;
 }
 
+/* The Swipe Stage */
+.tinder-stage {
+    position: relative;
+    width: 320px;
+    height: 500px;
+    perspective: 1000px;
+}
+
+/* The Card */
 .tinder-card-main {
     width: 320px;
     height: 480px;
     background: #0a0a0a;
     border: 1px solid #222;
     border-radius: 20px;
-    position: relative;
+    position: absolute;
     box-shadow: 0 30px 60px rgba(0,0,0,1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     cursor: grab;
+    transition: transform 0.1s ease;
+}
+
+.tinder-card-main img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    background: #000;
 }
 
 .swipe-indicator {
     position: absolute;
-    top: 50px;
-    padding: 8px 15px;
+    top: 40px;
+    padding: 10px;
     border: 4px solid;
     border-radius: 8px;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
     opacity: 0;
     z-index: 100;
-    pointer-events: none;
     text-transform: uppercase;
 }
 
 .swipe-indicator.like { left: 20px; color: var(--neon-green); border-color: var(--neon-green); transform: rotate(-15deg); }
 .swipe-indicator.nope { right: 20px; color: var(--neon-pink); border-color: var(--neon-pink); transform: rotate(15deg); }
-
 /* Animations */
 @keyframes tributeCardAppear {
   0% {
