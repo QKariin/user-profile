@@ -139,7 +139,7 @@ export function observeNewElements() {
       // Prevent feedback loop
       observer.disconnect();
 
-      signUrlAsync(url).then(signedUrl => {
+      signUrl(url).then(signedUrl => {
         // Only update if still the same unsigned URL
         const current = el.getAttribute(mutation.attributeName);
         if (current === url) {
