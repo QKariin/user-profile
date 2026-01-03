@@ -2098,99 +2098,83 @@ html, body {
    TRIBUTE TINDER - FULL HEIGHT & CENTERED
    ========================================================================== */
 
+/* --- THE ELEGANT BLACKOUT (FIXED) --- */
 #tributeHuntOverlay {
     position: absolute !important;
     inset: 0 !important;
-    background: #000 !important; 
-    z-index: 3000 !important;
-    display: none; /* <--- Change 'flex !important' to 'none' */
+    background: #000 !important;
+    z-index: 5000 !important;
+    display: none;
     flex-direction: column;
+    overflow: hidden !important; /* NO SCROLLING */
+}
+
+#tributeHuntOverlay:not(.hidden) { display: flex !important; }
+
+.tribute-moment-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    padding: 0 !important;
+    padding: 15px 20px;
+    border-bottom: 1px solid #111;
 }
 
-/* ADD THIS NEW BLOCK RIGHT BELOW IT: */
-/* --- THE ELEGANT TRIBUTE OVERLAY --- */
-#tributeHuntOverlay {
-    position: absolute !important;
-    inset: 0 !important; /* Covers everything from edge to edge of the chat card */
-    background: #000 !important; /* Pure black for maximum focus */
-    z-index: 5000 !important; /* Sits on top of Header AND Footer */
-    display: none; 
-    flex-direction: column;
-    padding: 0 !important;
-    animation: fadeIn 0.4s ease-out;
-}
+#huntProgress { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-yellow); letter-spacing: 3px; }
+.close-tribute { color: #444; cursor: pointer; font-size: 1.8rem; line-height: 1; }
 
-#tributeHuntOverlay:not(.hidden) {
-    display: flex !important;
-}
-
-/* The Stage */
-#huntStoreGrid {
+.tribute-moment-body {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle, #111 0%, #000 100%);
+    position: relative;
+    padding: 10px;
 }
 
-/* The Premium Tinder Card */
+.hunt-step {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.tribute-title {
+    font-family: 'Rubik Glitch';
+    font-size: 1.2rem;
+    color: var(--neon-yellow);
+    margin-bottom: 10px;
+}
+
+/* THE CARD: Sized to fit perfectly */
 .tinder-card-main {
-    width: 280px;
-    height: 480px;
-    background: #0a0a0a;
+    width: 260px;
+    height: 400px; /* Locked size to fit in chat box */
+    background: #050505;
     border: 1px solid #222;
-    border-radius: 20px;
+    border-radius: 15px;
+    position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 20px rgba(255, 215, 0, 0.1);
-    transition: transform 0.1s;
+    box-shadow: 0 20px 50px rgba(0,0,0,1);
 }
 
 .tinder-card-main img {
     width: 100%;
-    height: 320px;
+    height: 280px;
     object-fit: contain;
     background: #000;
-    padding: 10px;
 }
 
-/* Typography Polish */
-.hunt-step h2 {
-    font-family: 'Rubik Glitch', cursive;
-    color: var(--neon-yellow);
-    letter-spacing: 4px;
+.tinder-card-info {
+    padding: 15px;
     text-align: center;
+    background: linear-gradient(to top, #000, transparent);
 }
 
-.swipe-indicator {
-    font-family: 'Orbitron';
-    font-weight: 900;
-    text-transform: uppercase;
-    padding: 10px 20px;
-    border: 4px solid;
-    border-radius: 10px;
-    position: absolute;
-    top: 40px;
-    z-index: 100;
-    opacity: 0;
-}
-.swipe-indicator.like { left: 20px; color: var(--neon-green); border-color: var(--neon-green); transform: rotate(-15deg); }
-.swipe-indicator.nope { right: 20px; color: var(--neon-pink); border-color: var(--neon-pink); transform: rotate(15deg); }
-
-/* Confession Box */
-#huntNote {
-    background: #050505;
-    border: 1px solid #222;
-    color: #ccc;
-    font-family: 'Rajdhani';
-    font-size: 1.1rem;
-    padding: 20px;
-    width: 90%;
-    margin: 0 auto;
-    border-radius: 15px;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-}
+/* Confession Area */
+#huntSummary { display: flex; align-items: center; gap: 15px; background: #111; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 90%; }
+#huntSummary img { height: 50px; border-radius: 5px; }
+#huntNote { width: 90%; height: 80px; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 10px; resize: none; }
+.finalize-btn { width: 90% !important; background: var(--neon-pink) !important; color: black !important; margin-top: 10px; }
