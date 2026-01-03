@@ -2093,3 +2093,83 @@ html, body {
   
   * { box-shadow: none !important; text-shadow: none !important; }
 }
+
+/* ==========================================================================
+   TRIBUTE TINDER - FULL HEIGHT & CENTERED
+   ========================================================================== */
+
+/* 1. The Overlay: Solid black to cover everything (kills the leaking stamps) */
+#tributeHuntOverlay {
+    position: absolute !important;
+    inset: 0 !important;
+    background: #000 !important; 
+    z-index: 3000 !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important; /* Edge to edge */
+}
+
+/* 2. The Stage: Centers the card vertically and horizontally */
+#huntStoreGrid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+/* 3. The Card: Maximum height (580px) to fit in your 600px box */
+.tinder-card-main {
+    width: 90%;
+    max-width: 340px;
+    height: 560px; /* High card as requested */
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 25px;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: grab;
+    transition: transform 0.1s ease;
+}
+
+/* Image scaling for the high card */
+.tinder-card-main img {
+    width: 100%;
+    height: 400px; /* Huge image area */
+    object-fit: contain;
+    background: #000;
+}
+
+/* Labels for the Swipe */
+.swipe-indicator {
+    position: absolute;
+    top: 50px;
+    padding: 10px 20px;
+    border: 5px solid;
+    border-radius: 10px;
+    font-size: 2rem;
+    font-weight: 900;
+    opacity: 0;
+    z-index: 100;
+    text-transform: uppercase;
+    font-family: 'Orbitron';
+}
+.swipe-indicator.like { left: 20px; color: var(--neon-green); border-color: var(--neon-green); transform: rotate(-15deg); }
+.swipe-indicator.nope { right: 20px; color: var(--neon-pink); border-color: var(--neon-pink); transform: rotate(15deg); }
+
+/* Card Text Info */
+.tinder-card-info {
+    padding: 20px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(to top, #000, transparent);
+}
