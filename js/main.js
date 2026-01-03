@@ -320,6 +320,12 @@ function selectTributeReason(reason) {
     showTributeStep(2);
 }
 
+function setTributeNote(note) {
+    console.log("Note:", note);
+    selectedNote = note;
+    showTributeStep(3);
+}
+
 function filterByBudget(max) {
     renderHuntStore(max); 
     showTributeStep(3);
@@ -541,6 +547,7 @@ setInterval(() => { window.parent.postMessage({ type: "heartbeat", view: current
 
 window.toggleTributeHunt = toggleTributeHunt;
 window.selectTributeReason = selectTributeReason;
+window.setTributeNote = setTributeNote;
 window.filterByBudget = filterByBudget;
 window.showTributeStep = showTributeStep;
 window.toggleHuntNote = toggleHuntNote;
