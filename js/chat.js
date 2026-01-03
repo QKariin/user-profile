@@ -83,7 +83,7 @@ export async function renderChat(messages) {
     chatContent.innerHTML = visibleMessages.map(m => {
         let txt = DOMPurify.sanitize(m.message);
         // Convert newlines to <br>
-        safeHtml = safeHtml.replace(/\n/g, "<br>");
+        txt = txt.replace(/\n/g, "<br>");
         const isMe = m.sender === 'user';
         const isSystem = m.sender === 'system';
 
