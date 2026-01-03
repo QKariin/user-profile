@@ -266,7 +266,7 @@ let filteredItems = [];
 let selectedReason = "";
 let selectedItem = null;
 
-export function toggleTributeHunt() {
+ function toggleTributeHunt() {
     const overlay = document.getElementById('tributeHuntOverlay');
     if (overlay.classList.contains('hidden')) {
         selectedReason = ""; selectedItem = null;
@@ -278,7 +278,7 @@ export function toggleTributeHunt() {
     }
 }
 
-export function showHuntStep(step) {
+ function showHuntStep(step) {
     document.querySelectorAll('.hunt-step').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById('huntStep' + step);
     if (target) target.classList.remove('hidden');
@@ -287,12 +287,12 @@ export function showHuntStep(step) {
     if (progressEl) progressEl.innerText = labels[step] || "";
 }
 
-export function selectTributeReason(reason) {
+ function selectTributeReason(reason) {
     selectedReason = reason;
     renderHuntStore(999999); // SKIP BUDGET STEP
 }
 
-export function renderHuntStore(budget) {
+ function renderHuntStore(budget) {
     const items = window.WISHLIST_ITEMS || [];
     filteredItems = items.filter(item => Number(item.price || item.Price || 0) <= budget);
     currentHuntIndex = 0;
@@ -305,7 +305,7 @@ export function renderHuntStore(budget) {
     showTinderCard();
 }
 
-export function showTinderCard() {
+ function showTinderCard() {
     const grid = document.getElementById('huntStoreGrid');
     if (!grid) return;
     const item = filteredItems[currentHuntIndex];
