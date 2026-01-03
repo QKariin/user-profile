@@ -2098,73 +2098,97 @@ html, body {
    TRIBUTE TINDER - FULL HEIGHT & CENTERED
    ========================================================================== */
 
-/* --- THE ELEGANT BLACKOUT (FULL CARD COVER) --- */
+/* --- THE RITUAL VOID --- */
 #tributeHuntOverlay {
     position: absolute !important;
-    inset: 0 !important; /* Forces it to cover Header, Body, and Footer */
-    background: #000 !important;
-    z-index: 9999 !important; /* Higher than header (1001) and footer (1005) */
+    inset: 0 !important;
+    background: #000 !important; /* Total Blackout */
+    z-index: 9999 !important;
     display: none;
     flex-direction: column;
-    overflow: hidden !important;
-    border-radius: 12px; /* Matches your glass-card corners */
-    animation: tributeFadeIn 0.3s ease-out;
+    overflow: hidden;
+    color: #C5A059; /* Champagne Gold */
 }
 
-#tributeHuntOverlay:not(.hidden) {
-    display: flex !important;
-}
-
-@keyframes tributeFadeIn {
-    from { opacity: 0; transform: scale(1.02); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* Header inside the Blackout */
-.tribute-moment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: #050505;
-    border-bottom: 1px solid #111;
-    flex-shrink: 0;
-}
-
-/* Centered Content Area */
-.tribute-moment-body {
-    flex: 1;
+/* The Progress Ring for the Sacrifice */
+.sacrifice-hold-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    position: relative;
+    cursor: pointer;
 }
 
-/* The Card: Locked size to fit perfectly in a 600px box */
+.sacrifice-ring-svg {
+    position: absolute;
+    transform: rotate(-90deg);
+}
+
+.sacrifice-ring-bg {
+    fill: none;
+    stroke: rgba(197, 160, 89, 0.1);
+    stroke-width: 2;
+}
+
+.sacrifice-ring-fill {
+    fill: none;
+    stroke: #C5A059;
+    stroke-width: 3;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283; /* Fills as you hold */
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.hold-text {
+    font-family: 'Orbitron';
+    font-size: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #C5A059;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* The Relic Card */
 .tinder-card-main {
     width: 260px;
-    height: 380px; 
-    background: #080808;
-    border: 1px solid #222;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 40px rgba(0,0,0,1);
+    height: 400px;
+    background: #0a0a0a;
+    border: 0.5px solid rgba(197, 160, 89, 0.3); /* Thin Gold Line */
+    border-radius: 0; /* Sharp corners look more expensive */
+    box-shadow: 0 0 40px rgba(0,0,0,1), inset 0 0 20px rgba(197, 160, 89, 0.05);
 }
 
 .tinder-card-main img {
-    width: 100%;
-    height: 260px;
-    object-fit: contain;
-    background: #000;
+    filter: sepia(0.5) brightness(0.8); /* Makes images look like relics */
+    transition: 0.5s ease;
 }
 
-/* Options/Buttons */
-.tribute-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-width: 240px;
+.tribute-title {
+    font-family: 'Orbitron'; /* Ditch the glitch font */
+    font-weight: 400;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #C5A059;
+    font-size: 0.9rem;
+}
+
+/* Premium Buttons */
+.tribute-options .tab-btn {
+    background: transparent;
+    border: 0.5px solid rgba(197, 160, 89, 0.4);
+    color: #C5A059;
+    border-radius: 0;
+    font-family: 'Orbitron';
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    transition: 0.4s;
+}
+
+.tribute-options .tab-btn:hover {
+    background: rgba(197, 160, 89, 0.1);
+    border-color: #C5A059;
 }
