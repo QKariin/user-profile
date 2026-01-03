@@ -259,7 +259,7 @@ function updateStats() {
     setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
     setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
     setVal('statCompleted', gameStats.taskdom_completed_tasks || gameStats.completedTasks);
-    setVal('statSkipped', gameStats.taskdom_skipped_tasks || stats.skippedTasks);
+    setVal('statSkipped', gameStats.skippedTasks || stats.skippedTasks);
     setVal('statTotalKneels', gameStats.kneelCount || gameStats.totalKneels);
 
     const sinceEl = document.getElementById('slaveSinceDate');
@@ -302,7 +302,7 @@ function toggleTributeHunt() {
 }
 
 function showHuntStep(step) {
-    document.querySelectorAll('.hunt-step').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById('tributeStep' + step);
     if (target) {
         target.classList.remove('hidden');
