@@ -1,5 +1,3 @@
-main.js 
-
 // --- 1. FULL IMPORTS ---
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -222,7 +220,8 @@ window.addEventListener("message", (event) => {
         if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
         updateStats(); // RECONNECTS THE VISUALS
     }
-        // C. INSTANT REVEAL SYNC (The Roulette Trigger)
+
+      // C. INSTANT REVEAL SYNC (The Roulette Trigger)
     if (data.type === "INSTANT_REVEAL_SYNC") {
         // 1. URGENT: Update the media URL first
         if (data.currentLibraryMedia) {
@@ -955,3 +954,8 @@ if (window.self === window.top) {
         }, "*");
     }, 2000); 
 }
+
+/*window.addEventListener("load", () => {
+  scanExisting();
+  observeNewElements();
+});*/
