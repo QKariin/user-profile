@@ -44,7 +44,6 @@ document.addEventListener('click', () => {
     }
 }, { once: true });
 
-
 const resizer = new ResizeObserver(() => { 
     if(window.parent) window.parent.postMessage({ iframeHeight: document.body.scrollHeight }, '*'); 
 });
@@ -53,17 +52,7 @@ resizer.observe(document.body);
 function initDomProfile() {
     const frame = document.getElementById('twitchFrame');
     if(frame && !frame.src) {
-        const parents = [
-            "qkarin.com", 
-            "www.qkarin.com", 
-            "entire-ecosystem.vercel.app", 
-            "html-components.wixusercontent.com", 
-            "filesusr.com", 
-            "editor.wix.com", 
-            "manage.wix.com", 
-            "localhost"
-        ];
-        
+        const parents = ["qkarin.com", "www.qkarin.com", "entire-ecosystem.vercel.app", "html-components.wixusercontent.com", "filesusr.com", "editor.wix.com", "manage.wix.com", "localhost"];
         let parentString = "";
         parents.forEach(p => parentString += `&parent=${p}`);
         frame.src = `https://player.twitch.tv/?channel=${CONFIG.TWITCH_CHANNEL}${parentString}&muted=true&autoplay=true`;
@@ -72,25 +61,13 @@ function initDomProfile() {
 initDomProfile();
 
 Bridge.listen((data) => {
-    const ignoreList = [
-        "CHAT_ECHO", 
-        "UPDATE_CHAT", 
-        "UPDATE_FULL_DATA", 
-        "UPDATE_DOM_STATUS", 
-        "instantUpdate", 
-        "instantReviewSuccess"
-    ];
-
-    if (ignoreList.includes(data.type)) {
-        return; 
-    }
-
+    const ignoreList = ["CHAT_ECHO", "UPDATE_CHAT", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
+    if (ignoreList.includes(data.type)) return;
     window.postMessage(data, "*"); 
 });
 
 window.addEventListener("message", (event) => {
     const data = event.data;
-
     if (data.type === "CHAT_ECHO" && data.msgObj) {
         const chatContent = document.getElementById('chatContent');
         if (chatContent) {
@@ -102,7 +79,6 @@ window.addEventListener("message", (event) => {
             forceBottom();
         }
     }
-
     if (data.type === 'UPDATE_RULES') {
         const rules = data.payload || {};
         for (let i = 1; i <= 8; i++) {
@@ -110,17 +86,11 @@ window.addEventListener("message", (event) => {
             if (el && rules['rule' + i]) el.innerHTML = rules['rule' + i];
         }
     }
-
     if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
     if (data.type === "INIT_WISHLIST" || data.wishlist) {
         const items = data.wishlist || [];
-        if (Array.isArray(items) && items.length > 0) {
-            setWishlistItems(items);
-            window.WISHLIST_ITEMS = items; 
-            renderWishlist();
-        }
+        if (Array.isArray(items) && items.length > 0) { setWishlistItems(items); window.WISHLIST_ITEMS = items; renderWishlist(); }
     }
-
     if (data.type === "UPDATE_DOM_STATUS") {
         const badge = document.getElementById('chatStatusBadge');
         const ring = document.getElementById('chatStatusRing');
@@ -129,93 +99,51 @@ window.addEventListener("message", (event) => {
         if(ring) ring.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
         if(domBadge) { domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; domBadge.className = data.online ? "dom-status status-online" : "dom-status"; }
     }
-
     if (data.type === "UPDATE_Q_FEED") {
         const feedData = data.domVideos || data.posts || data.feed;
-        if (feedData && Array.isArray(feedData)) {
-            renderDomVideos(feedData);
-            renderNews(feedData);
-            const pc = document.getElementById('cntPosts');
-            if (pc) pc.innerText = feedData.length;
-        }
+        if (feedData && Array.isArray(feedData)) { renderDomVideos(feedData); renderNews(feedData); const pc = document.getElementById('cntPosts'); if (pc) pc.innerText = feedData.length; }
     }
-
     const payload = data.profile || data.galleryData || data.pendingState ? data : (data.type === "UPDATE_FULL_DATA" ? data : null);
-    
     if (payload) {
         if (data.profile && !ignoreBackendUpdates) {
-        setGameStats(data.profile);
-        setUserProfile({
-            name: data.profile.name || "Slave",
-            hierarchy: data.profile.hierarchy || "HallBoy",
-            memberId: data.profile.memberId || "",
-            joined: data.profile.joined
-        });
-        
-        if (data.profile.taskQueue) {
-            setTaskQueue(data.profile.taskQueue);
+            setGameStats(data.profile);
+            setUserProfile({ name: data.profile.name || "Slave", hierarchy: data.profile.hierarchy || "HallBoy", memberId: data.profile.memberId || "", joined: data.profile.joined });
+            if (data.profile.taskQueue) setTaskQueue(data.profile.taskQueue);
+            if (data.profile.activeRevealMap) {
+                let map = [];
+                try { map = (typeof data.profile.activeRevealMap === 'string') ? JSON.parse(data.profile.activeRevealMap) : data.profile.activeRevealMap; } catch(e) { map = []; }
+                setActiveRevealMap(map);
+            }
+            if (data.profile.rewardVault) {
+                let vault = [];
+                try { vault = (typeof data.profile.rewardVault === 'string') ? JSON.parse(data.profile.rewardVault) : data.profile.rewardVault; } catch(e) { vault = []; }
+                setVaultItems(vault);
+            }
+            setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
+            setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
+            renderRewardGrid();
+            if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
+            setStats(migrateGameStatsToStats(data.profile, stats));
+            if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
+            updateStats();
         }
-        if (data.profile.activeRevealMap) {
-            let map = [];
-            try { 
-                map = (typeof data.profile.activeRevealMap === 'string') 
-                    ? JSON.parse(data.profile.activeRevealMap) 
-                    : data.profile.activeRevealMap;
-            } catch(e) { map = []; }
-            setActiveRevealMap(map);
+        if (data.type === "INSTANT_REVEAL_SYNC") {
+            if (data.currentLibraryMedia) setCurrentLibraryMedia(data.currentLibraryMedia);
+            renderRewardGrid(); 
+            setTimeout(() => {
+                const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
+                runTargetingAnimation(winnerId, () => { setActiveRevealMap(data.activeRevealMap || []); renderRewardGrid(); });
+            }, 50); 
         }
-        
-        if (data.profile.rewardVault) {
-            let vault = [];
-            try { 
-                vault = (typeof data.profile.rewardVault === 'string') 
-                        ? JSON.parse(data.profile.rewardVault) 
-                        : data.profile.rewardVault; 
-            } catch(e) { vault = []; }
-            setVaultItems(vault);
-        }
-
-        setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
-        setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
-
-        renderRewardGrid();
-        if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
-        setStats(migrateGameStatsToStats(data.profile, stats));
-        if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
-        updateStats(); 
-    }
-
-    if (data.type === "INSTANT_REVEAL_SYNC") {
-        if (data.currentLibraryMedia) {
-            setCurrentLibraryMedia(data.currentLibraryMedia);
-        }
-        renderRewardGrid(); 
-        setTimeout(() => {
-            const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
-            runTargetingAnimation(winnerId, () => {
-                setActiveRevealMap(data.activeRevealMap || []);
-                renderRewardGrid(); 
-            });
-        }, 50); 
-    }
-
         if (payload.galleryData) {
             const currentGalleryJson = JSON.stringify(payload.galleryData);
-            if (currentGalleryJson !== lastGalleryJson) {
-                setLastGalleryJson(currentGalleryJson);
-                setGalleryData(payload.galleryData);
-                renderGallery();
-                updateStats();
-            }
+            if (currentGalleryJson !== lastGalleryJson) { setLastGalleryJson(currentGalleryJson); setGalleryData(payload.galleryData); renderGallery(); updateStats(); }
         }
-
         if (payload.pendingState !== undefined) {
             if (!taskJustFinished && !ignoreBackendUpdates) {
                 setPendingTaskState(payload.pendingState);
-                if (pendingTaskState) {
-                    setCurrentTask(pendingTaskState.task);
-                    restorePendingUI();
-                } else if (!resetUiTimer) {
+                if (pendingTaskState) { setCurrentTask(pendingTaskState.task); restorePendingUI(); }
+                else if (!resetUiTimer) {
                     document.getElementById('cooldownSection').classList.add('hidden');
                     document.getElementById('activeBadge').classList.remove('show');
                     document.getElementById('mainButtonsArea').classList.remove('hidden');
@@ -224,49 +152,31 @@ window.addEventListener("message", (event) => {
             }
         }
     }
-
     if (data.type === "UPDATE_CHAT" || data.chatHistory) renderChat(data.chatHistory || data.messages);
     setTimeout(styleTributeMessages, 100); 
-
     if (data.type === "FRAGMENT_REVEALED") {
         const { fragmentNumber, day, totalRevealed, isComplete } = data;
         import('./reward.js').then(({ runTargetingAnimation, renderRewardGrid }) => {
-            runTargetingAnimation(fragmentNumber, () => {
-                renderRewardGrid();
-                if (isComplete) {
-                    triggerSound('coinSound');
-                }
-            });
+            runTargetingAnimation(fragmentNumber, () => { renderRewardGrid(); if (isComplete) triggerSound('coinSound'); });
         });
     }
-
 });
 
 function updateStats() {
     const subName = document.getElementById('subName');
     if (!subName || !userProfile || !gameStats) return; 
-
     subName.textContent = userProfile.name || "Slave";
     document.getElementById('subHierarchy').textContent = userProfile.hierarchy || "HallBoy";
     document.getElementById('coins').textContent = gameStats.coins ?? 0;
     document.getElementById('points').textContent = gameStats.points ?? 0;
-
-    const setVal = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val ?? 0;
-    };
-
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? 0; };
     setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
     setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
     setVal('statCompleted', gameStats.taskdom_completed_tasks || gameStats.completedTasks);
     setVal('statSkipped', gameStats.skippedTasks || stats.skippedTasks);
     setVal('statTotalKneels', gameStats.kneelCount || gameStats.totalKneels);
-
     const sinceEl = document.getElementById('slaveSinceDate');
-    if (sinceEl && userProfile.joined) {
-        try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
-    }
-
+    if (sinceEl && userProfile.joined) { try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; } }
     if (typeof LEVELS !== 'undefined' && LEVELS.length > 0) {
         let nextLevel = LEVELS.find(l => l.min > gameStats.points) || LEVELS[LEVELS.length - 1];
         document.getElementById('nextLevelName').innerText = nextLevel.name;
@@ -277,81 +187,52 @@ function updateStats() {
         const pb = document.getElementById('progressBar');
         if (pb) pb.style.width = Math.min(100, Math.max(0, progress)) + "%";
     }
-
     updateKneelingStatus(); 
 }
 
-let currentHuntIndex = 0;
-let filteredItems = [];
-let selectedReason = "";
-let selectedItem = null;
+let currentHuntIndex = 0; let filteredItems = []; let selectedReason = ""; let selectedItem = null;
 
 function toggleTributeHunt() {
     const overlay = document.getElementById('tributeHuntOverlay');
-    
     if (overlay.classList.contains('hidden')) {
-        selectedReason = "";
-        selectedItem = null;
+        selectedReason = ""; selectedItem = null;
         if(document.getElementById('huntNote')) document.getElementById('huntNote').value = "";
-        overlay.classList.remove('hidden');
-        showHuntStep(1);
-    } else {
-        overlay.classList.add('hidden');
-        resetTributeFlow();
-    }
+        overlay.classList.remove('hidden'); showHuntStep(1); 
+    } else { overlay.classList.add('hidden'); }
 }
 
 function showHuntStep(step) {
     document.querySelectorAll('.hunt-step').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById('huntStep' + step);
-    if (target) {
-        target.classList.remove('hidden');
-    }
-    const labels = ["", "INTENTION", "SACRIFICE", "THE HUNT", "CONFESSION"];
+    if (target) target.classList.remove('hidden');
+    const labels = ["", "INTENTION", "SEARCHING", "THE HUNT", "CONFESSION"];
     const progressEl = document.getElementById('huntProgress');
     if (progressEl) progressEl.innerText = labels[step] || "";
 }
 
-function selectTributeReason(reason) {
-    selectedReason = reason;
-    showHuntStep(2);
-}
-
-function filterByBudget(max) {
-    renderHuntStore(max); 
-    showHuntStep(3);
+function selectTributeReason(reason) { 
+    selectedReason = reason; 
+    renderHuntStore(999999); // JUMP DIRECTLY TO STEP 3
 }
 
 function renderHuntStore(budget) {
-    const grid = document.getElementById('huntStoreGrid');
-    if (!grid) return;
     const items = window.WISHLIST_ITEMS || [];
     filteredItems = items.filter(item => Number(item.price || item.Price || 0) <= budget);
-    currentHuntIndex = 0; 
-
+    currentHuntIndex = 0;
     if (filteredItems.length === 0) {
-        grid.innerHTML = '<div style="color:#666; text-align:center; padding:40px;">NO TRIBUTES IN THIS TIER...</div>';
+        const grid = document.getElementById('huntStoreGrid');
+        if(grid) grid.innerHTML = `<div style="text-align:center;"><p style="color:#666;">VAULT EMPTY</p></div>`;
         return;
     }
-
+    showHuntStep(3); // SHOW THE GRID
     showTinderCard();
 }
 
 function showTinderCard() {
     const grid = document.getElementById('huntStoreGrid');
+    if (!grid) return;
     const item = filteredItems[currentHuntIndex];
-
-    if (!item) {
-        grid.innerHTML = `
-            <div style="text-align:center; padding:40px;">
-                <div style="font-size:2rem; margin-bottom:10px;">💨</div>
-                <div style="color:#666; font-size:0.7rem;">NO MORE ITEMS IN THIS TIER</div>
-                <button class="tab-btn" onclick="showHuntStep(2)" style="margin-top:15px; width:auto; padding:5px 15px;">CHANGE BUDGET</button>
-            </div>`;
-        return;
-    }
-
-    grid.style.perspective = "1000px";
+    if (!item) { grid.innerHTML = `<div style="text-align:center;"><p style="color:#666;">END OF LIST</p><button class="action-btn" onclick="showHuntStep(1)">RESTART</button></div>`; return; }
     grid.innerHTML = `
         <div id="tinderCard" class="tinder-card-main">
             <div id="likeLabel" class="swipe-indicator like">SACRIFICE</div>
@@ -361,47 +242,34 @@ function showTinderCard() {
                 <div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div>
                 <div style="color:white; letter-spacing:2px; font-weight:bold; font-size:0.8rem;">${item.name.toUpperCase()}</div>
             </div>
-        </div>
-    `;
-
+        </div>`;
     initSwipeEvents(document.getElementById('tinderCard'), item);
 }
 
 function initSwipeEvents(card, item) {
-    let startX = 0;
-    let currentX = 0;
-
-    const handleStart = (e) => {
-        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        card.style.transition = 'none';
-    };
-
+    let startX = 0; let currentX = 0;
+    const handleStart = (e) => { startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; card.style.transition = 'none'; };
     const handleMove = (e) => {
         if (!startX) return;
         currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
         const diff = currentX - startX;
         card.style.transform = `translateX(${diff}px) rotate(${diff / 15}deg)`;
-        const likeLabel = document.getElementById('likeLabel');
-        const nopeLabel = document.getElementById('nopeLabel');
-        if(likeLabel) likeLabel.style.opacity = diff > 0 ? (diff / 100) : 0;
-        if(nopeLabel) nopeLabel.style.opacity = diff < 0 ? (Math.abs(diff) / 100) : 0;
+        const like = document.getElementById('likeLabel'); const nope = document.getElementById('nopeLabel');
+        if(like) like.style.opacity = diff > 0 ? Math.min(diff / 100, 1) : 0;
+        if(nope) nope.style.opacity = diff < 0 ? Math.min(Math.abs(diff) / 100, 1) : 0;
     };
-
     const handleEnd = () => {
-        const diff = currentX - startX;
-        card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-
-        if (diff > 120) {
-            card.style.transform = `translateX(600px) rotate(45deg)`;
-            selectedItem = item;
+        const diff = currentX - startX; card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        if (diff > 100) { // SACRIFICE
+            card.style.transform = `translateX(600px) rotate(45deg)`; selectedItem = item;
             if(document.getElementById('huntSelectedImg')) document.getElementById('huntSelectedImg').src = item.img || item.image;
             if(document.getElementById('huntSelectedName')) document.getElementById('huntSelectedName').innerText = item.name.toUpperCase();
             if(document.getElementById('huntSelectedPrice')) document.getElementById('huntSelectedPrice').innerText = item.price + " 🪙";
             setTimeout(() => { showHuntStep(4); }, 200);
-        } else if (diff < -120) {
-            card.style.transform = `translateX(-600px) rotate(-45deg)`;
+        } else if (diff < -100) { // SKIP: FIX TO SHOW NEXT ITEM
+            card.style.transform = `translateX(-600px) rotate(-45deg)`; 
             card.style.opacity = "0";
-            currentHuntIndex++;
+            currentHuntIndex++; 
             setTimeout(() => { showTinderCard(); }, 300);
         } else {
             card.style.transform = `translateX(0) rotate(0)`;
@@ -410,166 +278,77 @@ function initSwipeEvents(card, item) {
         }
         startX = 0;
     };
+    card.addEventListener('mousedown', handleStart); card.addEventListener('touchstart', handleStart);
+    window.addEventListener('mousemove', handleMove); window.addEventListener('touchmove', handleMove);
+    window.addEventListener('mouseup', handleEnd); window.addEventListener('touchend', handleEnd);
+}
 
-    card.addEventListener('mousedown', handleStart);
-    card.addEventListener('touchstart', handleStart);
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('touchmove', handleMove);
-    window.addEventListener('mouseup', handleEnd);
-    window.addEventListener('touchend', handleEnd);
+function finalizeSacrifice() {
+    const note = document.getElementById('huntNote') ? document.getElementById('huntNote').value.trim() : "";
+    if (!selectedItem || !selectedReason) return;
+    if (gameStats.coins < selectedItem.price) { triggerSound('sfx-deny'); alert('Insufficient coins!'); return; }
+    const tributeMessage = `💝 TRIBUTE: ${selectedReason}\n🎁 ITEM: ${selectedItem.name}\n💰 COST: ${selectedItem.price}\n💌 "${note || "A silent tribute."}"`;
+    window.parent.postMessage({ type: "PURCHASE_ITEM", itemName: selectedItem.name, cost: selectedItem.price, messageToDom: tributeMessage }, "*");
+    triggerSound('sfx-buy'); triggerCoinShower(); toggleTributeHunt();
 }
 
 function toggleHuntNote(show) {
     const container = document.getElementById('huntNoteContainer');
     const btn = document.getElementById('btnShowNote');
-    if (!container || !btn) return;
-    if (show) {
-        container.classList.remove('hidden');
-        btn.classList.add('hidden');
-        document.getElementById('huntNote').focus();
-    } else {
-        container.classList.add('hidden');
-        btn.classList.remove('hidden');
-    }
-}
-
-function finalizeSacrifice() {
-    const noteEl = document.getElementById('huntNote');
-    const note = noteEl ? noteEl.value.trim() : "";
-    if (!selectedItem || !selectedReason) return;
-    if (gameStats.coins < selectedItem.price) { triggerSound('sfx-deny'); alert('Insufficient coins!'); return; }
-    const tributeMessage = `💝 TRIBUTE: ${selectedReason}\n🎁 ITEM: ${selectedItem.name}\n💰 COST: ${selectedItem.price}\n💌 "${note || "A silent tribute."}"`;
-    window.parent.postMessage({ 
-        type: "PURCHASE_ITEM",
-        itemName: selectedItem.name,
-        cost: selectedItem.price,
-        messageToDom: tributeMessage
-    }, "*");
-    triggerSound('sfx-buy');
-    triggerCoinShower();
-    toggleTributeHunt();
+    if (show) { container.classList.remove('hidden'); btn.classList.add('hidden'); document.getElementById('huntNote').focus(); }
+    else { container.classList.add('hidden'); btn.classList.remove('hidden'); }
 }
 
 function styleTributeMessages() {
-    const chatContent = document.getElementById('chatContent');
-    if (!chatContent) return;
-    const messages = chatContent.querySelectorAll('.msg');
-    messages.forEach(msg => {
+    const chatContent = document.getElementById('chatContent'); if (!chatContent) return;
+    chatContent.querySelectorAll('.msg').forEach(msg => {
         const text = msg.textContent || msg.innerHTML;
         if (text.includes('💝 TRIBUTE:') && !msg.classList.contains('tribute-styled')) {
             msg.classList.add('tribute-styled');
             const lines = text.split('\n');
-            const tributeLine = lines.find(line => line.includes('💝 TRIBUTE:'));
-            const messageLine = lines.find(line => line.includes('💌'));
+            const tributeLine = lines.find(l => l.includes('💝 TRIBUTE:'));
+            const messageLine = lines.find(l => l.includes('💌'));
             if (tributeLine && messageLine) {
                 const reason = tributeLine.replace('💝 TRIBUTE:', '').trim();
                 const message = messageLine.replace('💌', '').replace(/"/g, '').trim();
-                const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeStr = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
                 const msgRow = msg.closest('.msg-row');
                 if (msgRow) {
-                    msgRow.innerHTML = `
-                        <div class="tribute-system-container">
-                            <div class="tribute-timestamp">${timeStr}</div>
-                            <div class="tribute-card">
-                                <svg class="tribute-card-icon"><use href="#icon-gift"></use></svg>
-                                <div class="tribute-card-content">
-                                    <div class="tribute-card-left">
-                                        <div class="tribute-card-title">TRIBUTE SENT</div>
-                                        <div class="tribute-card-reason">${reason}</div>
-                                        <div class="tribute-card-message">"${message}"</div>
-                                    </div>
-                                    <div class="tribute-card-right">
-                                        <div class="tribute-card-footer">For Queen Karin</div>
-                                        <svg class="tribute-card-footer-icon"><use href="#icon-crown"></use></svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    msgRow.style.justifyContent = 'center';
-                    msgRow.style.margin = '15px 0';
-                    msgRow.classList.add('tribute-system-row');
+                    msgRow.innerHTML = `<div class="tribute-system-container"><div class="tribute-timestamp">${timeStr}</div><div class="tribute-card"><svg class="tribute-card-icon"><use href="#icon-gift"></use></svg><div class="tribute-card-content"><div class="tribute-card-left"><div class="tribute-card-title">TRIBUTE SENT</div><div class="tribute-card-reason">${reason}</div><div class="tribute-card-message">"${message}"</div></div><div class="tribute-card-right"><div class="tribute-card-footer">For Queen Karin</div><svg class="tribute-card-footer-icon"><use href="#icon-crown"></use></svg></div></div></div></div>`;
+                    msgRow.style.justifyContent = 'center'; msgRow.style.margin = '15px 0'; msgRow.classList.add('tribute-system-row');
                 }
             }
         }
     });
 }
 
-function buyRealCoins(amount) {
-    triggerSound('sfx-buy');
-    window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*");
-}
-
+function buyRealCoins(amount) { triggerSound('sfx-buy'); window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*"); }
 function triggerCoinShower() {
     for (let i = 0; i < 40; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin-particle';
-        coin.innerHTML = `<svg style="width:100%; height:100%; fill:gold;"><use href="#icon-coin"></use></svg>`;
-        coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`);
-        coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`);
-        document.body.appendChild(coin);
-        setTimeout(() => coin.remove(), 2000);
+        const coin = document.createElement('div'); coin.className = 'coin-particle';
+        coin.innerHTML = `<svg style="width:100%;height:100%;fill:gold;"><use href="#icon-coin"></use></svg>`;
+        coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`); coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`);
+        document.body.appendChild(coin); setTimeout(() => coin.remove(), 2000);
     }
 }
-
-function breakGlass(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    const overlay = document.getElementById('specialGlassOverlay');
-    if (overlay) overlay.classList.remove('active');
-    window.parent.postMessage({ type: "GLASS_BROKEN" }, "*");
-}
-
-function submitSessionRequest() {
-    const checked = document.querySelector('input[name="sessionType"]:checked');
-    if (!checked) return;
-    window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*");
-}
-
-function resetTributeFlow() {
-    selectedReason = "";
-    selectedItem = null;
-    const note = document.getElementById('huntNote');
-    if (note) note.value = "";
-    showHuntStep(1);
-}
+function breakGlass(e) { if (e && e.stopPropagation) e.stopPropagation(); const overlay = document.getElementById('specialGlassOverlay'); if (overlay) overlay.classList.remove('active'); window.parent.postMessage({ type: "GLASS_BROKEN" }, "*"); }
+function submitSessionRequest() { const checked = document.querySelector('input[name="sessionType"]:checked'); if (!checked) return; window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*"); }
+function resetTributeFlow() { selectedReason = ""; selectedItem = null; if (document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; showHuntStep(1); }
 
 setInterval(updateKneelingStatus, 1000);
 setInterval(() => { window.parent.postMessage({ type: "heartbeat", view: currentView }, "*"); }, 5000);
 
-window.toggleTributeHunt = toggleTributeHunt;
-window.selectTributeReason = selectTributeReason;
-window.filterByBudget = filterByBudget;
-window.showHuntStep = showHuntStep;
-window.toggleHuntNote = toggleHuntNote;
-window.finalizeSacrifice = finalizeSacrifice;
-window.resetTributeFlow = resetTributeFlow;
-window.switchTab = switchTab;
-window.toggleStats = toggleStats;
-window.toggleSection = toggleSection;
-window.handleHoldStart = handleHoldStart;
-window.handleHoldEnd = handleHoldEnd;
-window.claimKneelReward = claimKneelReward;
-window.updateKneelingStatus = updateKneelingStatus;
-window.getRandomTask = getRandomTask;
-window.cancelPendingTask = cancelPendingTask;
-window.handleEvidenceUpload = handleEvidenceUpload;
-window.sendChatMessage = sendChatMessage;
-window.handleChatKey = handleChatKey;
-window.loadMoreChat = loadMoreChat;
-window.openChatPreview = openChatPreview;
-window.closeChatPreview = closeChatPreview;
-window.breakGlass = breakGlass;
-window.openHistoryModal = openHistoryModal;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.toggleHistoryView = toggleHistoryView;
-window.loadMoreHistory = loadMoreHistory;
-window.handleProfileUpload = handleProfileUpload;
-window.openSessionUI = openSessionUI;
-window.closeSessionUI = closeSessionUI;
-window.updateSessionCost = updateSessionCost;
-window.submitSessionRequest = submitSessionRequest;
-window.handleAdminUpload = handleAdminUpload;
-window.WISHLIST_ITEMS = WISHLIST_ITEMS;
-window.gameStats = gameStats;
+// GLOBAL BINDINGS
+window.toggleTributeHunt = toggleTributeHunt; window.selectTributeReason = selectTributeReason; window.showHuntStep = showHuntStep;
+window.finalizeSacrifice = finalizeSacrifice; window.resetTributeFlow = resetTributeFlow; window.toggleHuntNote = toggleHuntNote;
+window.switchTab = switchTab; window.toggleStats = toggleStats; window.toggleSection = toggleSection;
+window.handleHoldStart = handleHoldStart; window.handleHoldEnd = handleHoldEnd; window.claimKneelReward = claimKneelReward;
+window.updateKneelingStatus = updateKneelingStatus; window.getRandomTask = getRandomTask; window.cancelPendingTask = cancelPendingTask;
+window.handleEvidenceUpload = handleEvidenceUpload; window.sendChatMessage = sendChatMessage; window.handleChatKey = handleChatKey;
+window.loadMoreChat = loadMoreChat; window.openChatPreview = openChatPreview; window.closeChatPreview = closeChatPreview;
+window.breakGlass = breakGlass; window.openHistoryModal = openHistoryModal; window.openModal = openModal;
+window.closeModal = closeModal; window.toggleHistoryView = toggleHistoryView; window.loadMoreHistory = loadMoreHistory;
+window.handleProfileUpload = handleProfileUpload; window.openSessionUI = openSessionUI; window.closeSessionUI = closeSessionUI;
+window.updateSessionCost = updateSessionCost; window.submitSessionRequest = submitSessionRequest; window.handleAdminUpload = handleAdminUpload;
+window.WISHLIST_ITEMS = WISHLIST_ITEMS; window.gameStats = gameStats;
 window.parent.postMessage({ type: "UI_READY" }, "*");
