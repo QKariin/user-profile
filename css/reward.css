@@ -56,7 +56,10 @@
     overflow: hidden;
 
     /* FIX: flex is fine, but only if width is stable */
-    display: flex !important;
+    /*display: flex !important;*/
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
     align-items: center;
     justify-content: center;
 }
