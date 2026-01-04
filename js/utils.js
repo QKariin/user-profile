@@ -3,6 +3,8 @@ export function getOptimizedUrl(url, width) {
     if (!url) return "";
     if (url.startsWith('data:')) return url;
 
+    if (url.includes("cloudinary")) return "https://upcdn.io/kW2K8hR/raw/uploads/2025/12/06/collar-512.png";
+
     // REMOVED THE CLOUDINARY KILL SWITCH THAT WAS BREAKING YOUR LOGS
     if (url.includes("upcdn.io")) {
         let cleanUrl = url.replace(/\.(mp4|webm|mov)$/i, ".jpg");
