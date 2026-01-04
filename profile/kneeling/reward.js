@@ -9,9 +9,13 @@ export function renderRewardGrid() {
     const gridContainer = document.getElementById('revealGridContainer');
     const section = document.getElementById('revealSection');
 
-    // If no media is loaded yet, keep the section hidden
-    if (!gridContainer || !currentLibraryMedia) {
-        if (section) section.style.display = 'none';
+    // If no container, can't render anything
+    if (!gridContainer) {
+        return;
+    }
+    
+    // If no media is loaded yet, just keep buttons visible and wait
+    if (!currentLibraryMedia) {
         return;
     }
 
@@ -70,11 +74,14 @@ export function buyRewardFragment(cost) {
     const rewardMenu = document.getElementById('kneelRewardOverlay');
     if (rewardMenu) rewardMenu.classList.add('hidden');
     
-    // 4. Force the grid view to open and render the grid
+    // 4. Reset the button menu to main menu
+    toggleRewardSubMenu(false);
+    
+    // 5. Force the grid view to open and render the grid
     const section = document.getElementById('revealSection');
     if (section) section.style.display = 'flex';
     
-    // 5. Render the grid with current media
+    // 6. Render the grid with current media (if available)
     renderRewardGrid();
 
     triggerSound('coinSound');
