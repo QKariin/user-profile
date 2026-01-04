@@ -4,6 +4,7 @@
     
     <!-- THE PRIZE GRID (Opened) -->
     <div id="revealGridContainer">
+        <!-- Media and grid overlay will be injected here by renderRewardGrid() -->
         
         <!-- THE INTEGRATED COMMAND BLOCK -->
         <div class="reveal-market-row">
@@ -19,7 +20,7 @@
             </div>
         
             <!-- TIER 2: PURCHASE OPTIONS (Starts Hidden) -->
-            <div id="reward-buy-menu" class="hidden" style="flex-direction: column; gap: 6px; align-items: center;">
+            <div id="reward-buy-menu" class="hidden" style="display: none; flex-direction: column; gap: 6px; align-items: center;">
                 <button onclick="buyRewardFragment(100)" class="dr-enforce-btn market-btn">
                     1 SQUARE (100 🪙)
                 </button>
@@ -32,5 +33,5 @@
             </div>
 
         </div> <!-- End reveal-market-row -->
-    </div> <!-- End revealGridContainer (Now correctly closing AFTER the buttons) -->
+    </div> <!-- End revealGridContainer -->
 </div> <!-- End revealSection -->
