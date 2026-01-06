@@ -1834,6 +1834,8 @@ html, body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     transition: opacity 0.3s;
 }
