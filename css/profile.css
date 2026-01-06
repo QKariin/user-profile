@@ -89,6 +89,28 @@ html, body {
     border: none !important;
 }
 
+.blessing-orb:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.coin-presets-row {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    background: rgba(0,0,0,0.3); /* Subtle background for the button area */
+}
+
+.blessing-orb.orb-yellow:hover {
+    border-color: var(--neon-yellow) !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.blessing-orb.orb-pink:hover {
+    border-color: var(--neon-pink) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 222, 0.2);
+}
+
 #kneelRewardOverlay.hidden {
     opacity: 0;
     pointer-events: none;
@@ -96,6 +118,100 @@ html, body {
 }
 
 /* TRIBUTE HUNT OVERLAY ANIMATION */
+#tributeHuntOverlay {
+    background: rgba(5, 5, 5, 0.98) !important;
+    border: 1px solid var(--neon-yellow);
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1);
+    transition: all 0.4s ease;
+}
+
+/* Step Transitions */
+.hunt-step {
+    animation: slideUpFade 0.3s ease-out forwards;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tribute Progress Header */
+#huntProgress {
+    font-family: 'Orbitron';
+    text-shadow: 0 0 10px var(--neon-yellow);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    padding-bottom: 10px;
+}
+
+/* Overriding tab-btn for the Hunt context */
+#tributeHuntOverlay .tab-btn {
+    margin-bottom: 8px;
+    border-color: #333;
+    background: rgba(255, 255, 255, 0.02);
+    transition: 0.2s;
+    font-size: 0.75rem;
+}
+
+#tributeHuntOverlay .tab-btn:hover {
+    border-color: var(--neon-yellow);
+    color: var(--neon-yellow);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+#huntNote::placeholder {
+    color: #444;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+/* Make the Skip link glow slightly on hover */
+#huntStep4 button:last-child:hover {
+    color: var(--neon-yellow) !important;
+    transition: 0.3s;
+}
+
+/* Special Back Button */
+.hunt-back-btn {
+    background: transparent;
+    border: none;
+    color: #444;
+    font-family: 'Rajdhani';
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: auto;
+    padding: 15px;
+    text-transform: uppercase;
+}
+
+.hunt-back-btn:hover {
+    color: #888;
+}
+
+/* Tribute Grid Styling */
+#huntStoreGrid {
+    padding: 10px 0;
+}
+
+#huntStoreGrid .store-item {
+    border-color: #222;
+    background: #050505;
+}
+
+/* Confession Area */
+#huntNote {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid #333 !important;
+    transition: border-color 0.3s;
+}
+
+#huntNote:focus {
+    border-color: var(--neon-yellow) !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+}
 
 .bottom-section-full {
   width: 100%;
@@ -136,6 +252,13 @@ html, body {
     margin-bottom: 5px;
 }
 
+.m-points-val {
+    color: var(--neon-yellow);
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
 .sub-view {
     flex: 1;
     display: flex;
@@ -146,6 +269,15 @@ html, body {
 
 .hidden { display: none !important; }
 
+.feedback-text-bubble, .task-text-bubble {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-family: 'Rajdhani';
+    font-size: 1.1rem;
+    width: 100%;
+}
 
 .modal-footer-menu {
     display: grid;
@@ -223,6 +355,38 @@ html, body {
   display: none;
 }
 
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-family: 'Rajdhani';
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: left;
+  width: 100%;
+}
+
+.menu-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.menu-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: #ccc;
+}
+
+.menu-btn:hover svg {
+  fill: white;
+}
+
 .btn-plus {
   height: 45px;
   width: 45px;
@@ -263,22 +427,338 @@ html, body {
   background: #000;
 }
 
+/* Tribute Card System - Clean Banner Style with SVGs */
+.tribute-card {
+  max-width: 85%;
+  width: 100%;
+  margin: 10px auto;
+  background: linear-gradient(135deg, rgba(255,0,222,0.08), rgba(0,0,0,0.4));
+  border: 1px solid var(--neon-pink);
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 0 15px rgba(255,0,222,0.2);
+  position: relative;
+  overflow: hidden;
+  animation: tributeBannerSlide 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 60px;
+}
+
+/* Subtle shimmer */
+.tribute-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  animation: tributeShimmer 4s ease-in-out infinite;
+}
+
+.tribute-card-icon {
+  width: 32px;
+  height: 32px;
+  fill: var(--neon-pink);
+  flex-shrink: 0;
+  animation: tributeIconPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px var(--neon-pink));
+}
+
+.tribute-card-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.tribute-card-left {
+  flex: 1;
+}
+
+.tribute-card-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--neon-pink);
+  text-shadow: 0 0 8px var(--neon-pink);
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.tribute-card-reason {
+  font-size: 0.75rem;
+  color: var(--neon-yellow);
+  margin-bottom: 2px;
+}
+
+.tribute-card-message {
+  font-size: 0.7rem;
+  color: #ccc;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.tribute-card-right {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tribute-card-footer {
+  font-size: 0.65rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tribute-card-footer-icon {
+  width: 16px;
+  height: 16px;
+  fill: var(--neon-yellow);
+  filter: drop-shadow(0 0 4px var(--neon-yellow));
+}
+
+/* System message container styling */
+.tribute-system-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0;
+  position: relative;
+}
+
+.tribute-timestamp {
+  font-size: 0.65rem;
+  color: #666;
+  margin-bottom: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 1px;
+}
+
+/* Animations */
+@keyframes tributeBannerSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tributeShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes tributeIconPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px var(--neon-pink));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px var(--neon-pink));
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tribute-card {
+    max-width: 95%;
+    padding: 12px 15px;
+    gap: 10px;
+  }
+  
+  .tribute-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .tribute-card-right {
+    text-align: left;
+  }
+}
+
+/* Animations - Much Cleaner */
+@keyframes tributeBannerSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tributeShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes tributeIconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tribute-card {
+    max-width: 95%;
+    padding: 12px 15px;
+    gap: 10px;
+  }
+  
+  .tribute-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .tribute-card-right {
+    text-align: left;
+  }
+}
 
 
+/* Animations */
+@keyframes tributeCardDrop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px) rotateX(90deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1) translateY(10px) rotateX(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotateX(0deg);
+  }
+}
+
+@keyframes tributeBorderGlow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    filter: hue-rotate(90deg);
+  }
+}
+
+@keyframes tributeShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes tributeTitlePulse {
+  0%, 100% {
+    text-shadow: 0 0 15px var(--neon-pink);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 25px var(--neon-pink), 0 0 35px var(--neon-pink);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse-yellow {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+#swipeHint {
+    animation: pulse-yellow 2s infinite ease-in-out;
+    text-shadow: 0 0 5px var(--neon-yellow);
+}
+
+.tinder-card:active {
+    cursor: grabbing;
+}
+
+/* Particle effects container */
+.tribute-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Animations */
+@keyframes tributeCardAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tributeShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.tribute-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 30px rgba(255,0,222,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+}
+
+/* Center tribute cards in chat */
+.msg-row.tribute-row {
+  justify-content: center !important;
+}
 
 
+/* Animations */
+@keyframes tributeCardAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
 
+@keyframes tributeShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
 
-
-
-
-
-
-
-
-
-
-
+/* Hover effect */
+.tribute-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 30px rgba(255,0,222,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+}
 
 .pc-avatar-edit-overlay {
   position: absolute;
@@ -459,7 +939,7 @@ html, body {
   font-weight: 900;
   letter-spacing: 2px;
   text-transform: uppercase;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid rgba(255,0,222,0.3);
   padding-bottom: 3px;
   margin-bottom: 3px;
 }
@@ -486,7 +966,6 @@ html, body {
   margin-top: 20px;
   padding: 0;
   width: 75% !important;
-  flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -1037,6 +1516,27 @@ html, body {
   padding-bottom: 15px;
 }
 
+.store-item {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s;
+  position: relative;
+}
+
+.store-item.locked {
+  filter: grayscale(1) brightness(0.6);
+  border-color: #222;
+}
+
+.store-item.can-afford {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 8px rgba(255, 0, 222, 0.15);
+}
+
 .si-img-box {
   height: 100px;
   background: black;
@@ -1105,6 +1605,32 @@ html, body {
   gap: 4px;
   transition: 0.2s;
   cursor: pointer;
+}
+
+.cat-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 5px;
+}
+
+.cat-pill {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 15px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: #666;
+  font-size: 0.65rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cat-pill.active {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  background: rgba(255,215,0,0.1);
 }
 
 .social-header {
@@ -1518,7 +2044,6 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
 }
 
 .kneel-btn-bar {
@@ -1575,6 +2100,40 @@ html, body {
   text-shadow: 0 0 5px var(--neon-blue);
   font-weight: bold;
   margin-left: 5px;
+}
+
+.global-ticker {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: black;
+  border-top: 1px solid #333;
+  color: var(--neon-green);
+  font-family: 'Rajdhani';
+  font-weight: bold;
+  font-size: 0.75rem;
+  padding: 5px 0;
+  z-index: 99999;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ticker-content {
+  display: inline-block;
+  padding-left: 100%;
+  animation: tickerScroll 25s linear infinite;
+}
+
+@keyframes tickerScroll {
+  0% {
+    transform: translate3d(0,0,0);
+  }
+
+  100% {
+    transform: translate3d(-100%,0,0);
+  }
 }
 
 .gi-sticker {
@@ -1649,6 +2208,13 @@ html, body {
     position: relative;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     margin-bottom: 60px; /* Leaves room for the main buttons at the bottom */
+}
+
+.m-status-badge-big {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-shadow: 0 0 15px currentColor;
 }
 
 .m-reward-row { display: flex; align-items: center; gap: 20px; }
@@ -1942,8 +2508,6 @@ html, body {
     object-fit: cover;
 }
 
-
-
 /* --- 9. MOBILE FIXES (UNDER 1023px) --- */
 @media (max-width: 1023px) {
   .glass-card, .glass-modal, .theater-text-box {
@@ -1958,107 +2522,3 @@ html, body {
   
   * { box-shadow: none !important; text-shadow: none !important; }
 }
-
-/* ==========================================================================
-   TRIBUTE TINDER - FULL HEIGHT & CENTERED
-   ========================================================================== */
-
-/* --- THE RITUAL VOID --- */
-#tributeHuntOverlay {
-    position: absolute !important;
-    inset: 0 !important;
-    background: #000 !important; /* Total Blackout */
-    z-index: 9999 !important;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    color: #C5A059; /* Champagne Gold */
-}
-
-/* The Progress Ring for the Sacrifice */
-.sacrifice-hold-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    margin: 20px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.sacrifice-ring-svg {
-    position: absolute;
-    transform: rotate(-90deg);
-}
-
-.sacrifice-ring-bg {
-    fill: none;
-    stroke: rgba(197, 160, 89, 0.1);
-    stroke-width: 2;
-}
-
-.sacrifice-ring-fill {
-    fill: none;
-    stroke: #C5A059;
-    stroke-width: 3;
-    stroke-dasharray: 283;
-    stroke-dashoffset: 283; /* Fills as you hold */
-    transition: stroke-dashoffset 0.1s linear;
-}
-
-.hold-text {
-    font-family: 'Orbitron';
-    font-size: 0.5rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #C5A059;
-    text-align: center;
-    pointer-events: none;
-}
-
-/* The Relic Card */
-/* Ensure the Stage doesn't allow scrolling */
-#huntStoreGrid {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-/* SHRINK THE CARD TO FIT THE CHAT BOX */
-.tinder-card-main {
-    width: 240px; /* Small enough for chat box */
-    height: 380px; 
-    background: #0a0a0a;
-    border: 1px solid #333;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,1);
-    position: relative;
-    overflow: hidden;
-}
-
-.tinder-card-main img {
-    width: 100%;
-    height: 250px; /* Fixed height for image area */
-    object-fit: contain;
-    background: #000;
-}
-
-/* Correct Swiping Labels */
-.swipe-indicator {
-    position: absolute;
-    top: 30px;
-    padding: 5px 15px;
-    border: 3px solid;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: 900;
-    opacity: 0;
-    z-index: 100;
-    pointer-events: none;
-}
-.swipe-indicator.like { left: 10px; color: var(--neon-green); border-color: var(--neon-green); transform: rotate(-15deg); }
-.swipe-indicator.nope { right: 10px; color: var(--neon-pink); border-color: var(--neon-pink); transform: rotate(15deg); }
