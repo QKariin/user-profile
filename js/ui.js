@@ -57,35 +57,10 @@ export function switchTab(mode) {
         'buy': 'viewBuy'
     };
 
-    // Tabs that should use the modal system for full-screen display
-    const modalTabs = ['session', 'protocol', 'buy', 'rewards'];
-    
-    if (modalTabs.includes(mode)) {
-        // Use modal system for these tabs
-        const modal = document.getElementById('glassModal');
-        const modalContent = document.getElementById('modalGlassOverlay');
-        const targetId = viewMap[mode];
+    const targetId = viewMap[mode];
+    if (targetId) {
         const targetEl = document.getElementById(targetId);
-        
-        if (modal && modalContent && targetEl) {
-            // Clear modal content and add the view
-            modalContent.innerHTML = `
-                <div id="modalCloseX" onclick="closeModal(null)">×</div>
-                <div style="width: 100%; height: 100%; overflow-y: auto; padding: 20px;">
-                    ${targetEl.outerHTML}
-                </div>
-            `;
-            
-            // Show modal
-            modal.classList.add('active');
-        }
-    } else {
-        // Regular view switching for serve/news
-        const targetId = viewMap[mode];
-        if (targetId) {
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) targetEl.classList.remove('hidden');
-        }
+        if (targetEl) targetEl.classList.remove('hidden');
     }
        
     // 6. TRIGGER RENDERS & MESSAGES
