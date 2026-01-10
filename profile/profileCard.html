@@ -3,10 +3,14 @@
     <!-- TOP SECTION: AVATAR LEFT - INFO CENTERED -->
     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
         
-        <!-- LEFT: AVATAR -->
-        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="flex-shrink: 0; margin: 0;">
+        <!-- LEFT: AVATAR + BADGES -->
+        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="flex-shrink: 0; margin: 0; position: relative;">
             <img id="profilePic" src="" class="pc-avatar-img">
             <div class="pc-avatar-edit-overlay"><span style="font-size:1.5rem; color:white;">✎</span></div>
+            
+            <!-- LOGIC CONNECTORS -->
+            <div id="activeBadge" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); background: #8b0000; color: #fff; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #ff0000; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">ACTIVE TASK</div>
+            <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fff; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">NEW MSG</div>
         </div>
 
         <!-- RIGHT: INFO (CENTERED TEXT) -->
@@ -37,7 +41,7 @@
         </div>
     </div>
 
-    <!-- KNEEL BUTTON (GOLD OUTSIDE - RED FILL) -->
+    <!-- KNEEL BUTTON -->
     <div class="devotion-wrapper" style="margin-bottom: 15px;">
         <div id="btn" class="kneel-btn-bar" 
                 onmousedown="handleHoldStart(event)" 
@@ -47,10 +51,10 @@
                 ontouchend="handleHoldEnd(event)"
                 style="position: relative; display: block; cursor: pointer; user-select: none; overflow: hidden; height: 60px; background: rgba(0,0,0,0.6); border: 1px solid #c5a059; border-radius: 50px; box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);">
             
-            <!-- FILL: BLACK TO RED RED (Used State) -->
+            <!-- FILL -->
             <span id="fill" class="bar-fill" style="display: block; position: absolute; top: 0; left: 0; height: 100%; width: 0%; z-index: 1; background: linear-gradient(90deg, #8b0000, #ff0000); transition: none;"></span> 
 
-            <!-- TEXT: GOLD (Calm State) -->
+            <!-- TEXT -->
             <div class="bar-text" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; pointer-events: none;">
                 <span id="txt-main" style="font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 900; color: #c5a059; letter-spacing: 5px; text-shadow: 0 0 10px rgba(0,0,0,0.8);">KNEEL</span>
                 <span id="txt-sub" style="font-family: 'Cinzel', serif; font-size: 0.6rem; color: #888; letter-spacing: 1px; margin-top: -4px;">TODAY KNEELING: <span id="todayKneels">0</span></span>
@@ -58,23 +62,23 @@
         </div>
     </div>
 
-    <!-- STATS STACKED (POINTS RED - COINS GOLD) -->
+    <!-- STATS STACKED -->
     <div class="pc-stats-grid" style="display: flex; flex-direction: column; gap: 8px;">
         
-        <!-- POINTS (RED ACCENT) -->
-        <div class="stat-single-row" style="border: 1px solid #500000; background: rgba(20,0,0,0.6); border-left: 3px solid #ff0000; margin-bottom: 0;">
+        <!-- POINTS (Background is Dark/Glass, ONLY Left Line & Text are Red) -->
+        <div class="stat-single-row" style="margin-bottom: 0; border-left: 3px solid #ff0000;">
             <div id="points" class="ssr-val" style="color: #ff4444;">0</div>
-            <div class="ssr-lbl" style="color: #aa4444;">POINTS</div>
+            <div class="ssr-lbl">POINTS</div>
         </div>
         
-        <!-- COINS (GOLD ACCENT) -->
+        <!-- COINS (Standard Gold Style) -->
         <div class="stat-single-row row-coins" style="margin-bottom: 0;">
             <div id="coins" class="ssr-val">0</div>
             <svg style="width:16px; height:16px; fill:var(--gold); margin-left: 5px;"><use href="#icon-coin"></use></svg>
         </div>
     </div>
 
-    <!-- STATS BUTTON (SILVER) -->
+    <!-- STATS BUTTON -->
     <div class="stats-toggle-btn" onclick="toggleStats()" style="border: 1px solid #444; color: #c0c0c0; background: rgba(40,40,40,0.4); margin-top: 15px;">
         STATS ▾
     </div>
