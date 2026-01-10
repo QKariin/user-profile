@@ -1422,16 +1422,22 @@ html, body {
 }
 
 #timerDisplay {
-    font-family: 'Orbitron', sans-serif !important; /* Technical high-end font */
-    font-weight: 900 !important;
-    color: var(--gold-bright) !important;       /* Elite gold color */
-    letter-spacing: 6px !important;             /* Wide spacing for a custom look */
-    font-size: 2.5rem !important;               /* Make it massive and dominant */
-    text-shadow: 0 0 15px var(--gold-dim) !important; /* System glow */
+    /* Use Cinzel for that Royal, expensive look you prefer */
+    font-family: 'Cinzel', serif !important; 
+    font-weight: 700 !important;
+    font-size: 2.8rem !important; /* Large and dominant */
+    letter-spacing: 10px !important; /* Wide spacing for high-end feel */
+    text-align: center;
     margin: 15px 0 !important;
     display: block;
-    width: 100%;
-    text-align: center;
+
+    /* The Gradient Trick */
+    background: linear-gradient(180deg, #d4b76a 0%, #c5a059 50%, #1a1a1a 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    
+    /* Adds depth so it doesn't look flat */
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
 
 .timer-icon {
