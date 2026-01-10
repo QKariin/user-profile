@@ -215,10 +215,19 @@ window.addEventListener("message", (event) => {
                     setCurrentTask(pendingTaskState.task);
                     restorePendingUI();
                 } else if (!resetUiTimer) {
+                    // RESET UI TO IDLE STATE
                     document.getElementById('cooldownSection').classList.add('hidden');
                     document.getElementById('activeBadge').classList.remove('show');
                     document.getElementById('mainButtonsArea').classList.remove('hidden');
-                    document.getElementById('taskContent').innerHTML = `<h2 id="readyText" style="font-weight:bold; margin-bottom:5px; color:white; font-size:1.5rem;">Ready?</h2><p class="rajdhani" style="color:#aaa; margin:0;">Waiting for orders.</p>`;
+                    
+                    // --- THE FIX IS HERE ---
+                    document.getElementById('taskContent').innerHTML = `
+                        <h2 id="readyText">VACANT ASSET</h2>
+                        <p class="inter">
+                            Current status: Unproductive. <br>
+                            Standby for mandatory labor assignment.
+                        </p>
+                    `;
                 }
             }
         }
