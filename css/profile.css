@@ -525,70 +525,67 @@ html, body {
   opacity: 0.7;
 }
 
-/* --- 1. THE CONTAINER (Structure Only) --- */
+/* Moves Skip/Cancel lower and dims it significantly */
+
+/* --- THE COMMAND DOSSIER --- */
 #taskContent {
-    /* PUSH DOWN (Keeps text away from timer) */
+    /* PUSH DOWN */
     margin-top: 40px !important; 
-    padding-top: 5px !important;
+    padding-top: 10px !important;
     padding-bottom: 20px !important;
     
     /* RESTORE THE GOLD LINE DESIGN */
     border-left: 3px solid var(--gold) !important;
-    padding-left: 20px !important;
+    padding-left: 25px !important;
     text-align: left !important;
     position: relative !important;
-    width: 100% !important;
 }
 
-/* --- 2. THE HEADER (RESTORED TO WHITE) --- */
+/* Ensure the Header is big and left-aligned */
+#readyText {
+    text-align: left !important;
+    margin-bottom: 5px !important;
+}
+
+/* THE DOMINANT HEADER */
 #readyText {
     font-family: 'Cinzel', serif !important;
-    font-weight: 700 !important;
-    
-    /* COLOR RESTORED: Bright White */
-    color: #ffffff !important; 
-    
-    font-size: 1.4rem !important;
-    letter-spacing: 3px !important;
+    font-weight: 900 !important;
+    color: var(--gold) !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 5px !important;
     text-transform: uppercase !important;
-    margin-bottom: 5px !important;
+    margin-bottom: 10px !important;
     display: block;
-    text-shadow: 0 0 10px rgba(0,0,0,0.8) !important;
-    line-height: 1.2 !important;
+    text-shadow: 0 0 10px rgba(197, 160, 89, 0.3); /* Elite glow */
 }
 
-/* --- 3. THE DESCRIPTION (RESTORED TO LIGHT GREY) --- */
+/* THE COLD STATUS DESCRIPTION */
 #taskContent p, .inter {
     font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    
-    /* COLOR RESTORED: Light Readable Grey */
-    color: #cccccc !important; 
-    
-    font-size: 0.9rem !important;
-    letter-spacing: 1px !important;
-    text-transform: none !important; /* Easier to read */
-    line-height: 1.5 !important;
-    opacity: 1 !important;
+    font-weight: 300 !important;
+    color: #555 !important; /* Dims the text to make the gold header dominant */
+    font-size: 0.75rem !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    line-height: 1.6 !important;
 }
 
-/* --- 4. THE BUTTON (Full Width & Symmetrical) --- */
+/* THE EXECUTION BUTTON */
 #newTaskBtn {
     background: transparent !important;
     border: 1px solid var(--gold) !important;
     color: var(--gold) !important;
     font-family: 'Cinzel', serif !important;
     font-weight: 700 !important;
-    letter-spacing: 4px !important;
+    letter-spacing: 5px !important;
     text-transform: uppercase !important;
-    
-    /* SYMMETRY FIX */
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 15px 0 !important;
-    
+    padding: 15px 50px !important;
+    width: auto !important;
+    min-width: 280px;
+    margin: 0 auto !important;
     display: block;
-    border-radius: 2px !important;
+    border-radius: 0 !important; /* Sharp corners only */
     transition: all 0.4s ease;
 }
 
@@ -1980,78 +1977,50 @@ html, body {
 
 /* --- 9. MOBILE FIXES (UNDER 1023px) --- */
 @media (max-width: 1023px) {
-  /* --- EXISTING MOBILE OPTIMIZATIONS --- */
   .glass-card, .glass-modal, .theater-text-box {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: rgba(15, 15, 15, 0.98) !important;
   }
   
-  #chatCard { 
-    background-image: none !important; 
-    background-color: #000 !important; 
-    height: 480px !important; 
-  }
+  #chatCard { background-image: none !important; background-color: #000 !important; height: 480px !important; }
+  #taskContent div { font-size: 0.9rem !important; }
+  .feedback-bubble { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: rgba(0,0,0,0.85); border: 1px solid var(--neon-pink); padding: 12px; z-index: 30; }
   
-  .feedback-bubble { 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    width: 80%; 
-    background: rgba(0,0,0,0.85); 
-    border: 1px solid var(--neon-pink); 
-    padding: 12px; 
-    z-index: 30; 
-  }
+}
 
-  /* --- NEW MOBILE SYMMETRY & COLOR FIXES --- */
+#taskContent div {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 300 !important;
+    font-size: 1rem !important;
+    line-height: 1.8 !important;
+    color: var(--elegant-white) !important;
+}
 
-  /* 1. Card Symmetry (Balanced Padding) */
-  #taskCard {
-      padding: 20px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-  }
 
-  /* 2. Text Colors Restored (White Title / Grey Text) */
-  #readyText {
-      color: #ffffff !important;
-      font-size: 1.3rem !important;
-      text-shadow: 0 0 10px rgba(0,0,0,0.8) !important;
-      margin-bottom: 5px !important;
-  }
+.btn-upload {
+    background: transparent !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
+    font-family: 'Cinzel', serif !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 4px !important; /* Increased spacing for luxury look */
+    
+    /* WIDTH & SPACING FIX */
+    width: auto !important;         /* Stop full width */
+    min-width: 280px !important;    /* Solid, fixed size */
+    padding: 18px 40px !important;  /* Massive internal spacing */
+    margin: 40px auto 10px auto !important; /* Huge space above the button */
+    
+    display: block !important;
+    border-radius: 0 !important;    /* Keep sharp corners */
+    transition: all 0.4s ease !important;
+}
 
-  #taskContent div, #taskContent p, .inter {
-      color: #cccccc !important;
-      font-size: 0.9rem !important;
-      line-height: 1.5 !important;
-      font-weight: 300 !important;
-      opacity: 1 !important;
-  }
-
-  /* 3. Task Alignment (Gold Line & Spacing) */
-  #taskContent {
-      border-left: 3px solid var(--gold) !important;
-      padding-left: 15px !important;
-      margin: 15px 0 25px 0 !important; /* Clean vertical spacing */
-      width: 100% !important;
-      text-align: left !important;
-  }
-
-  /* 4. Button Full Width & Centered */
-  #mainButtonsArea {
-      width: 100% !important;
-      display: block !important;
-  }
-
-  #newTaskBtn {
-      width: 100% !important; /* Full width on mobile */
-      min-width: 0 !important; /* Remove desktop constraints */
-      margin: 0 !important;
-      padding: 12px 0 !important;
-  }
+.btn-upload:hover {
+    background: var(--gold) !important;
+    color: #000 !important;
 }
 
 /* ==========================================================================
