@@ -217,10 +217,6 @@ html, body {
   margin-top: 0;
 }
 
-.hidden {
-  display: none !important;
-}
-
 .d-none {
   display: none !important;
 }
@@ -1785,15 +1781,6 @@ html, body {
   border: none;
 }
 
-
-/* Ensure the photo NEVER crops and always fits the middle */
-.modal-bg-photo img, .modal-bg-photo video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important; /* Perfect fit, no cropping */
-    transition: all 0.3s ease;
-}
-
 /* THE PROOF MODE TOGGLE: This only fires when you click See Proof */
 .glass-modal.proof-mode-active { background: transparent !important; }
 
@@ -1952,21 +1939,6 @@ html, body {
     width: 100%;
 }
 
-.sg-item {
-    aspect-ratio: 1/1;
-    background: #111;
-    overflow: hidden;
-    position: relative;
-}
-
-.sg-img, .sg-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-
-
 /* --- 9. MOBILE FIXES (UNDER 1023px) --- */
 @media (max-width: 1023px) {
   .glass-card, .glass-modal, .theater-text-box {
@@ -1981,14 +1953,6 @@ html, body {
   
 }
 
-/* Fixes the "Ready?" and "Waiting" text */
-#taskContent {
-    text-align: left !important;
-    border-left: 2px solid var(--gold);
-    padding-left: 20px !important;
-    margin: 20px 0 !important;
-}
-
 #taskContent div {
     font-family: 'Inter', sans-serif !important;
     font-weight: 300 !important;
@@ -1997,15 +1961,6 @@ html, body {
     color: var(--elegant-white) !important;
 }
 
-/* Fixes the "Request Task" button */
-#newTaskBtn {
-    background: transparent !important;
-    border: 1px solid var(--gold) !important;
-    border-radius: 2px !important; /* Sharp corners for luxury feel */
-    color: var(--gold) !important;
-    font-family: 'Cinzel', serif !important;
-    padding: 10px 20px !important;
-}
 
 .btn-upload {
     background: transparent !important;
