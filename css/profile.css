@@ -530,54 +530,39 @@ html, body {
 }
 
 /* Moves Skip/Cancel lower and dims it significantly */
-#taskCard a, .skip-link {
-    display: block !important;
-    margin-top: 30px !important; /* Creates a large gap under the gold button */
-    color: rgba(255, 255, 255, 0.2) !important; /* Dims to a dark gray */
-    font-size: 0.6rem !important; /* Tiny, technical size */
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-decoration: none;
-    transition: color 0.3s ease;
-    cursor: pointer;
-    text-align: center;
-}
 
-/* Only shows up slightly when hovered, staying subtle */
-#taskCard a:hover, .skip-link:hover {
-    color: var(--gold-dim) !important;
-}
-
-.task-badge-top {
-    background: #000 !important;
-    border: 1px solid var(--gold-dim) !important;
-    color: var(--gold-dim) !important;
-    font-size: 0.55rem !important;
-    letter-spacing: 3px !important;
-    padding: 2px 12px !important;
-    border-radius: 50px;
-    top: -12px !important; /* Pins it to the top border of the card */
-}
-
-#activeBadge {
-    display: none; /* Hidden by default */
-    position: absolute;
-    top: -12px; /* Sits exactly on the top border */
+/* THE NEW STATUS BAR - Replaces .task-badge-top and #activeBadge */
+.task-badge-top, #activeBadge {
+    display: flex !important; /* Forces the text and timer into one line */
+    align-items: center;
+    gap: 12px;                /* Space between "ACTIVE TASK" and the clock */
+    position: absolute !important;
+    top: -14px !important;    /* Pins it perfectly to the top border */
     left: 50%;
     transform: translateX(-50%);
-    
-    /* VISUAL STYLE */
-    background: #000 !important;
-    border: 1px solid #c5a059 !important;
-    color: #c5a059 !important;
-    font-family: 'Cinzel', serif !important;
-    font-weight: 700;
-    font-size: 0.65rem;
-    padding: 3px 15px;
-    border-radius: 20px; /* Pill Shape */
-    box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
-    z-index: 20; /* High Z-Index ensures it sits ON TOP of the card */
+    background: #050505 !important;
+    border: 1px solid var(--gold) !important;
+    padding: 4px 18px !important;
+    border-radius: 0 !important; /* Sharp corners match the luxury card */
+    z-index: 100;
     white-space: nowrap;
+    
+    /* Text Style */
+    font-family: 'Cinzel', serif !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 2px;
+    color: var(--soft-gray);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+}
+
+/* THE GRADIENT CLOCK INSIDE THE BAR */
+#timerDisplay {
+    background: linear-gradient(180deg, #d4b76a 0%, #c5a059 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 700;
+    font-size: 0.75rem !important;
+    letter-spacing: 1px !important;
 }
 
 /* 3. THE RULE TO MAKE IT VISIBLE (CRITICAL) */
