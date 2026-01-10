@@ -42,7 +42,8 @@ export function getRandomTask() {
         setResetUiTimer(null); 
     }
     
-    let taskText = "Waiting for orders...";
+    // --- FIXED: REMOVED "Waiting for orders..." ---
+    let taskText = "AWAITING DIRECTIVE..."; 
     
     if (taskQueue && taskQueue.length > 0) {
         taskText = taskQueue[0];
@@ -84,7 +85,8 @@ export function restorePendingUI() {
     document.getElementById('activeBadge').classList.add('show');
     
     if (currentTask) {
-        document.getElementById('taskContent').innerHTML = `<div style="font-size:1.2rem; font-weight:bold; color:white; padding:10px;">${currentTask.text}</div>`;
+        // Render the task text nicely
+        document.getElementById('taskContent').innerHTML = `<div style="font-family:'Cinzel', serif; font-size:1.1rem; color:#e0e0e0; padding:10px; line-height:1.4;">${currentTask.text}</div>`;
     }
     
     document.getElementById('cooldownSection').classList.remove('hidden');
