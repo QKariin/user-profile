@@ -529,15 +529,17 @@ html, body {
 
 /* --- THE COMMAND DOSSIER --- */
 #taskContent {
-    /* RESTORE THE LEFT LINE LOOK */
+    /* BREATHE ROOM */
+    padding-top: 45px !important; /* Push down away from the timer */
+    padding-bottom: 30px !important; /* Push away from the buttons */
+    
+    /* THE GOLD LINE LOOK */
     border-left: 3px solid var(--gold) !important;
     padding-left: 25px !important;
-    text-align: left !important; /* Forces text to the left */
+    text-align: left !important;
     
-    /* Spacing */
-    margin: 20px 0 20px 10px !important;
-    padding-top: 5px !important; /* Remove the huge padding I added before */
-    padding-bottom: 5px !important;
+    /* MARGINS */
+    margin: 0 0 10px 10px !important;
 }
 
 /* Ensure the Header is big and left-aligned */
@@ -2138,40 +2140,42 @@ html, body {
 }
 
 #activeBadge {
-    display: none; /* HIDDEN BY DEFAULT */
-    
-    /* Bugle/Pill Styling */
+    /* POSITIONING */
     position: absolute;
-    top: -18px; /* Sits on the top border */
+    top: -15px !important; /* Sits tight on the line */
     left: 50%;
     transform: translateX(-50%);
-    width: auto;
-    min-width: 160px;
-    padding: 4px 25px;
-    border-radius: 50px;
+    z-index: 20;
     
-    /* Luxury Colors */
-    background-color: #000;
-    border: 1px solid var(--gold);
-    box-shadow: 0 0 15px rgba(0,0,0,1); /* Shadow hides the line behind it */
-    z-index: 99;
+    /* SQUASH THE HEIGHT */
+    padding: 3px 40px !important; /* Minimal vertical, wide horizontal */
+    height: auto !important;
+    line-height: 1 !important; /* Kill the extra height */
+    
+    /* VISUALS */
+    background-color: #000 !important;
+    border: 1px solid var(--gold) !important;
+    border-radius: 50px !important;
+    box-shadow: 0 0 15px rgba(0,0,0,1) !important;
+    
+    /* HIDDEN DEFAULT */
+    display: none;
 }
 
-/* THE TIMER TEXT STYLING */
+/* Ensure the text inside doesn't push it open */
 #activeBadge #timerDisplay {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    font-size: 1.1rem !important; /* Keep text visible size */
     font-family: 'Cinzel', serif !important;
-    font-size: 1.1rem !important;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 3px;
-    margin: 0;
+    font-weight: 700 !important;
+    color: var(--gold) !important;
 }
 
-/* ONLY SHOW WHEN TASK IS PENDING */
+/* SHOW RULE */
 #activeBadge.show {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
+    display: block !important;
 }
 
 /* ENSURE THE CARD CAN HOLD THE BADGE */
