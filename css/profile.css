@@ -531,83 +531,59 @@ html, body {
 
 /* Moves Skip/Cancel lower and dims it significantly */
 
-/* --- THE ULTIMATE COMMAND BADGE --- */
-/* This replaces .task-badge-top and #activeBadge entirely */
-.task-badge-top, #activeBadge {
-    display: none; /* Hidden by default */
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    position: absolute !important;
-    top: -38px !important; /* Sits high on the border */
-    left: 50%;
-    transform: translateX(-50%);
-    background: #050505 !important;
-    border: 1px solid var(--gold) !important;
-    padding: 12px 35px !important;
-    border-radius: 0 !important; /* Sharp technical corners */
-    z-index: 1000 !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,1) !important;
-    white-space: nowrap;
+/* --- THE COMMAND DOSSIER --- */
+#taskContent {
+    border-left: 2px solid var(--gold) !important; /* The Law Line */
+    padding-left: 25px !important;
+    margin: 20px 0 40px 10px !important; /* Massive gap before the button */
+    text-align: left !important; /* No more weak centered text */
 }
 
-/* Force show the flex layout */
-#activeBadge.show {
-    display: flex !important;
-}
-
-/* THE PROTOCOL LABEL */
-.task-badge-top::before {
-    content: "PROTOCOL ACTIVE"; 
-    display: block;
+/* THE DOMINANT HEADER */
+#readyText {
     font-family: 'Cinzel', serif !important;
-    font-size: 0.5rem !important;
+    font-weight: 900 !important;
+    color: var(--gold) !important;
+    font-size: 1.2rem !important;
     letter-spacing: 5px !important;
-    color: #555; /* Dimmed so the gold pops */
-    margin-bottom: 5px;
-    text-transform: uppercase;
+    text-transform: uppercase !important;
+    margin-bottom: 10px !important;
+    display: block;
+    text-shadow: 0 0 10px rgba(197, 160, 89, 0.3); /* Elite glow */
 }
 
-/* THE GRADIENT TIMER */
-#timerDisplay {
-    background: linear-gradient(180deg, #d4b76a 0%, #c5a059 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
+/* THE COLD STATUS DESCRIPTION */
+#taskContent p, .inter {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 300 !important;
+    color: #555 !important; /* Dims the text to make the gold header dominant */
+    font-size: 0.75rem !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    line-height: 1.6 !important;
+}
+
+/* THE EXECUTION BUTTON */
+#newTaskBtn {
+    background: transparent !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
     font-family: 'Cinzel', serif !important;
     font-weight: 700 !important;
-    font-size: 1.7rem !important; /* Large, expensive digital look */
-    letter-spacing: 4px !important;
-    line-height: 1 !important;
-    margin: 0 !important;
+    letter-spacing: 5px !important;
+    text-transform: uppercase !important;
+    padding: 15px 50px !important;
+    width: auto !important;
+    min-width: 280px;
+    margin: 0 auto !important;
+    display: block;
+    border-radius: 0 !important; /* Sharp corners only */
+    transition: all 0.4s ease;
 }
 
-/* KILL THE OLD "SHIT" TIMER IN THE MIDDLE */
-/* THE LUXURY TASK HUB */
-#taskCard {
-    background: rgba(5, 5, 5, 0.9) !important; /* Deep black glass */
-    border: 1px solid rgba(197, 160, 89, 0.7) !important; /* 70% Visibility Gold */
-    border-radius: 4px !important;
-    
-    /* POSITIONING FIX */
-    margin-top: 50px !important; /* Moves the whole task lower */
-    padding: 60px 30px 30px 30px !important; /* Huge top padding to clear the badge */
-    
-    position: relative !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
-    overflow: visible !important;
-    opacity: 1; /* Keep content clear, only dim the border/bg */
-}
-
-/* TIGHTEN THE INNER TEXT */
-#taskContent {
-    margin-top: 10px !important;
-    opacity: 0.9; /* Slightly dim the instructions for elite feel */
-}
-
-/* DIM THE SECONDARY BUTTONS */
-#taskCard a, .skip-link {
-    margin-top: 50px !important;
-    opacity: 0.3 !important; /* Make skip almost invisible */
+#newTaskBtn:hover {
+    background: var(--gold) !important;
+    color: #000 !important;
 }
 
 #chatBadge {
