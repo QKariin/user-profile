@@ -855,29 +855,23 @@ html, body {
   box-shadow: none !important;                   /* Remove the cheap glow */
 }
 
-/* Fix for the small verification cards */
-.m-approve .msg-avatar, 
-.m-reject .msg-avatar,
-.m-queen .msg-avatar {
-    display: none !important; /* Remove clutter */
+/* Tight, small audit cards */
+.m-approve, .m-reject {
+    width: fit-content !important; /* Card only grows as wide as the text */
+    min-width: 150px !important;
+    max-width: 280px !important;
+    padding: 10px !important;
+    background: #0a0a0a !important;
+    border-radius: 0 !important;
+    border: 1px solid #222 !important;
 }
 
-/* Force Rejection text to be small Cinzel */
+/* Force "TASK FAILED" into Cinzel */
 .m-reject {
+    border-left: 3px solid #8b4513 !important;
     font-family: 'Cinzel', serif !important;
     text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    font-size: 0.75rem !important;
-    color: #8b4513 !important;
-}
-
-/* Tighten the message rows to look like a log, not a chat */
-.msg-row {
-    margin-bottom: 5px !important;
-}
-
-.msg-col {
-    max-width: 100% !important;
+    font-size: 0.7rem !important;
 }
 
 .msg-time {
