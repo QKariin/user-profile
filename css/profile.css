@@ -2101,3 +2101,37 @@ html, body {
   border-color: #8b4513; 
   transform: rotate(15deg); 
 }
+
+/* --- ACTIVE TASK BADGE (Restored) --- */
+#activeBadge {
+    display: none; /* Hidden until JS triggers it */
+    position: absolute;
+    top: -12px; /* Sits on the top border */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Luxury Terminal Style */
+    background-color: #000;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 20px;
+    border-radius: 20px;
+    z-index: 99;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.9);
+    white-space: nowrap;
+}
+
+/* REQUIRED TO MAKE IT VISIBLE */
+#activeBadge.show {
+    display: block !important;
+}
+
+/* ENSURE THE CARD CAN HOLD THE BADGE */
+#taskCard {
+    position: relative !important;
+    overflow: visible !important;
+}
