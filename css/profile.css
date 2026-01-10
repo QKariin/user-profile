@@ -529,13 +529,34 @@ html, body {
   opacity: 0.7;
 }
 
-#taskCard {
-    background: #050505 !important;
-    border: 1px solid #1a1a1a !important;
-    padding: 30px !important;
-    border-radius: 0 !important; /* Sharp corners only */
-    position: relative;
-    box-shadow: inset 0 0 50px rgba(0,0,0,1) !important;
+/* Moves Skip/Cancel lower and dims it significantly */
+#taskCard a, .skip-link {
+    display: block !important;
+    margin-top: 30px !important; /* Creates a large gap under the gold button */
+    color: rgba(255, 255, 255, 0.2) !important; /* Dims to a dark gray */
+    font-size: 0.6rem !important; /* Tiny, technical size */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Only shows up slightly when hovered, staying subtle */
+#taskCard a:hover, .skip-link:hover {
+    color: var(--gold-dim) !important;
+}
+
+.task-badge-top {
+    background: #000 !important;
+    border: 1px solid var(--gold-dim) !important;
+    color: var(--gold-dim) !important;
+    font-size: 0.55rem !important;
+    letter-spacing: 3px !important;
+    padding: 2px 12px !important;
+    border-radius: 50px;
+    top: -12px !important; /* Pins it to the top border of the card */
 }
 
 #activeBadge {
@@ -1990,16 +2011,23 @@ html, body {
     border: 1px solid var(--gold) !important;
     color: var(--gold) !important;
     font-family: 'Cinzel', serif !important;
-    letter-spacing: 3px !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-    max-width: none !important; /* Take the full width of the card */
-    padding: 15px !important;
+    letter-spacing: 4px !important; /* Increased spacing for luxury look */
+    
+    /* WIDTH & SPACING FIX */
+    width: auto !important;         /* Stop full width */
+    min-width: 280px !important;    /* Solid, fixed size */
+    padding: 18px 40px !important;  /* Massive internal spacing */
+    margin: 40px auto 10px auto !important; /* Huge space above the button */
+    
+    display: block !important;
+    border-radius: 0 !important;    /* Keep sharp corners */
+    transition: all 0.4s ease !important;
 }
 
 .btn-upload:hover {
-    background: #c5a059 !important;
+    background: var(--gold) !important;
     color: #000 !important;
 }
 
