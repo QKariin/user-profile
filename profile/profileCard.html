@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <!-- 2. ASSETS (Points/Coins) -->
+    <!-- 2. ASSETS -->
     <div class="pc-stats-grid" style="display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-bottom: 25px;">
         <div style="text-align: center;">
             <div style="font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 1px; color: #555; text-transform: uppercase; margin-bottom: 4px;">Net Merit</div>
@@ -63,36 +63,51 @@
         View Full Record ▾
     </div>
 
-    <!-- 6. HIDDEN DRAWER (With Progress Bar Inside) -->
+    <!-- 6. HIDDEN DRAWER -->
     <div id="statsContent">
         
-        <!-- PROGRESS SECTION -->
+        <!-- PROGRESS SECTION (Target Left, Centered To Go) -->
         <div class="level-progress-container" style="width: 100%; margin: 15px auto 25px auto;">
-            
-            <!-- ROW 1: TARGET (Left) - NAME (Right) -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 1px; color: #444; text-transform: uppercase;">
                 <span>TARGET</span>
                 <span id="nextLevelName" style="color: #c5a059; font-weight: 700;">-</span>
             </div>
-            
-            <!-- ROW 2: BAR (Visibly Thicker & Lighter Track) -->
             <div class="lp-bar-bg" style="background: #222; border: 1px solid #333; height: 4px; border-radius: 0;">
                 <div id="progressBar" class="lp-bar-fill" style="width: 0%; height: 100%; background: #c5a059; box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);"></div>
             </div>
-            
-            <!-- ROW 3: TO GO (Strictly Centered) -->
             <div style="text-align: center; margin-top: 6px;">
                 <span id="pointsNeeded" style="font-family: 'Inter', monospace; font-size: 0.5rem; color: #666;">CALCULATING...</span>
             </div>
         </div>
 
-        <!-- STATS LIST -->
+        <!-- UPDATED STATS LIST -->
         <div class="stat-row-group">
-            <div class="stat-line"><span>Adherence Streak</span> <strong id="statStreak" style="color:#666;">0</strong></div>
-            <div class="stat-line"><span>Tasks Issued</span> <strong id="statTotal" style="color:#666;">0</strong></div>
-            <div class="stat-line"><span>Tasks Executed</span> <strong id="statCompleted" style="color:#666;">0</strong></div>
-            <div class="stat-line"><span>Skipped</span> <strong id="statSkipped" style="color:#666;">0</strong></div>
-            <div class="stat-line"><span>Total Submissions</span> <strong id="statTotalKneels" style="color:#666;">0</strong></div>
+            
+            <div class="stat-line">
+                <span>STREAK</span> 
+                <strong id="statStreak" style="color:#666;">0</strong>
+            </div>
+            
+            <div class="stat-line">
+                <span>GIVEN TASKS:</span> 
+                <strong id="statTotal" style="color:#666;">0</strong>
+            </div>
+            
+            <div class="stat-line">
+                <span>DONE</span> 
+                <strong id="statCompleted" style="color:#666;">0</strong>
+            </div>
+            
+            <div class="stat-line">
+                <span>FAILED</span> 
+                <strong id="statSkipped" style="color:#666;">0</strong>
+            </div>
+            
+            <!-- TOTAL KNEELING (Cinzel Font) -->
+            <div class="stat-line">
+                <span style="font-family: 'Cinzel', serif; color: #555;">TOTAL KNEELING</span> 
+                <strong id="statTotalKneels" style="color:#c5a059;">0</strong>
+            </div>
             
             <!-- REGISTRATION DATE -->
             <div style="text-align: center; margin-top: 20px;">
