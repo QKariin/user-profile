@@ -857,27 +857,32 @@ html, body {
 }
 
 /* Base Style for all Task Evaluations */
+/* Small, tight evaluation cards */
 .m-approve, .m-reject {
-  background: rgba(15, 15, 18, 0.6) !important; /* Matches glass-card */
+  background: rgba(10, 10, 10, 0.8) !important; 
   border: 1px solid var(--glass-border) !important;
-  border-radius: 4px !important; /* Sharp corners */
-  padding: 15px !important;
-  margin: 10px 0 !important;
-  width: 100% !important;
+  border-radius: 0px !important; /* Sharp technical edge */
+  padding: 8px 12px !important;  /* Much smaller padding */
+  margin: 5px 0 !important;
+  width: auto !important;        /* Only as wide as the text */
+  max-width: 85% !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 5px !important;
-  box-shadow: none !important;
+  gap: 2px !important;
 }
 
 /* Approval Accent */
-.m-approve {
-  border-left: 4px solid var(--gold-bright) !important; /* Strong Success Line */
-}
+.m-approve { border-left: 2px solid var(--gold-bright) !important; }
 
 /* Rejection Accent */
+.m-reject { border-left: 2px solid #8b4513 !important; }
+
+/* Task Failed Text in Cinzel */
 .m-reject {
-  border-left: 4px solid #8b4513 !important; /* Strong Failure Line */
+  font-family: 'Cinzel', serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-size: 0.75rem !important; /* Small and sharp */
 }
 
 .m-slave {
