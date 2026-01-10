@@ -525,62 +525,70 @@ html, body {
   opacity: 0.7;
 }
 
-/* Moves Skip/Cancel lower and dims it significantly */
-
-/* --- THE COMMAND DOSSIER --- */
+/* --- 1. THE CONTAINER (Structure Only) --- */
 #taskContent {
-    /* PUSH DOWN */
+    /* PUSH DOWN (Keeps text away from timer) */
     margin-top: 40px !important; 
-    padding-top: 10px !important;
+    padding-top: 5px !important;
     padding-bottom: 20px !important;
     
     /* RESTORE THE GOLD LINE DESIGN */
     border-left: 3px solid var(--gold) !important;
-    padding-left: 25px !important;
+    padding-left: 20px !important;
     text-align: left !important;
     position: relative !important;
+    width: 100% !important;
 }
 
-
-/* THE DOMINANT HEADER */
+/* --- 2. THE HEADER (RESTORED TO WHITE) --- */
 #readyText {
     font-family: 'Cinzel', serif !important;
-    font-weight: 900 !important;
-    color: var(--gold) !important;
-    font-size: 1.2rem !important;
-    letter-spacing: 5px !important;
+    font-weight: 700 !important;
+    
+    /* COLOR RESTORED: Bright White */
+    color: #ffffff !important; 
+    
+    font-size: 1.4rem !important;
+    letter-spacing: 3px !important;
     text-transform: uppercase !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 5px !important;
     display: block;
-    text-shadow: 0 0 10px rgba(197, 160, 89, 0.3); /* Elite glow */
+    text-shadow: 0 0 10px rgba(0,0,0,0.8) !important;
+    line-height: 1.2 !important;
 }
 
-/* THE COLD STATUS DESCRIPTION */
+/* --- 3. THE DESCRIPTION (RESTORED TO LIGHT GREY) --- */
 #taskContent p, .inter {
     font-family: 'Inter', sans-serif !important;
-    font-weight: 300 !important;
-    color: #555 !important; /* Dims the text to make the gold header dominant */
-    font-size: 0.75rem !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
-    line-height: 1.6 !important;
+    font-weight: 400 !important;
+    
+    /* COLOR RESTORED: Light Readable Grey */
+    color: #cccccc !important; 
+    
+    font-size: 0.9rem !important;
+    letter-spacing: 1px !important;
+    text-transform: none !important; /* Easier to read */
+    line-height: 1.5 !important;
+    opacity: 1 !important;
 }
 
-/* THE EXECUTION BUTTON */
+/* --- 4. THE BUTTON (Full Width & Symmetrical) --- */
 #newTaskBtn {
     background: transparent !important;
     border: 1px solid var(--gold) !important;
     color: var(--gold) !important;
     font-family: 'Cinzel', serif !important;
     font-weight: 700 !important;
-    letter-spacing: 5px !important;
+    letter-spacing: 4px !important;
     text-transform: uppercase !important;
-    padding: 15px 50px !important;
-    width: auto !important;
-    min-width: 280px;
-    margin: 0 auto !important;
+    
+    /* SYMMETRY FIX */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 15px 0 !important;
+    
     display: block;
-    border-radius: 0 !important; /* Sharp corners only */
+    border-radius: 2px !important;
     transition: all 0.4s ease;
 }
 
