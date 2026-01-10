@@ -1,47 +1,61 @@
 <div class="glass-card profile-card">
     
-    <!-- TOP SECTION: AVATAR LEFT - INFO CENTERED -->
-    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+    <!-- TOP SECTION: AVATAR LEFT - ALL INFO/STATS RIGHT -->
+    <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px;">
         
-        <!-- LEFT: AVATAR + BADGES -->
-        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="flex-shrink: 0; margin: 0; position: relative;">
+        <!-- LEFT: AVATAR -->
+        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="flex-shrink: 0; margin: 0; width: 80px; height: 80px; position: relative;">
             <img id="profilePic" src="" class="pc-avatar-img">
             <div class="pc-avatar-edit-overlay"><span style="font-size:1.5rem; color:white;">✎</span></div>
             
-            <!-- LOGIC CONNECTORS -->
+            <!-- BADGES -->
             <div id="activeBadge" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); background: #8b0000; color: #fff; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #ff0000; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">ACTIVE TASK</div>
             <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fff; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">NEW MSG</div>
         </div>
 
-        <!-- RIGHT: INFO (CENTERED TEXT) -->
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div id="subName" class="pc-name" style="text-align: center; letter-spacing: 4px; margin-bottom: 2px;">SLAVE</div>
-            <div id="subHierarchy" class="pc-rank" style="text-align: center; color: #666; font-size: 0.7rem; margin-bottom: 8px;">LOADING...</div>
+        <!-- RIGHT: NAME -> POINTS/COINS -> BAR -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
             
-            <!-- CONNECTED PROGRESS UNIT -->
-            <div class="level-progress-container" style="width: 100%; margin: 0;">
+            <!-- 1. NAME & RANK -->
+            <div style="text-align: center;">
+                <div id="subName" class="pc-name" style="letter-spacing: 4px; font-size: 1rem; line-height: 1;">SLAVE</div>
+                <div id="subHierarchy" class="pc-rank" style="color: #666; font-size: 0.65rem; margin-top: 2px;">LOADING...</div>
+            </div>
+
+            <!-- 2. STATS GRID (MOVED TO TOP) -->
+            <div class="pc-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 0;">
                 
-                <!-- 1. NEXT LEVEL LABEL (TOP LEFT) -->
-                <div style="display: flex; justify-content: flex-start; margin-bottom: 2px;">
-                    <span style="font-family: 'Cinzel', serif; font-size: 0.55rem; color: #666; letter-spacing: 1px;">
-                        NEXT: <span id="nextLevelName" style="color: #c5a059; font-weight: 800;">LOADING...</span>
-                    </span>
+                <!-- POINTS (Red Accent) -->
+                <div class="stat-single-row" style="padding: 4px; margin-bottom: 0; border-left: 3px solid #ff0000; background: rgba(0,0,0,0.3); justify-content: space-between;">
+                    <div id="points" class="ssr-val" style="color: #ff4444; font-size: 0.9rem;">0</div>
+                    <div class="ssr-lbl" style="font-size: 0.45rem;">PTS</div>
                 </div>
-
-                <!-- 2. THE BAR -->
-                <div class="lp-bar-bg" style="background: #111; border: 1px solid #333; height: 6px; border-radius: 4px;">
-                    <div id="progressBar" class="lp-bar-fill" style="width: 0%; background: linear-gradient(90deg, #000, #c5a059);"></div>
-                </div>
-
-                <!-- 3. TO GO LABEL (BOTTOM RIGHT) -->
-                <div style="text-align: right; margin-top: 2px;">
-                    <span id="pointsNeeded" style="font-family: 'Inter', sans-serif; font-size: 0.5rem; color: #555; font-weight: 600;">LOADING...</span>
+                
+                <!-- COINS (Gold Accent) -->
+                <div class="stat-single-row row-coins" style="padding: 4px; margin-bottom: 0; background: rgba(0,0,0,0.3); justify-content: space-between;">
+                    <div id="coins" class="ssr-val" style="font-size: 0.9rem;">0</div>
+                    <svg style="width:12px; height:12px; fill:var(--gold);"><use href="#icon-coin"></use></svg>
                 </div>
             </div>
+
+            <!-- 3. PROGRESS BAR (MOVED INTO STATS SECTION) -->
+            <div class="level-progress-container" style="width: 100%; margin: 0;">
+                <!-- Bar -->
+                <div class="lp-bar-bg" style="background: #111; border: 1px solid #333; height: 5px; border-radius: 4px;">
+                    <div id="progressBar" class="lp-bar-fill" style="width: 0%; background: linear-gradient(90deg, #000, #c5a059);"></div>
+                </div>
+                
+                <!-- Labels (Next & To Go) -->
+                <div style="display: flex; justify-content: space-between; margin-top: 2px;">
+                    <span style="font-family: 'Cinzel', serif; font-size: 0.45rem; color: #666;">NEXT: <span id="nextLevelName" style="color: #c5a059;">...</span></span>
+                    <span id="pointsNeeded" style="font-family: 'Inter', sans-serif; font-size: 0.45rem; color: #555;">LOADING...</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- KNEEL BUTTON -->
+    <!-- KNEEL BUTTON (BOTTOM - FULL WIDTH) -->
     <div class="devotion-wrapper" style="margin-bottom: 15px;">
         <div id="btn" class="kneel-btn-bar" 
                 onmousedown="handleHoldStart(event)" 
@@ -62,23 +76,7 @@
         </div>
     </div>
 
-    <!-- STATS STACKED -->
-    <div class="pc-stats-grid" style="display: flex; flex-direction: column; gap: 8px;">
-        
-        <!-- POINTS (Background is Dark/Glass, ONLY Left Line & Text are Red) -->
-        <div class="stat-single-row" style="margin-bottom: 0; border-left: 3px solid #ff0000;">
-            <div id="points" class="ssr-val" style="color: #ff4444;">0</div>
-            <div class="ssr-lbl">POINTS</div>
-        </div>
-        
-        <!-- COINS (Standard Gold Style) -->
-        <div class="stat-single-row row-coins" style="margin-bottom: 0;">
-            <div id="coins" class="ssr-val">0</div>
-            <svg style="width:16px; height:16px; fill:var(--gold); margin-left: 5px;"><use href="#icon-coin"></use></svg>
-        </div>
-    </div>
-
-    <!-- STATS BUTTON -->
+    <!-- STATS DRAWER BUTTON (Silver) -->
     <div class="stats-toggle-btn" onclick="toggleStats()" style="border: 1px solid #444; color: #c0c0c0; background: rgba(40,40,40,0.4); margin-top: 15px;">
         STATS ▾
     </div>
@@ -88,7 +86,7 @@
         DAILY ID: <span id="dailyRandomId" style="color: #666;">#----</span>
     </div>
 
-    <!-- HIDDEN STATS DRAWER -->
+    <!-- HIDDEN STATS CONTENT -->
     <div id="statsContent">
         <div class="stat-row-group">
             <div class="stat-line"><span>Task Streak</span> <strong id="statStreak" style="color:#ccc;">0</strong></div>
