@@ -1,119 +1,169 @@
-<div class="glass-card profile-card">
-    
-    <!-- 1. TOP SECTION: AVATAR LEFT - NAME/RANK RIGHT -->
-    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+<!-- PRIVATE BANKING STYLE CARD -->
+<div class="glass-card profile-card" style="
+    background: #050505; 
+    border: 1px solid rgba(197, 160, 89, 0.2); 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+    border-radius: 4px; /* Sharper corners for a bank card look */
+    padding: 25px;
+    font-family: 'Cinzel', serif;">
+
+    <!-- 1. IDENTITY HEADER (Avatar + Name) -->
+    <div style="display: flex; align-items: center; gap: 25px; margin-bottom: 25px;">
         
-        <!-- LEFT: AVATAR + BADGES -->
-        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="flex-shrink: 0; margin: 0; position: relative;">
-            <img id="profilePic" src="" class="pc-avatar-img">
-            <div class="pc-avatar-edit-overlay"><span style="font-size:1.5rem; color:white;">✎</span></div>
+        <!-- AVATAR (Framed like a painting, not a game profile) -->
+        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="
+            flex-shrink: 0; margin: 0; width: 70px; height: 70px; 
+            border-radius: 50%; 
+            border: 1px solid #333; /* Subtle frame */
+            position: relative;
+            background: #000;">
             
-            <!-- BADGES (For Logic) -->
-            <div id="activeBadge" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); background: #8b0000; color: #fff; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #ff0000; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">ACTIVE TASK</div>
-            <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #fff; white-space: nowrap; font-family: 'Cinzel', serif; z-index: 10;">NEW MSG</div>
+            <img id="profilePic" src="" class="pc-avatar-img" style="filter: grayscale(100%) contrast(1.2);"> <!-- B&W Photo for luxury feel -->
+            <div class="pc-avatar-edit-overlay"><span style="font-size:1rem; color:white; opacity: 0.5;">+</span></div>
+            
+            <!-- BADGES (Hidden logic) -->
+            <div id="activeBadge" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); background: #8b0000; color: #fff; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; border: 1px solid #ff0000; z-index: 10;">ACTIVE</div>
+            <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; z-index: 10;">MSG</div>
         </div>
 
-        <!-- RIGHT: NAME & RANK (Handwritten) -->
+        <!-- IDENTITY DETAILS -->
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-            <div id="subName" class="pc-name" style="text-align: left; letter-spacing: 4px; font-size: 1.1rem; line-height: 1; margin-bottom: 0;">SLAVE</div>
-            <div id="subHierarchy" class="pc-rank" style="text-align: left; color: #c5a059; font-family: 'Italianno', cursive; font-size: 2rem; line-height: 0.8; margin-left: -5px; margin-bottom: 0; text-transform: none; letter-spacing: 0;">Loading...</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 2px; color: #555; text-transform: uppercase;">Unit Identifier</div>
+            <div id="subName" class="pc-name" style="text-align: left; letter-spacing: 2px; font-size: 1.2rem; color: #e0e0e0; margin: 2px 0;">SLAVE</div>
+            <div id="subHierarchy" class="pc-rank" style="text-align: left; color: #c5a059; font-family: 'Italianno', cursive; font-size: 1.8rem; line-height: 0.8; margin-left: -5px; opacity: 0.8;">Loading...</div>
         </div>
     </div>
 
-    <!-- 2. KNEEL BUTTON (Gold Border / Red Fill) -->
-    <!-- 2. KNEEL BUTTON (Sophisticated Black Gradient + Formatted Locked Text) -->
-    <div class="devotion-wrapper" style="margin-bottom: 15px;">
+    <!-- 2. THE LEDGER (Assets Section) -->
+    <!-- Replaces "Stats" with a clean Banking Layout -->
+    <div class="pc-stats-grid" style="
+        display: grid; 
+        grid-template-columns: 1fr 1px 1fr; /* Two columns separated by a thin line */
+        align-items: center; 
+        border-top: 1px solid #222; 
+        border-bottom: 1px solid #222; 
+        padding: 15px 0; 
+        margin-bottom: 25px;">
+        
+        <!-- COLUMN 1: MERIT (Points) -->
+        <div style="text-align: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 4px;">Net Merit</div>
+            <div id="points" class="ssr-val" style="font-size: 1.1rem; color: #f0f0f0; font-family: 'Cinzel', serif;">0</div>
+        </div>
+
+        <!-- DIVIDER LINE -->
+        <div style="width: 1px; height: 30px; background: #222;"></div>
+
+        <!-- COLUMN 2: CAPITAL (Coins) -->
+        <div style="text-align: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 4px;">Liquid Capital</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <div id="coins" class="ssr-val" style="font-size: 1.1rem; color: #c5a059; font-family: 'Cinzel', serif;">0</div>
+                <!-- Abstract Geometric Icon instead of cartoon coin -->
+                <svg style="width:10px; height:10px; fill:#c5a059;"><rect width="10" height="10" transform="rotate(45 5 5)" /></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. PROTOCOL INTERFACE (The Button) -->
+    <!-- Styled like a high-end system switch -->
+    <div class="devotion-wrapper" style="margin-bottom: 20px;">
         <div id="btn" class="kneel-btn-bar" 
                 onmousedown="handleHoldStart(event)" 
                 onmouseup="handleHoldEnd(event)" 
                 onmouseleave="handleHoldEnd(event)" 
                 ontouchstart="handleHoldStart(event)" 
                 ontouchend="handleHoldEnd(event)"
-                style="position: relative; display: block; cursor: pointer; user-select: none; overflow: hidden; height: 48px; 
-                       /* SOPHISTICATED BLACK GRADIENT HERE: */
-                       background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%); 
-                       border: 1px solid #c5a059; border-radius: 50px; box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);">
+                style="position: relative; display: block; cursor: pointer; user-select: none; overflow: hidden; height: 50px; 
+                       background: linear-gradient(180deg, #141414 0%, #050505 100%); 
+                       border: 1px solid #333; 
+                       border-radius: 2px; /* Slight round, mostly square */
+                       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
             
-            <!-- FILL (Currently 0% for Locked State example) -->
-            <span id="fill" class="bar-fill" style="display: block; position: absolute; top: 0; left: 0; height: 100%; width: 0%; z-index: 1; background: linear-gradient(90deg, #8b0000, #ff0000); transition: none;"></span> 
+            <!-- FILL: Elegant Dark Red (System Alert style) -->
+            <span id="fill" class="bar-fill" style="display: block; position: absolute; top: 0; left: 0; height: 100%; width: 0%; z-index: 1; background: linear-gradient(90deg, #300000, #600000); transition: none;"></span> 
 
-            <!-- TEXT CENTERED -->
-            <div class="bar-text" style="position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; pointer-events: none; gap: 8px;">
+            <!-- TEXT CONTAINER -->
+            <div class="bar-text" style="position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; pointer-events: none; gap: 10px;">
                 
-                <!-- 1. THE MAIN 'LOCKED' TEXT (Cinzel, Gold) -->
-                <span id="txt-main" style="font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900; color: #c5a059; letter-spacing: 3px; text-shadow: 0 0 10px rgba(0,0,0,0.8);">
-                    LOCKED
+                <!-- MAIN LABEL -->
+                <span id="txt-main" style="
+                    font-family: 'Cinzel', serif; 
+                    font-size: 0.9rem; 
+                    font-weight: 700; 
+                    color: #c5a059; 
+                    letter-spacing: 3px; 
+                    text-transform: uppercase;">
+                    INITIATE PROTOCOL
                 </span>
 
-                <!-- 2. THE TIME (Inter, Styled exactly like 'POINTS' label) -->
-                <span id="txt-sub-time" style="font-family: 'Inter', sans-serif; font-size: 0.65rem; color: #888; font-weight: 600; letter-spacing: 1px; margin-top: 2px;">
-                    18 MIN
+                <!-- TIME / STATUS (Styled like a system log) -->
+                <span id="txt-sub-time" style="
+                    font-family: 'Inter', monospace; 
+                    font-size: 0.6rem; 
+                    color: #444; 
+                    border: 1px solid #333; 
+                    padding: 2px 6px; 
+                    border-radius: 2px;">
+                    READY
                 </span>
                 
-                <!-- HIDDEN SUBTEXT (Kept for JS safety) -->
+                <!-- Hidden legacy span -->
                 <span id="txt-sub" style="display: none !important;"></span>
             </div>
         </div>
     </div>
 
-    <!-- 3. STATS STACKED (Standard Labels) -->
-    <div class="pc-stats-grid" style="display: flex; flex-direction: column; gap: 8px;">
-        
-        <!-- POINTS (Red Left Line & Red Number) -->
-        <div class="stat-single-row" style="margin-bottom: 0; border-left: 3px solid #ff0000; background: rgba(20,0,0,0.4);">
-            <div id="points" class="ssr-val" style="color: #ff4444;">0</div>
-            <div class="ssr-lbl" style="margin-left: 10px;">POINTS</div>
+    <!-- 4. STANDING & PROJECTION (Progress Bar) -->
+    <!-- Styled like a financial projection -->
+    <div class="level-progress-container" style="width: 100%; margin: 0 auto 15px auto;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 1px; color: #444; text-transform: uppercase;">
+            <span>Current Standing</span>
+            <span>Projected: <span id="nextLevelName" style="color: #666;">-</span></span>
         </div>
         
-        <!-- COINS (Gold Standard) -->
-        <div class="stat-single-row row-coins" style="margin-bottom: 0;">
-            <div id="coins" class="ssr-val">0</div>
-            <svg style="width:16px; height:16px; fill:var(--gold); margin-left: 10px;"><use href="#icon-coin"></use></svg>
+        <!-- Thin, Elegant Bar -->
+        <div class="lp-bar-bg" style="background: #111; border-bottom: 1px solid #333; height: 2px; border-radius: 0;">
+            <div id="progressBar" class="lp-bar-fill" style="width: 0%; height: 100%; background: #c5a059; box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);"></div>
+        </div>
+
+        <div style="text-align: right; margin-top: 5px;">
+            <span id="pointsNeeded" style="font-family: 'Inter', monospace; font-size: 0.5rem; color: #444;">CALCULATING...</span>
         </div>
     </div>
 
-    <!-- 4. TOGGLE BUTTON -->
-    <div class="stats-toggle-btn" onclick="toggleStats()" style="border: 1px solid #444; color: #c0c0c0; background: rgba(40,40,40,0.4); margin-top: 15px;">
-        STATS ▾
+    <!-- 5. FOOTER TOGGLE (Minimalist) -->
+    <div class="stats-toggle-btn" onclick="toggleStats()" style="
+        border-top: 1px solid #222; 
+        color: #444; 
+        background: transparent; 
+        margin-top: 10px; 
+        padding-top: 15px; 
+        font-family: 'Inter', sans-serif; 
+        font-size: 0.6rem; 
+        letter-spacing: 2px; 
+        text-transform: uppercase;
+        border-radius: 0; 
+        border-left: none; border-right: none; border-bottom: none;">
+        View Full Record ▾
     </div>
 
-    <!-- 5. DAILY ID -->
-    <div style="text-align: center; padding: 10px 0; color: #444; font-size: 0.7rem; border-bottom: 1px solid #222; font-family: monospace;">
-        DAILY ID: <span id="dailyRandomId" style="color: #666;">#----</span>
-    </div>
-
-    <!-- 6. STATS DRAWER (With Progress Bar Inside) -->
+    <!-- HIDDEN DRAWER (Legacy Stats) -->
     <div id="statsContent">
-        
-        <!-- LEVEL PROGRESS SECTION (Moved Here) -->
-        <div class="level-progress-container" style="width: 100%; margin: 5px auto 15px auto; padding-bottom: 15px; border-bottom: 1px solid #333;">
-            <!-- Next Level -->
-            <div style="text-align: center; margin-bottom: 4px;">
-                 <span style="font-family: 'Cinzel', serif; font-size: 0.65rem; color: #666; letter-spacing: 1px;">
-                    NEXT: <span id="nextLevelName" style="color: #c5a059; font-weight: 800;">LOADING...</span>
-                </span>
-            </div>
-            <!-- Bar -->
-            <div class="lp-bar-bg" style="background: #111; border: 1px solid #333; height: 6px; border-radius: 4px;">
-                <div id="progressBar" class="lp-bar-fill" style="width: 0%; background: linear-gradient(90deg, #000, #c5a059);"></div>
-            </div>
-            <!-- To Go -->
-            <div style="text-align: center; margin-top: 4px;">
-                <span id="pointsNeeded" style="font-family: 'Inter', sans-serif; font-size: 0.55rem; color: #555; font-weight: 600;">LOADING...</span>
-            </div>
-        </div>
-
-        <!-- STAT LIST -->
-        <div class="stat-row-group">
-            <div class="stat-line"><span>Task Streak</span> <strong id="statStreak" style="color:#ccc;">0</strong></div>
-            <div class="stat-line"><span>Total Tasks</span> <strong id="statTotal" style="color:#ccc;">0</strong></div>
-            <div class="stat-line"><span>Completed</span> <strong id="statCompleted" style="color:#ccc;">0</strong></div>
-            <div class="stat-line"><span>Skipped</span> <strong id="statSkipped" style="color:#ccc;">0</strong></div>
-            <div class="stat-line"><span>Total Kneeling</span> <strong id="statTotalKneels" style="color:#ccc;">0</strong></div>
-            <div style="text-align: center; border-top: 1px solid #222; margin-top: 10px; padding-top: 10px;">
-                <div class="stat-header" style="color: #c0c0c0;">SLAVE SINCE</div>
-                <strong id="slaveSinceDate" style="color: #888;">--/--/--</strong>
+        <div class="stat-row-group" style="padding-top: 10px;">
+             <!-- Kept your IDs intact -->
+            <div class="stat-line"><span>Adherence Streak</span> <strong id="statStreak" style="color:#666;">0</strong></div>
+            <div class="stat-line"><span>Tasks Issued</span> <strong id="statTotal" style="color:#666;">0</strong></div>
+            <div class="stat-line"><span>Tasks Executed</span> <strong id="statCompleted" style="color:#666;">0</strong></div>
+            <div class="stat-line"><span>Skipped</span> <strong id="statSkipped" style="color:#666;">0</strong></div>
+            <div class="stat-line"><span>Total Submissions</span> <strong id="statTotalKneels" style="color:#666;">0</strong></div>
+            
+            <div style="text-align: center; border-top: 1px solid #222; margin-top: 15px; padding-top: 10px;">
+                <div class="stat-header" style="color: #333; font-size: 0.5rem;">REGISTRATION DATE</div>
+                <strong id="slaveSinceDate" style="color: #555; font-family: 'Inter', monospace; font-size: 0.7rem;">--/--/--</strong>
+                <div style="margin-top: 5px; font-family: 'Inter', monospace; font-size: 0.6rem; color: #333;">ID: <span id="dailyRandomId">#----</span></div>
             </div>
         </div>
     </div>
+
 </div>
