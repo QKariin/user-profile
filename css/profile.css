@@ -509,58 +509,39 @@ html, body {
   opacity: 0.7;
 }
 
-/* --- 1. THE CONTAINER (Structure Only) --- */
-#taskContent {
-    /* PUSH DOWN (Keeps text away from timer) */
-    margin-top: 40px !important; 
-    padding-top: 5px !important;
-    padding-bottom: 20px !important;
-    
-    /* RESTORE THE GOLD LINE DESIGN */
-    border-left: 3px solid var(--gold) !important;
-    padding-left: 20px !important;
-    text-align: left !important;
-    position: relative !important;
-    width: 100% !important;
-}
-
-/* --- 2. THE HEADER (RESTORED TO WHITE) --- */
-#readyText {
-    font-family: 'Cinzel', serif !important;
-    font-weight: 700 !important;
-    
-    /* COLOR RESTORED: Bright White */
-    color: #ffffff !important; 
-    
-    font-size: 1.4rem !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    margin-bottom: 5px !important;
-    display: block;
-    text-shadow: 0 0 10px rgba(0,0,0,0.8) !important;
-    line-height: 1.2 !important;
-}
-
-/* --- RICH TEXT & SPACING FIX --- */
-
+/* --- FIXED TASK TEXT & COLORS --- */
 #taskContent p, .inter, #taskContent div {
-    /* 1. BIGGER SPACING BETWEEN LINES */
-    line-height: 1.9 !important; /* Gives text room to breathe */
-    margin-bottom: 15px !important; /* Separation between paragraphs */
-
-    /* 2. ENABLE RICH TEXT READING */
-    white-space: pre-wrap !important; /* CRITICAL: Respects enters/newlines from CMS */
-    
-    /* 3. KEEP YOUR COLORS */
     font-family: 'Inter', sans-serif !important;
     color: #cccccc !important;      /* Light Grey */
     font-weight: 400 !important;
     font-size: 0.95rem !important;
-    opacity: 1 !important;
+    line-height: 1.8 !important;
+    white-space: pre-wrap !important; /* Reads Enters/Spaces from CMS */
+    text-align: left !important;
 }
 
-/* --- 4. THE BUTTON (Full Width & Symmetrical) --- */
-/* FIX THE BUTTON SIZE & CENTERING */
+#readyText {
+    font-family: 'Cinzel', serif !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;      /* Pure White */
+    font-size: 1.5rem !important;
+    letter-spacing: 3px !important;
+    text-transform: uppercase !important;
+    margin-bottom: 10px !important;
+    text-shadow: 0 0 10px rgba(0,0,0,0.8) !important;
+    text-align: left !important;
+}
+
+/* --- FIXED CONTAINER (Gold Line on Left) --- */
+#taskContent {
+    border-left: 3px solid var(--gold) !important;
+    padding-left: 20px !important;
+    margin: 20px 0 30px 10px !important; /* Space below text */
+    text-align: left !important;
+    width: auto !important;
+}
+
+/* --- FIXED BUTTON (Small & Centered) --- */
 #newTaskBtn {
     background: transparent !important;
     border: 1px solid var(--gold) !important;
@@ -570,26 +551,25 @@ html, body {
     letter-spacing: 4px !important;
     text-transform: uppercase !important;
     
-    /* CHANGE LINE 73 TO AUTO */
-    width: auto !important; 
-    
-    /* ADD MIN-WIDTH SO IT ISNT TINY */
+    /* SIZE FIXES */
+    width: auto !important;  /* STOPS IT FROM BEING HUGE */
     min-width: 250px !important;
-    
-    /* CHANGE LINE 74 TO CENTER IT */
-    margin: 20px auto !important; 
-    
     padding: 15px 30px !important;
+    
+    /* CENTERING */
     display: block !important;
+    margin: 0 auto !important; 
+    
     border-radius: 2px !important;
     transition: all 0.4s ease;
 }
 
-#newTaskBtn:hover {
-    background: var(--gold) !important;
-    color: #000 !important;
+/* ENSURE CONTAINER CENTERS THE BUTTON */
+#mainButtonsArea {
+    width: 100% !important;
+    text-align: center !important;
+    display: block !important;
 }
-
 
 .btn-upload {
     background: transparent !important;
