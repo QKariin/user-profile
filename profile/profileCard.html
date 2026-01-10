@@ -14,7 +14,10 @@
             border-radius: 50%; border: 1px solid #333; position: relative; background: #000;">
             <img id="profilePic" src="" class="pc-avatar-img" style="filter: grayscale(100%) contrast(1.2);">
             <div class="pc-avatar-edit-overlay"><span style="font-size:1rem; color:white; opacity: 0.5;">+</span></div>
-            <div id="activeBadge" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); background: #8b0000; color: #fff; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; border: 1px solid #ff0000; z-index: 10;">ACTIVE</div>
+            
+            <!-- REMOVED 'ACTIVE' BADGE FROM HERE SO THE TASK CARD WORKS -->
+            
+            <!-- Chat Badge (Kept active) -->
             <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; z-index: 10;">MSG</div>
         </div>
 
@@ -54,10 +57,10 @@
             </div>
         </div>
 
-        <!-- HIDDEN DAILY COUNTER (So Logic Doesn't Break) -->
+        <!-- HIDDEN DAILY COUNTER (Kept for Logic) -->
         <span id="todayKneels" style="display: none;">0</span>
 
-        <!-- BOTTOM: TASK STREAK (Gold & Serif) -->
+        <!-- BOTTOM: TASK STREAK -->
         <div style="text-align: center;">
             <span style="font-family: 'Cinzel', serif; font-size: 0.8rem; color: #c5a059; letter-spacing: 2px; font-weight: 700; text-transform: uppercase;">
                 TASK STREAK: <span id="statStreak">0</span>
@@ -92,7 +95,7 @@
             </div>
         </div>
 
-        <!-- STATS LIST (Total Kneeling Remains Here) -->
+        <!-- STATS LIST -->
         <div class="stat-row-group">
             
             <div class="stat-line">
