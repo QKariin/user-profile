@@ -488,35 +488,41 @@ html, body {
 .nav-tabs {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 0 auto;
-  margin-top: 20px;
+  gap: 0px; /* Flush buttons create a solid pillar look */
+  margin-top: 40px;
   padding: 0;
-  width: 75% !important;
-  flex-wrap: wrap;
+  width: 100% !important; /* Spans full width for perfect symmetry */
+  border-top: 1px solid var(--glass-border);
 }
 
 .tab-btn {
   width: 100%;
-  padding: 8px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid var(--glass-border);
+  padding: 15px 20px; /* Thicker, more substantial buttons */
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--glass-border);
   color: var(--soft-gray);
-  border-radius: 12px;
+  border-radius: 0; /* Forced sharp edges */
   font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 400; /* Lighter weight is more elegant */
+  font-size: 0.65rem; /* Tiny text is the luxury standard */
   cursor: pointer;
-  letter-spacing: 2px;
+  letter-spacing: 4px; /* Extreme kerning for the high-end feel */
   text-transform: uppercase;
-  transition: var(--transition);
+  text-align: left; /* Aligns with the sidebar "Record" text */
+  transition: all 0.4s ease;
+}
+
+.tab-btn:hover {
+  color: var(--gold);
+  background: rgba(197, 160, 89, 0.03);
 }
 
 .tab-btn.active {
-  background: rgba(197, 160, 89, 0.15);
+  background: rgba(197, 160, 89, 0.08);
   color: var(--elegant-white);
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 20px var(--gold-dim);
+  border-left: 3px solid var(--gold); /* A solid, sharp indicator line */
+  box-shadow: none; /* No cheap-looking glows */
 }
 
 .btn-foot-bank {
