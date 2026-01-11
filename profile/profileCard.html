@@ -4,52 +4,67 @@
     border: 1px solid rgba(197, 160, 89, 0.2); 
     box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
     border-radius: 4px; 
-    padding: 25px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-family: 'Cinzel', serif;">
 
-    <!-- 1. IDENTITY HEADER -->
-    <div style="display: flex; align-items: center; gap: 25px; margin-bottom: 20px;">
-        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="
-            flex-shrink: 0; margin: 0; width: 70px; height: 70px; 
-            border-radius: 50%; border: 1px solid #333; position: relative; background: #000;">
-            <img id="profilePic" src="" class="pc-avatar-img" style="filter: grayscale(100%) contrast(1.2);">
-            <div class="pc-avatar-edit-overlay"><span style="font-size:1rem; color:white; opacity: 0.5;">+</span></div>
-            
-            <!-- REMOVED 'ACTIVE' BADGE FROM HERE SO THE TASK CARD WORKS -->
-            
-            <!-- Chat Badge (Kept active) -->
-            <div id="chatBadge" style="display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; z-index: 10;">MSG</div>
-        </div>
+    <!-- 1. IDENTITY HEADER (Stacked) -->
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
+        
+        <!-- THE NAME (Top) -->
+        <div id="subName" class="pc-name-header">SLAVE</div>
 
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-            <div id="subName" class="pc-name" style="text-align: left; letter-spacing: 6px; font-size: 1.5rem; color: #e0e0e0; margin-bottom: 2px; line-height: 1;">SLAVE</div>
-            <div id="subHierarchy" class="pc-rank" style="text-align: left; color: #c5a059; font-family: 'Italianno', cursive; font-size: 2rem; line-height: 0.8; margin-left: -5px; letter-spacing: 0; text-transform: none;">Loading...</div>
+        <!-- THE AVATAR + STICKER (Middle) -->
+        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="
+            width: 100px; height: 100px; 
+            border-radius: 50%; 
+            border: 2px solid var(--gold); 
+            box-shadow: 0 0 25px rgba(197, 160, 89, 0.15);">
+            
+            <!-- Image -->
+            <img id="profilePic" src="" class="pc-avatar-img" style="
+                width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+                filter: grayscale(100%) contrast(1.2);">
+            
+            <!-- Edit Overlay -->
+            <div class="pc-avatar-edit-overlay" style="border-radius: 50%;">
+                <span style="font-size:1rem; color:white; opacity: 0.5;">+</span>
+            </div>
+
+            <!-- THE HIERARCHY STICKER (Overlapping Bottom) -->
+            <div id="subHierarchy" class="pc-rank-sticker">Loading...</div>
+
+            <!-- Chat Badge -->
+            <div id="chatBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; z-index: 25; font-weight: bold;">MSG</div>
         </div>
     </div>
 
     <!-- 2. ASSETS (Points/Coins) -->
-    <div class="pc-stats-grid" style="display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-bottom: 25px;">
+    <div class="pc-stats-grid" style="width: 100%; display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; border-top: 1px solid #222; padding-top: 20px; margin-bottom: 25px;">
         <div style="text-align: center;">
-            <div style="font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 1px; color: #555; text-transform: uppercase; margin-bottom: 4px;">Net Merit</div>
-            <div id="points" class="ssr-val" style="font-size: 1.1rem; color: #f0f0f0; font-family: 'Cinzel', serif; letter-spacing: 1px;">0</div>
+            <div style="font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 2px; color: #666; text-transform: uppercase; margin-bottom: 4px;">Net Merit</div>
+            <div id="points" class="ssr-val" style="font-size: 1.2rem; color: #f0f0f0; font-family: 'Cinzel', serif; letter-spacing: 1px;">0</div>
         </div>
-        <div style="width: 1px; height: 30px; background: #222;"></div>
+        <!-- Divider Line -->
+        <div style="width: 1px; height: 30px; background: linear-gradient(to bottom, transparent, #333, transparent);"></div>
         <div style="text-align: center;">
-            <div style="font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 1px; color: #555; text-transform: uppercase; margin-bottom: 4px;">Liquid Capital</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                <div id="coins" class="ssr-val" style="font-size: 1.1rem; color: #c5a059; font-family: 'Cinzel', serif; letter-spacing: 1px;">0</div>
+            <div style="font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 2px; color: #666; text-transform: uppercase; margin-bottom: 4px;">Liquid Capital</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <div id="coins" class="ssr-val" style="font-size: 1.2rem; color: #c5a059; font-family: 'Cinzel', serif; letter-spacing: 1px;">0</div>
                 <svg style="width:10px; height:10px; fill:#c5a059;"><rect width="10" height="10" transform="rotate(45 5 5)" /></svg>
             </div>
         </div>
     </div>
 
-    <!-- 3. THE PROTOCOL STACK (Button -> Streak) -->
-    <div class="devotion-wrapper" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+    <!-- 3. THE PROTOCOL STACK -->
+    <div class="devotion-wrapper" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
         
-        <!-- TOP: ACTION BUTTON -->
+        <!-- BUTTON -->
         <div id="btn" class="kneel-btn-bar" 
                 onmousedown="handleHoldStart(event)" onmouseup="handleHoldEnd(event)" onmouseleave="handleHoldEnd(event)" ontouchstart="handleHoldStart(event)" ontouchend="handleHoldEnd(event)"
-                style="position: relative; display: block; cursor: pointer; user-select: none; overflow: hidden; height: 50px; background: linear-gradient(180deg, #141414 0%, #050505 100%); border: 1px solid #c5a059; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
+                style="position: relative; display: block; cursor: pointer; user-select: none; overflow: hidden; height: 50px; background: linear-gradient(180deg, #141414 0%, #050505 100%); border: 1px solid rgba(197, 160, 89, 0.5); border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
             <span id="fill" class="bar-fill" style="display: block; position: absolute; top: 0; left: 0; height: 100%; width: 0%; z-index: 1; background: linear-gradient(90deg, #300000, #600000); transition: none;"></span> 
             <div class="bar-text" style="position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; pointer-events: none; gap: 10px;">
                 <span id="txt-main" style="font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 700; color: #c5a059; letter-spacing: 3px; text-transform: uppercase;">INITIATE PROTOCOL</span>
@@ -57,10 +72,8 @@
             </div>
         </div>
 
-        <!-- HIDDEN DAILY COUNTER (Kept for Logic) -->
         <span id="todayKneels" style="display: none;">0</span>
 
-        <!-- BOTTOM: TASK STREAK -->
         <div style="text-align: center;">
             <span style="font-family: 'Cinzel', serif; font-size: 0.8rem; color: #c5a059; letter-spacing: 2px; font-weight: 700; text-transform: uppercase;">
                 TASK STREAK: <span id="statStreak">0</span>
@@ -69,7 +82,7 @@
     </div>
 
     <!-- 4. DAILY ID -->
-    <div style="text-align: center; padding: 10px 0; color: #333; font-size: 0.6rem; border-bottom: 1px solid #222; font-family: 'Inter', monospace; margin-bottom: 10px;">
+    <div style="text-align: center; padding: 10px 0; color: #333; font-size: 0.6rem; border-bottom: 1px solid #222; font-family: 'Inter', monospace; margin-bottom: 10px; width: 100%;">
         SESSION ID: <span id="dailyRandomId" style="color: #555;">#----</span>
     </div>
 
@@ -78,10 +91,8 @@
         View Full Record ▾
     </div>
 
-    <!-- 6. HIDDEN DRAWER -->
-    <div id="statsContent">
-        
-        <!-- PROGRESS SECTION -->
+    <!-- 6. HIDDEN DRAWER (Unchanged logic) -->
+    <div id="statsContent" style="width: 100%;">
         <div class="level-progress-container" style="width: 100%; margin: 15px auto 25px auto;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 1px; color: #444; text-transform: uppercase;">
                 <span>TARGET</span>
@@ -95,35 +106,15 @@
             </div>
         </div>
 
-        <!-- STATS LIST -->
         <div class="stat-row-group">
-            
-            <div class="stat-line">
-                <span style="font-family: 'Cinzel', serif; color: #555;">GIVEN TASKS:</span> 
-                <strong id="statTotal" style="color:#c5a059;">0</strong>
-            </div>
-            
-            <div class="stat-line">
-                <span style="font-family: 'Cinzel', serif; color: #555;">DONE</span> 
-                <strong id="statCompleted" style="color:#c5a059;">0</strong>
-            </div>
-            
-            <div class="stat-line">
-                <span style="font-family: 'Cinzel', serif; color: #555;">FAILED</span> 
-                <strong id="statSkipped" style="color:#c5a059;">0</strong>
-            </div>
-            
-            <div class="stat-line">
-                <span style="font-family: 'Cinzel', serif; color: #555;">TOTAL KNEELING</span> 
-                <strong id="statTotalKneels" style="color:#c5a059;">0</strong>
-            </div>
-            
-            <!-- REGISTRATION DATE -->
+            <div class="stat-line"><span style="font-family: 'Cinzel', serif; color: #555;">GIVEN TASKS:</span> <strong id="statTotal" style="color:#c5a059;">0</strong></div>
+            <div class="stat-line"><span style="font-family: 'Cinzel', serif; color: #555;">DONE</span> <strong id="statCompleted" style="color:#c5a059;">0</strong></div>
+            <div class="stat-line"><span style="font-family: 'Cinzel', serif; color: #555;">FAILED</span> <strong id="statSkipped" style="color:#c5a059;">0</strong></div>
+            <div class="stat-line"><span style="font-family: 'Cinzel', serif; color: #555;">TOTAL KNEELING</span> <strong id="statTotalKneels" style="color:#c5a059;">0</strong></div>
             <div style="text-align: center; margin-top: 20px;">
                 <div class="stat-header" style="color: #333; font-size: 0.5rem; border: none; margin-bottom: 2px;">REGISTRATION DATE</div>
                 <strong id="slaveSinceDate" style="color: #555; font-family: 'Inter', monospace; font-size: 0.7rem;">--/--/--</strong>
             </div>
         </div>
     </div>
-
 </div>
