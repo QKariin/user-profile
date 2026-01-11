@@ -716,43 +716,6 @@ html, body {
   text-shadow: 0 0 8px var(--gold-dim);
 }
 
-#chatSessionBtn {
-  display: none;
-  padding: 6px 14px;
-  background: rgba(0,0,0,0.8);
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  border-radius: 4px;
-  font-family: 'Cinzel', serif;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  cursor: pointer;
-  align-items: center;
-  gap: 6px;
-  transition: var(--transition);
-  white-space: nowrap;
-  box-shadow: inset 0 0 8px var(--gold-dim);
-}
-
-#chatSessionBtn:hover {
-  background: var(--gold);
-  color: var(--bg-dark);
-  box-shadow: 0 0 20px var(--gold-dim);
-}
-
-#sessionOverlay {
-  display: none;
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.95);
-  z-index: 99;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-}
 
 #modalCloseX {
     position: absolute;
@@ -1863,37 +1826,37 @@ html, body {
 }
 
 .protocol-item {
-  background: rgba(0,0,0,0.6);
-  padding: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
+    background: rgba(10, 10, 12, 0.4); /* Matte luxury finish */
+    padding: 20px 25px;
+    border-radius: 0; /* Kill the roundness for a brutalist look */
+    cursor: pointer;
+    border-bottom: 1px solid var(--glass-border); /* Elegant hairline divider */
+    width: 100%; /* Force it to fill the right column width */
+    transition: background 0.4s ease;
 }
 
 .protocol-header {
-  margin: 0;
-  font-weight: 700;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  font-family: 'Cinzel', serif;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.75rem; /* Small text is luxury */
+    letter-spacing: 4px; /* Wide kerning for the designer feel */
+    text-transform: uppercase;
+    font-family: 'Cinzel', serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gold);
 }
 
 .protocol-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease-out, margin-top 0.3s;
-  font-family: 'Inter', sans-serif;
-  color: #ccc;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.protocol-item.active .protocol-content {
-  max-height: 300px;
-  margin-top: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Inter', sans-serif;
+    color: #888;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    font-weight: 300;
 }
 
 .theater-content {
