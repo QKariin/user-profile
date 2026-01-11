@@ -10,35 +10,32 @@
     align-items: center;
     font-family: 'Cinzel', serif;">
 
-    <!-- 1. IDENTITY HEADER (Stacked) -->
-    <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
+    <!-- 1. IDENTITY STACK (Rank -> Picture -> Name) -->
+    <div class="pc-identity-stack">
         
-        <!-- THE NAME (Top) -->
-        <div id="subName" class="pc-name-header">SLAVE</div>
+        <!-- TOP: HIERARCHY (The Dominant Label) -->
+        <div id="subHierarchy" class="rank-dominant-header">Loading...</div>
 
-        <!-- THE AVATAR + STICKER (Middle) -->
-        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()" style="
-            width: 100px; height: 100px; 
-            border-radius: 50%; 
-            border: 2px solid var(--gold); 
-            box-shadow: 0 0 25px rgba(197, 160, 89, 0.15);">
-            
-            <!-- Image -->
+        <!-- MIDDLE: AVATAR (The Object) -->
+        <div class="pc-avatar-box" onclick="document.getElementById('profileUploadInput').click()">
             <img id="profilePic" src="" class="pc-avatar-img" style="
                 width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
                 filter: grayscale(100%) contrast(1.2);">
             
-            <!-- Edit Overlay -->
             <div class="pc-avatar-edit-overlay" style="border-radius: 50%;">
                 <span style="font-size:1rem; color:white; opacity: 0.5;">+</span>
             </div>
 
-            <!-- THE HIERARCHY STICKER (Overlapping Bottom) -->
-            <div id="subHierarchy" class="pc-rank-sticker">Loading...</div>
-
-            <!-- Chat Badge -->
-            <div id="chatBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 6px; border-radius: 2px; z-index: 25; font-weight: bold;">MSG</div>
+            <!-- Optional: Chat Badge if needed -->
+            <div id="chatBadge" style="display: none; position: absolute; top: 0; right: 0; background: var(--gold); color: #000; font-size: 0.5rem; padding: 2px 4px; border-radius: 2px; z-index: 25; font-weight: bold;">!</div>
         </div>
+
+        <!-- BOTTOM: NAME (The Subservient Tag) -->
+        <div class="name-subservient-footer">
+            <span class="name-label">DESIGNATION</span>
+            <span id="subName">SLAVE</span>
+        </div>
+
     </div>
 
     <!-- 2. ASSETS (Points/Coins) -->
@@ -47,7 +44,6 @@
             <div style="font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 2px; color: #666; text-transform: uppercase; margin-bottom: 4px;">Net Merit</div>
             <div id="points" class="ssr-val" style="font-size: 1.2rem; color: #f0f0f0; font-family: 'Cinzel', serif; letter-spacing: 1px;">0</div>
         </div>
-        <!-- Divider Line -->
         <div style="width: 1px; height: 30px; background: linear-gradient(to bottom, transparent, #333, transparent);"></div>
         <div style="text-align: center;">
             <div style="font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 2px; color: #666; text-transform: uppercase; margin-bottom: 4px;">Liquid Capital</div>
@@ -72,6 +68,7 @@
             </div>
         </div>
 
+        <!-- Hidden Logic Span -->
         <span id="todayKneels" style="display: none;">0</span>
 
         <div style="text-align: center;">
@@ -81,18 +78,19 @@
         </div>
     </div>
 
-    <!-- 4. DAILY ID -->
+    <!-- 4. DAILY ID (Bottom Footer) -->
     <div style="text-align: center; padding: 10px 0; color: #333; font-size: 0.6rem; border-bottom: 1px solid #222; font-family: 'Inter', monospace; margin-bottom: 10px; width: 100%;">
         SESSION ID: <span id="dailyRandomId" style="color: #555;">#----</span>
     </div>
 
-    <!-- 5. FOOTER TOGGLE -->
+    <!-- 5. TOGGLE -->
     <div class="stats-toggle-btn" onclick="toggleStats()" style="color: #444; background: transparent; font-family: 'Inter', sans-serif; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer;">
         View Full Record ▾
     </div>
 
-    <!-- 6. HIDDEN DRAWER (Unchanged logic) -->
+    <!-- 6. HIDDEN DRAWER -->
     <div id="statsContent" style="width: 100%;">
+        <!-- Progress Bar -->
         <div class="level-progress-container" style="width: 100%; margin: 15px auto 25px auto;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 1px; color: #444; text-transform: uppercase;">
                 <span>TARGET</span>
