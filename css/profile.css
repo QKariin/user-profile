@@ -1825,14 +1825,19 @@ html, body {
   overflow: hidden;
 }
 
+/* Update your protocol-item block */
 .protocol-item {
-    background: rgba(10, 10, 12, 0.4); /* Matte luxury finish */
+    width: 100% !important; /* Prevents shrinking to top-right */
+    background: rgba(10, 10, 12, 0.4); 
     padding: 20px 25px;
-    border-radius: 0; /* Kill the roundness for a brutalist look */
+    border-radius: 0; 
+    border-bottom: 1px solid var(--glass-border);
     cursor: pointer;
-    border-bottom: 1px solid var(--glass-border); /* Elegant hairline divider */
-    width: 100%; /* Force it to fill the right column width */
-    transition: background 0.4s ease;
+}
+
+/* Add this to ensure ALL views fill the column width */
+#viewServingTop, #viewNews, #viewVault, #viewSession, #viewProtocol, #viewRewards, #viewHierarchy, #viewBuy {
+    width: 100% !important;
 }
 
 .protocol-header {
