@@ -1,3 +1,4 @@
+
 // Chat functionality - FIXED FOR MODULES
 import { 
     lastChatJson, isInitialLoad, chatLimit, lastNotifiedMessageId 
@@ -89,19 +90,17 @@ export async function renderChat(messages) {
 
         if (isSystem) {
             let sysClass = "";
-            let sysIcon = "#icon-check";
             const lower = txt.toLowerCase();
 
             if (lower.includes("tribute") || lower.includes("coins")) {
-                sysClass = "sys-gold"; sysIcon = "#icon-coin";
+                sysClass = "sys-gold";
             } else if (lower.includes("insufficient") || lower.includes("rejected")) {
-                sysClass = "sys-red"; sysIcon = "#icon-close";
+                sysClass = "sys-red";
             }
 
             return `
                 <div class="msg-row system-row">
                     <div class="msg-system ${sysClass}">
-                        <svg class="sys-icon"><use href="${sysIcon}"></use></svg>
                         ${txt}
                     </div>
                 </div>`;
