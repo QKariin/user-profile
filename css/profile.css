@@ -1931,8 +1931,14 @@ html, body {
   .app-container { width: 80%; max-width: 1600px; padding-top: 60px; }
   .top-section-split { flex-direction: row; align-items: flex-start; }
   .layout-left { width: 30%; min-width: 280px; position: sticky; top: 20px; }
-  .layout-right { width: 70%; margin-top: 25px; }
-} /* THIS CLOSES DESKTOP */
+  .layout-right { 
+    flex: 1; /* This fills the remaining space perfectly */
+    margin-top: 0 !important; /* Aligns the headers horizontally */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Forces internal windows to fill the width */
+  }
+ /* THIS CLOSES DESKTOP */
 
 /* --- 8. GLOBAL PRISON & FEED (WORKS ON ALL DEVICES) --- */
 #historySection {
