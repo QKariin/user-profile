@@ -242,19 +242,33 @@
 </div>
 
 <script>
+    // 1. Handle Includes
     document.querySelectorAll("[data-include]").forEach(async el => {
         const file = el.getAttribute("data-include");
-        try { const html = await fetch(file).then(r => r.text()); el.innerHTML = html; } catch (err) {}
+        try { 
+            const html = await fetch(file).then(r => r.text()); 
+            el.innerHTML = html; 
+        } catch (err) {
+            console.error("Include failed:", file, err);
+        }
     });
 
+    // 2. Main Tab Switching Logic
     window.switchTab = function(viewId) {
+        // Update navigation button states
         document.querySelectorAll('.nav-btn').forEach(item => {
-            if(item.getAttribute('onclick').includes(viewId)) item.classList.add('active');
-            else item.classList.remove('active');
+            const onClickAttr = item.getAttribute('onclick') || "";
+            if(onClickAttr.includes(`'${viewId}'`) || onClickAttr.includes(`"${viewId}"`)) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
         });
 
-        // Hide ALL views
+        // Define all possible view IDs
         const views = ['viewServingTop', 'viewProtocol', 'viewNews', 'viewVault', 'viewBuy', 'historySection', 'viewRewards', 'viewHierarchy', 'viewSession'];
+        
+        // Hide ALL views first
         views.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
@@ -263,32 +277,51 @@
             }
         });
 
+        // Map short keywords to actual Element IDs
         let targetId = viewId;
-        if(viewId === 'serve') targetId = 'viewServingTop';
-        if(viewId === 'news') targetId = 'viewNews';
-        if(viewId === 'buy') targetId = 'viewBuy';
-        if(viewId === 'vault') targetId = 'viewVault';
+        if(viewId === 'serve')    targetId = 'viewServingTop';
+        if(viewId === 'news')     targetId = 'viewNews';
+        if(viewId === 'buy')      targetId = 'viewBuy';
+        if(viewId === 'vault')    targetId = 'viewVault';
         if(viewId === 'protocol') targetId = 'viewProtocol';
-        if(viewId === 'history') targetId = 'historySection';
+        if(viewId === 'history')  targetId = 'historySection';
 
         const target = document.getElementById(targetId);
         if(target) {
+            // Reveal the target
             target.classList.remove('hidden');
-            if (targetId === 'viewNews' || targetId === 'viewVault' || targetId === 'viewServingTop' || targetId === 'historySection') {
+            
+            // Set correct display mode
+            const flexViews = ['viewNews', 'viewVault', 'viewServingTop', 'historySection'];
+            if (flexViews.includes(targetId)) {
                  target.style.display = 'flex'; 
                  target.style.flexDirection = 'column';
             } else {
                  target.style.display = 'block';
             }
             
-            if (typeof window.showView === 'function') window.showView(targetId);
-            
-            // THE FIX: Trigger Data Load specifically for Slave Record (History)
-            if(targetId === 'historySection' && typeof window.loadMoreHistory === 'function') {
-                window.loadMoreHistory();
-            }
+            // 3. EXECUTION FIX (Retry Logic)
+            // This waits for the module to finish loading if the user clicks too fast
+            const executeLogic = () => {
+                // Trigger standard view logic
+                if (typeof window.showView === 'function') {
+                    window.showView(targetId);
+                }
+
+                // Trigger data load specifically for the Slave Record
+                if (targetId === 'historySection') {
+                    if (typeof window.loadMoreHistory === 'function') {
+                        window.loadMoreHistory();
+                    } else {
+                        // Module not ready, try again in 100ms
+                        setTimeout(executeLogic, 100);
+                    }
+                }
+            };
+
+            executeLogic();
         }
-    }
+    };
 </script>
 
 </body>
