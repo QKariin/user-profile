@@ -1,11 +1,10 @@
-
-// Chat functionality - FIXED FOR MODULES
+// Chat functionality - FIXED FOR MODULES & LUXURY UI
 import { 
     lastChatJson, isInitialLoad, chatLimit, lastNotifiedMessageId 
 } from './state.js';
 import { 
     setLastChatJson, setIsInitialLoad, setChatLimit, setLastNotifiedMessageId 
-} from './state.js'; // IMPORT THE SETTERS
+} from './state.js'; 
 import { URLS } from './config.js';
 import { triggerSound } from './utils.js';
 import { signUpcdnUrl } from './bytescale.js';
@@ -58,56 +57,56 @@ export async function renderChat(messages) {
         Math.max(sortedMessages.length - chatLimit, 0)
     );
 
-    // Proxy Bytescale URLs for private access (in parallel)
-    /*const signingPromises = visibleMessages.map(async (m) => {
-        if (m.message && m.message.startsWith('https://upcdn.io/')) {
-            const parts = m.message.split('/raw/');
-            if (parts.length === 2) {
-                const filePath = '/' + parts[1];
-                try {
-                    m.mediaUrl = await getPrivateFile(filePath);
-                } catch (e) {
-                    console.error('Failed to proxy URL', e);
-                }
-            }
-        }
-    });
-    await Promise.all(signingPromises);*/
+    // Proxy Bytescale URLs
     const signingPromises = visibleMessages.map(async (m) => {
-    if (m.message?.startsWith("https://upcdn.io/")) {
-        m.mediaUrl = await signUpcdnUrl(m.message);
-    }
+        if (m.message?.startsWith("https://upcdn.io/")) {
+            m.mediaUrl = await signUpcdnUrl(m.message);
+        }
     });
     await Promise.all(signingPromises);
 
     // 4. RENDER HTML
     chatContent.innerHTML = visibleMessages.map(m => {
         let txt = DOMPurify.sanitize(m.message);
-        // Convert newlines to <br>
         txt = txt.replace(/\n/g, "<br>");
-        const isMe = m.sender === 'user';
-        const isSystem = m.sender === 'system';
+        
+        const senderLower = (m.sender || "").toLowerCase();
+        const isMe = senderLower === 'user' || senderLower === 'slave';
+        const isSystem = senderLower === 'system';
+        const isAdmin = senderLower === 'admin' || senderLower === 'queen';
 
+        // SYSTEM MESSAGE LOGIC
         if (isSystem) {
             let sysClass = "";
             const lower = txt.toLowerCase();
-
-            if (lower.includes("tribute") || lower.includes("coins")) {
-                sysClass = "sys-gold";
-            } else if (lower.includes("insufficient") || lower.includes("rejected")) {
-                sysClass = "sys-red";
-            }
+            if (lower.includes("tribute") || lower.includes("coins")) sysClass = "sys-gold";
+            else if (lower.includes("insufficient") || lower.includes("rejected")) sysClass = "sys-red";
 
             return `
                 <div class="msg-row system-row">
-                    <div class="msg-system ${sysClass}">
-                        ${txt}
+                    <div class="msg-system ${sysClass}">${txt}</div>
+                </div>`;
+        }
+
+        // TRIBUTE CARD LOGIC (Luxury Layout)
+        if (txt.includes("💝 TRIBUTE:")) {
+            const lines = txt.split('<br>');
+            const item = lines.find(l => l.includes('ITEM:'))?.replace('ITEM:', '').trim() || "Tribute";
+            const cost = lines.find(l => l.includes('COST:'))?.replace('COST:', '').trim() || "0";
+            
+            return `
+                <div class="msg-row mr-out">
+                    <div class="tribute-card">
+                        <div class="tribute-card-title">Sacrifice Validated</div>
+                        <div style="color:white; font-family:'Orbitron'; font-size:1rem; margin:10px 0;">${item}</div>
+                        <div style="color:var(--gold); font-weight:bold;">${cost} 🪙</div>
                     </div>
                 </div>`;
         }
 
+        // CHOOSE BUBBLE CLASS
         let msgClass = isMe ? 'm-slave' : 'm-queen';
-        if (!isMe) {
+        if (isAdmin) {
             if (txt.includes("Verified")) msgClass = 'm-approve';
             else if (txt.includes("Rejected")) msgClass = 'm-reject';
         }
@@ -118,44 +117,34 @@ export async function renderChat(messages) {
         if (m.message && (m.message.startsWith('http') || m.mediaUrl)) {
             const originalUrl = m.message.toLowerCase();
             const srcUrl = m.mediaUrl || m.message;
-
             const isVideo = originalUrl.match(/\.(mp4|webm|mov)(\?|$)/);
             const isImage = originalUrl.match(/\.(jpg|jpeg|png|gif|webp|avif|bmp|svg)(\?|$)/);
 
             if (isVideo) {
                 contentHtml = `
-                    <div class="msg ${msgClass}" style="padding:0; background:black;">
-                        <video 
-                            src="${srcUrl}" 
-                            controls 
-                            style="max-width:100%; border-radius:8px; display:block; cursor:pointer;"
-                            onclick="openChatPreview('${encodeURIComponent(srcUrl)}', true)">
+                    <div class="msg ${msgClass}" style="padding:0; background:black; overflow:hidden;">
+                        <video src="${srcUrl}" controls style="max-width:100%; display:block; cursor:pointer;"
+                               onclick="openChatPreview('${encodeURIComponent(srcUrl)}', true)">
                         </video>
                     </div>`;
-            } 
-            else if (isImage) {
+            } else if (isImage) {
                 contentHtml = `
-                    <div class="msg ${msgClass}" style="padding:0;">
-                        <img 
-                            src="${srcUrl}" 
-                            style="max-width:100%; border-radius:8px; display:block; cursor:pointer;"
-                            onclick="openChatPreview('${encodeURIComponent(srcUrl)}', false)">
+                    <div class="msg ${msgClass}" style="padding:0; overflow:hidden;">
+                        <img src="${srcUrl}" style="max-width:100%; display:block; cursor:pointer;"
+                             onclick="openChatPreview('${encodeURIComponent(srcUrl)}', false)">
                     </div>`;
-            } 
-            else {
-                // Normal link
-                contentHtml = `
-                    <div class="msg ${msgClass}">
-                        <a href="${srcUrl}" target="_blank" rel="noopener noreferrer">${srcUrl}</a>
-                    </div>`;
+            } else if (m.message.startsWith('http')) {
+                contentHtml = `<div class="msg ${msgClass}"><a href="${srcUrl}" target="_blank" rel="noopener noreferrer">${srcUrl}</a></div>`;
             }
         }
 
-        const avatar = isMe ? "" : `<img src="${URLS.QUEEN_AVATAR}" class="msg-avatar">`;
-        const timeStr = new Date(m._createdDate).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        // AVATAR LOGIC (Correct Class for CSS)
+        const profilePic = document.getElementById('profilePic')?.src;
+        const slaveAvatar = profilePic ? `<img src="${profilePic}" class="chat-av">` : `<div class="chat-av-placeholder">S</div>`;
+        const queenAvatar = `<img src="${URLS.QUEEN_AVATAR}" class="chat-av">`;
+        
+        const avatar = isMe ? "" : queenAvatar;
+        const timeStr = new Date(m._createdDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
             <div class="msg-row ${isMe ? 'mr-out' : 'mr-in'}">
@@ -164,23 +153,18 @@ export async function renderChat(messages) {
                     ${contentHtml}
                     <div class="msg-time">${timeStr}</div>
                 </div>
+                ${isMe ? slaveAvatar : ''}
             </div>`;
     }).join('');
 
-    // 5. ATTACH MEDIA LOAD LISTENERS (Fixes scroll issue)
+    // Load Listeners
     chatContent.querySelectorAll("img").forEach(img => {
-        img.addEventListener("load", () => {
-            setTimeout(forceBottom, 30);
-        });
+        img.addEventListener("load", () => setTimeout(forceBottom, 30));
+    });
+    chatContent.querySelectorAll("video").forEach(v => {
+        v.addEventListener("loadedmetadata", () => setTimeout(forceBottom, 30));
     });
 
-    chatContent.querySelectorAll("video").forEach(video => {
-        video.addEventListener("loadedmetadata", () => {
-            setTimeout(forceBottom, 30);
-        });
-    });
-
-    // 6. AUTO-SCROLL
     if (wasInitialLoad || isAtBottom) {
         forceBottom();
     }
@@ -192,7 +176,7 @@ export function forceBottom() {
 }
 
 export function loadMoreChat() {
-    setChatLimit(chatLimit + 10); // FIXED: Using Setter
+    setChatLimit(chatLimit + 10);
     if (lastChatJson) {
         renderChat(JSON.parse(lastChatJson));
     }
@@ -218,7 +202,6 @@ export function openChatPreview(url, isVideo) {
     const overlay = document.getElementById('chatMediaOverlay');
     const content = document.getElementById('chatMediaOverlayContent');
     const decoded = decodeURIComponent(url);
-
     if (!overlay || !content) return;
     content.innerHTML = isVideo ? `<video src="${decoded}" controls autoplay class="cmo-media"></video>` : `<img src="${decoded}" class="cmo-media">`;
     overlay.classList.remove('hidden');
@@ -228,9 +211,7 @@ export function openChatPreview(url, isVideo) {
 export function closeChatPreview() {
     const overlay = document.getElementById('chatMediaOverlay');
     const container = document.getElementById('chatMediaOverlayContent');
-
     if (!overlay || !container) return;
-
     overlay.classList.add('hidden');
-    container.innerHTML = ""; // stops video + clears image
+    container.innerHTML = "";
 }
