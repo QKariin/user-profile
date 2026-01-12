@@ -80,47 +80,49 @@
 /* Kill the Circus Avatars */
 .chat-av, .msg-avatar, .chat-av-placeholder { display: none !important; }
 
-/* --- KILL BUBBLES - ACTIVATE TACTICAL LINES --- */
+/* --- LUXURY TERMINAL TYPOGRAPHY --- */
 .msg {
-    background: none !important; /* No more bubble background */
+    background: none !important;
     border: none !important;
     border-radius: 0 !important;
-    max-width: 75% !important; /* Matches your requirement */
+    max-width: 70% !important; /* Your strict limit */
     padding: 10px 0 !important;
+    
+    /* THE FONT FIX */
     font-family: 'Rajdhani', sans-serif !important;
-    font-size: 1rem !important;
+    font-optical-sizing: auto;
+    font-weight: 500 !important;
+    font-size: 1.1rem !important;
+    line-height: 1.2 !important;
     letter-spacing: 1px !important;
-    position: relative !important;
+    text-transform: none !important;
 }
 
-/* SLAVE MESSAGE (Right Side - Silver Strip) */
+/* SLAVE MESSAGE: Anchor Right, Silver Strip on Right */
 .mr-out .msg {
-    color: #eee !important;
+    color: #cccccc !important;
     text-align: right !important;
-    border-right: 3px solid #888 !important; /* Silver accent line */
+    border-right: 2px solid #555555 !important; /* Silver strip */
     padding-right: 15px !important;
+    margin-left: auto !important; /* Forces it to stay on the right */
 }
 
-/* QUEEN MESSAGE (Left Side - Gold Strip) */
+/* QUEEN MESSAGE: Anchor Left, Gold Strip on Left */
 .mr-in .msg {
-    color: #fff !important;
+    color: #ffffff !important;
     text-align: left !important;
-    border-left: 3px solid var(--gold) !important; /* Gold accent line */
+    border-left: 2px solid var(--gold) !important; /* Gold strip */
     padding-left: 15px !important;
+    margin-right: auto !important; /* Forces it to stay on the left */
 }
 
-/* Optional: Subtle Glow for Queen's Gold Line */
-.mr-in .msg {
-    box-shadow: -10px 0 15px -10px var(--gold) !important;
-}
-
-/* Fix Time Stamps to sit under the lines */
+/* Fix Time Stamps to align with the text edge */
 .msg-time {
     font-family: 'Rajdhani' !important;
-    font-size: 0.6rem !important;
-    color: #444 !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    color: #333333 !important;
     margin-top: 4px !important;
-    text-transform: uppercase !important;
 }
 
 .system-row {
