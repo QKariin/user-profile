@@ -90,12 +90,6 @@
 }
 
 /* Slave (Left - Pink) */
-.mr-out .msg {
-    background: var(--pink) !important;
-    color: #000 !important;
-    border-radius: 15px 15px 15px 2px !important;
-    font-weight: 700 !important;
-}
 
 /* Queen (Right - Dark Glass) */
 .mr-in .msg {
