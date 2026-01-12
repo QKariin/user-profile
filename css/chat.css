@@ -116,13 +116,31 @@
     margin-right: auto !important; /* Forces it to stay on the left */
 }
 
-/* Fix Time Stamps to align with the text edge */
+/* --- TIME STAMP POSITIONING --- */
+.msg-col {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Slave: Pin time to the right edge */
+.mr-out .msg-col {
+    align-items: flex-end !important;
+    text-align: right !important;
+}
+
+/* Queen: Pin time to the left edge */
+.mr-in .msg-col {
+    align-items: flex-start !important;
+    text-align: left !important;
+}
+
 .msg-time {
-    font-family: 'Rajdhani' !important;
+    font-family: 'Rajdhani', sans-serif !important;
     font-size: 0.65rem !important;
     font-weight: 700 !important;
-    color: #333333 !important;
+    color: #333333 !important; /* Dark grey for minimalist look */
     margin-top: 4px !important;
+    width: fit-content !important;
 }
 
 .system-row {
