@@ -246,3 +246,18 @@ body {
 .modal-glass-overlay * {
     pointer-events: auto; /* Re-enable clicking on buttons/text */
 }
+
+/* 1. Hide the badge by default */
+#activeBadge {
+    display: none;
+}
+
+/* 2. The JS adds this class to make it visible */
+#activeBadge.show {
+    display: block; /* or display: flex; if you want alignment */
+}
+
+/* 3. Utility for the other buttons (standard) */
+.hidden {
+    display: none !important;
+}
