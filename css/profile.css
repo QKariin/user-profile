@@ -210,3 +210,39 @@ body {
 
 .gi-status-sticker { position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; z-index: 5; filter: drop-shadow(0 0 5px black); }
 .gi-reward-sticker { position: absolute; bottom: 5px; left: 5px; width: 25px; height: 25px; z-index: 5; }
+
+/* --- FIX: MODAL & PREVIEW LAYERS --- */
+
+/* 1. Force Modal above the new Layout */
+.glass-modal {
+    z-index: 99999 !important; /* Higher than everything */
+}
+
+/* 2. Fix Broken/Invisible Images in Preview */
+#modalMediaContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#modalMediaContainer img, 
+#modalMediaContainer video {
+    max-width: 95%;
+    max-height: 90%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    border: 1px solid var(--gold);
+}
+
+/* 3. Ensure Overlay Content is Clickable */
+.modal-glass-overlay {
+    pointer-events: none; /* Let clicks pass through to image/background if needed */
+}
+.modal-glass-overlay * {
+    pointer-events: auto; /* Re-enable clicking on buttons/text */
+}
