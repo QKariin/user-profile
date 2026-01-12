@@ -247,7 +247,7 @@ body {
     pointer-events: auto; /* Re-enable clicking on buttons/text */
 }
 
-/* 1. Hide the badge by default */
+/* 1. BUTTTONNN!!!!! */
 #activeBadge {
     display: none;
 }
@@ -260,4 +260,21 @@ body {
 /* 3. Utility for the other buttons (standard) */
 .hidden {
     display: none !important;
+}
+
+/* Loading State for Button */
+.btn-loading {
+    background: #333 !important;
+    color: var(--neon-yellow) !important; /* Gold color for active state */
+    border-color: var(--neon-yellow) !important;
+    cursor: wait !important;
+    pointer-events: none; /* Prevents double-clicking */
+}
+
+/* Simple blink animation for the text cursor */
+.blink {
+    animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+    50% { opacity: 0; }
 }
