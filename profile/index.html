@@ -44,7 +44,7 @@
 
 <div class="app-container">
     
-    <!-- HEADER: HIERARCHY + QUEEN KARIN + MENU -->
+    <!-- HEADER -->
     <div class="profile-crown-header">
         <div class="profile-crown-avatar">
             <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" alt="Profile Avatar">
@@ -55,13 +55,13 @@
             <div class="crown-name" style="font-family: 'Orbitron', sans-serif; color: white; font-weight: 900; letter-spacing: 1px;">of QUEEN KARIN</div>
         </div>
 
-        <!-- MENU: USES switchTab() EXACTLY LIKE YOUR WORKING CODE -->
+        <!-- MENU: Calls Original Logic (switchTab) + Visual Update (updateHeaderVisuals) -->
         <div class="profile-crown-navigation">
-            <span class="profile-crown-nav-item active" onclick="switchTab('serve')">HOME</span>
-            <span class="profile-crown-nav-item" onclick="switchTab('protocol')">PROTOCOL</span>
-            <span class="profile-crown-nav-item" onclick="switchTab('news')">GALLERY</span>
-            <span class="profile-crown-nav-item" onclick="switchTab('vault')">VAULT</span>
-            <span class="profile-crown-nav-item" onclick="switchTab('buy')">STORE</span>
+            <span class="profile-crown-nav-item active" onclick="switchTab('serve'); updateHeaderVisuals(this)">HOME</span>
+            <span class="profile-crown-nav-item" onclick="switchTab('protocol'); updateHeaderVisuals(this)">PROTOCOL</span>
+            <span class="profile-crown-nav-item" onclick="switchTab('news'); updateHeaderVisuals(this)">GALLERY</span>
+            <span class="profile-crown-nav-item" onclick="switchTab('vault'); updateHeaderVisuals(this)">VAULT</span>
+            <span class="profile-crown-nav-item" onclick="switchTab('buy'); updateHeaderVisuals(this)">STORE</span>
         </div>
     </div>
 
@@ -71,17 +71,14 @@
     <!-- DYNAMIC CONTENT -->
     <div class="profile-content-views" style="margin-top: 20px;">
         
-        <!-- VIEW 1: HOME/DASHBOARD (SPLIT LAYOUT) -->
+        <!-- HOME VIEW (Split Layout) -->
         <div id="viewServingTop">
             <div class="profile-command-center">
                 
-                <!-- LEFT PILLAR: PROFILE + TASK -->
+                <!-- LEFT: Profile & Task -->
                 <div class="profile-command-pillar">
-                    
-                    <!-- Profile Card -->
                     <div data-include="/profile/profileCard.html" style="margin-bottom: 20px;"></div>
-
-                    <!-- Task Card -->
+                    
                     <div class="profile-pillar-header">TASK COMMAND CENTER</div>
                     <div id="taskCard" class="glass-card">
                         <div id="activeBadge" class="task-badge-top">
@@ -105,7 +102,7 @@
                 <!-- SEPARATOR -->
                 <div class="profile-command-separator"></div>
 
-                <!-- RIGHT PILLAR: CHAT -->
+                <!-- RIGHT: Chat -->
                 <div class="profile-command-pillar">
                     <div class="profile-pillar-header">COMMUNICATIONS PORTAL</div>
                     <div class="profile-pillar-body">
@@ -129,27 +126,7 @@
                             </div>
                             
                             <div id="chatBody" style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
-                                
-                                <!-- OVERLAYS FROM WORKING CODE -->
-                                <div id="kneelRewardOverlay" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center;">
-                                    <div style="text-align: center; width: 100%; padding: 20px;">
-                                        <h2 style="font-family:'Orbitron'; font-weight: 900; color: white; font-size: 1.2rem; letter-spacing: 5px; text-transform: uppercase;">DEVOTION RECOGNIZED</h2>
-                                        <p style="font-family:'Rajdhani'; color:var(--neon-pink); margin-bottom: 30px;">CHOOSE YOUR BLESSING</p>
-                                        <div style="display: flex; gap: 15px; justify-content: center;">
-                                            <div class="blessing-orb orb-yellow" onclick="claimKneelReward('coins')" style="cursor:pointer; flex: 1; background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 15px; padding: 20px;">
-                                                <svg style="width:30px; height:30px; fill:var(--neon-yellow);"><use href="#icon-coin"></use></svg>
-                                                <div style="font-family:'Orbitron'; font-size: 1.2rem; color: white;">10</div>
-                                                <div style="font-size: 0.6rem; color: var(--neon-yellow);">COINS</div>
-                                            </div>
-                                            <div class="blessing-orb orb-pink" onclick="claimKneelReward('points')" style="cursor:pointer; flex: 1; background: rgba(255,0,222,0.05); border: 1px solid rgba(255,0,222,0.2); border-radius: 15px; padding: 20px;">
-                                                <svg style="width:30px; height:30px; fill:var(--neon-pink);"><use href="#icon-star"></use></svg>
-                                                <div style="font-family:'Orbitron'; font-size: 1.2rem; color: white;">50</div>
-                                                <div style="font-size: 0.6rem; color: var(--neon-pink);">POINTS</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-        
+                                <div data-include="/profile/kneeling/kneelingRewardOverlay.html"></div>
                                 <div id="chatMediaOverlay" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center;">
                                     <div id="mediaOverlayClose" onclick="closeChatPreview()" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:2rem; color:white; font-weight:300;">&times;</div>
                                     <div id="chatMediaOverlayContent" style="width: 100%; max-width: 90%; max-height: 90%; display:flex; align-items:center; justify-content:center;"></div>
@@ -228,13 +205,11 @@
             </div>
         </div>
             
-        <!-- OTHER VIEWS (Copied Logic from Working Code) -->
+        <!-- OTHER VIEWS (STORE, GALLERY, ETC) -->
         <div id="viewNews" class="hidden">
             <div class="glass-card" style="height: 100%; padding:0; overflow:hidden; background:#000;">
                 <div class="social-header">
-                    <div class="sh-avatar-frame">
-                        <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" class="sh-avatar">
-                    </div>
+                    <div class="sh-avatar-frame"><img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" class="sh-avatar"></div>
                     <div class="sh-info">
                         <div class="sh-name">QUEEN KARIN</div>
                         <div class="sh-bio">Time to serve.</div>
@@ -258,16 +233,7 @@
         <div id="viewVault" class="hidden" style="display:flex; flex-direction:column; gap:15px;">
             <div class="glass-card">
                 <h2 style="text-align:center; color:white; font-family:'Orbitron'; font-size:1.5rem; margin-bottom:20px; letter-spacing:3px;">THE QUEEN'S VAULT</h2>
-                <p style="text-align:center; color:#666; font-family:'Rajdhani'; font-size:0.8rem; margin-bottom:20px;">YOUR PERMANENT COLLECTION OF UNLOCKED DIRECTIVES.</p>
                 <div id="vaultGrid" class="gallery-grid"></div>
-            </div>
-        </div>
-                        
-        <div id="viewSession" class="hidden" style="display:flex; flex-direction:column; gap:15px;">
-            <div class="glass-card" style="text-align:center; padding: 50px;">
-                <h2 style="font-size:2rem; color:var(--neon-pink); text-shadow:0 0 10px var(--neon-pink);">PRIVATE SESSIONS</h2>
-                <p style="color:#aaa; font-family:'Rajdhani'; margin-top:10px;">Currently offline. Check back later.</p>
-                <button class="action-btn" style="margin-top:20px; opacity:0.5; cursor:not-allowed;">CHECK AVAILABILITY</button>
             </div>
         </div>
         
@@ -277,58 +243,18 @@
                 <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
                     <div class="protocol-item" onclick="toggleSection(this)" style="border:1px solid var(--neon-yellow);">
                         <h3 class="protocol-header" style="color:var(--neon-yellow);">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <svg style="width:18px; height:18px; fill:var(--neon-yellow);"><use href="#icon-coin"></use></svg> THE ECONOMY
-                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;"><svg style="width:18px; height:18px; fill:var(--neon-yellow);"><use href="#icon-coin"></use></svg>THE ECONOMY</div>
                             <span class="protocol-arrow">▼</span>
                         </h3>
-                        <div class="protocol-content">
-                            <p style="margin-bottom:10px;"><strong style="color:white;">COINS (Currency):</strong> Your physical worth. Used to buy gifts from the <strong>Wishlist</strong>, pay mandatory tributes, or purchase your freedom from a task via the <strong>Skip</strong> function.</p>
-                            <p><strong style="color:white;">POINTS (Status):</strong> Your spiritual worth. Earned strictly through <strong>Kneeling</strong> and completing <strong>Duties</strong>.</p>
-                        </div>
-                    </div>
-                    <div class="protocol-item" onclick="toggleSection(this)" style="border:1px solid var(--neon-green);">
-                        <h3 class="protocol-header" style="color:var(--neon-green);">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <svg style="width:18px; height:18px; fill:var(--neon-green);"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg> DUTY & TASKS
-                            </div>
-                            <span class="protocol-arrow">▼</span>
-                        </h3>
-                        <div class="protocol-content">
-                            <p style="margin-bottom:10px;">Click <strong>"REQUEST TASK"</strong> to receive your orders.</p>
-                        </div>
-                    </div>
-                    <div class="protocol-item" onclick="toggleSection(this)" style="border:1px solid var(--neon-pink);">
-                        <h3 class="protocol-header" style="color:var(--neon-pink);">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <svg style="width:18px; height:18px; fill:var(--neon-pink);"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> DEVOTION
-                            </div>
-                            <span class="protocol-arrow">▼</span>
-                        </h3>
-                        <div class="protocol-content"><p>Kneel once every <strong>1 minute</strong>.</p></div>
+                        <div class="protocol-content"><p style="margin-bottom:10px;">Coins are used for gifts and tributes.</p></div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div id="viewRewards" class="hidden">
-            <div class="glass-card" style="text-align:center; padding: 50px;">
-                <h2 style="font-size:2rem; color:var(--neon-yellow);">REWARDS</h2>
-                <div style="margin-top:20px; font-size: 3rem;">🎁</div>
-            </div>
-        </div>
-
-        <div id="viewHierarchy" class="hidden">
-            <div class="glass-card">
-                <div class="text-center mb-4"><h1 class="accent text-2xl md:text-4xl font-bold mb-1">ROYAL HIERARCHY</h1></div>
-                <div class="grid gap-4" id="hierarchyGrid"></div>
             </div>
         </div>
 
         <div id="viewBuy" class="hidden" style="display:flex; flex-direction:column; gap:15px;">
             <div class="glass-card">
                 <h2 style="text-align:center; color:var(--neon-yellow); font-family:'Rubik Glitch', sans-serif; font-size:2rem; margin-bottom:5px;">BUY COINS</h2>
-                <p style="text-align:center; color:#888; font-family:'Rajdhani'; font-size:0.8rem; margin-bottom:15px;">Purchase coins to pay tribute.</p>
                 <div class="store-grid">
                     <div class="store-item" style="border-color: var(--neon-yellow);"><div class="si-img-box"><svg style="width:40px; height:40px; fill:var(--neon-yellow);"><use href="#icon-coin"></use></svg></div><div class="si-info"><div class="si-name" style="color:white;">1.000 COINS</div><button class="si-btn" style="background:rgba(255,215,0,0.1); border-color:var(--neon-yellow); color:var(--neon-yellow);" onclick="buyRealCoins(1000)">€10.00</button></div></div>
                     <div class="store-item" style="border-color: var(--neon-yellow);"><div class="si-img-box"><svg style="width:50px; height:50px; fill:var(--neon-yellow);"><use href="#icon-coin"></use></svg></div><div class="si-info"><div class="si-name" style="color:white;">5.500 COINS</div><button class="si-btn" style="background:rgba(255,215,0,0.1); border-color:var(--neon-yellow); color:var(--neon-yellow);" onclick="buyRealCoins(5500)">€50.00</button></div></div>
@@ -342,7 +268,7 @@
     </div>
 </div>
 
-<!-- THE JAILED THEATER MODAL -->
+<!-- JAILED THEATER MODAL -->
 <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
     <div id="modalMediaContainer" class="modal-bg-photo"></div>
     <div id="modalGlassOverlay" class="modal-glass-overlay">
@@ -372,7 +298,7 @@
     </div>
 </div>
 
-<!-- SCRIPT -->
+<!-- SCRIPT: VISUAL UPDATER ONLY -->
 <script>
     document.querySelectorAll("[data-include]").forEach(async el => {
     const file = el.getAttribute("data-include");
@@ -384,52 +310,12 @@
     }
     });
 
-    // CUSTOM MENU LOGIC: Handles the Header Menu Clicks
-    // This replicates switchTab from your working code but adapts for the new header layout
-    window.switchTab = function(viewId) {
-        // 1. Update the Header Menu Active State
+    // ONLY UPDATES THE GOLD UNDERLINE. Logic is handled by main.js via switchTab()
+    function updateHeaderVisuals(el) {
         document.querySelectorAll('.profile-crown-nav-item').forEach(item => {
-            // Check if this item's onclick matches the viewId
-            if(item.getAttribute('onclick').includes(viewId)) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
+            item.classList.remove('active');
         });
-
-        // 2. Hide all Views
-        const views = ['viewServingTop', 'viewProtocol', 'viewNews', 'viewVault', 'viewBuy', 'viewRewards', 'viewHierarchy', 'viewSession'];
-        views.forEach(id => {
-            const v = document.getElementById(id);
-            if(v) {
-                v.classList.add('hidden');
-                v.style.display = 'none';
-            }
-        });
-
-        // 3. Map 'serve' to 'viewServingTop' (Home)
-        let targetId = viewId;
-        if(viewId === 'serve') targetId = 'viewServingTop';
-        if(viewId === 'protocol') targetId = 'viewProtocol';
-        if(viewId === 'news') targetId = 'viewNews';
-        if(viewId === 'vault') targetId = 'viewVault';
-        if(viewId === 'buy') targetId = 'viewBuy';
-
-        // 4. Show the Target View
-        const target = document.getElementById(targetId);
-        if(target) {
-            target.classList.remove('hidden');
-            if (targetId === 'viewNews' || targetId === 'viewVault' || targetId === 'viewServingTop') {
-                 target.style.display = 'block'; 
-            } else {
-                 target.style.display = 'flex';
-            }
-            
-            // Trigger main.js function if it exists
-            if (typeof window.showView === 'function') {
-                window.showView(targetId);
-            }
-        }
+        el.classList.add('active');
     }
 </script>
 
