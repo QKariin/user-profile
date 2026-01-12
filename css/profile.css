@@ -5,22 +5,37 @@
 --bg-void: #050505;
 --gold: #c5a059;
 --gold-dim: rgba(197, 160, 89, 0.2);
+--gold-bright: #d4b76a;
 --text-white: #e0e0e0;
 --glass: rgba(15, 15, 15, 0.95);
+--glass-bg: rgba(15, 15, 18, 0.6);
+--glass-border: rgba(197, 160, 89, 0.2);
+--elegant-white: #f8f8f8;
+--soft-gray: #888;
 --neon-green: #00ff00;
 --neon-yellow: #ffd700;
 --neon-red: #ff003c;
---red-grad: linear-gradient(135deg, #500000 0%, #ff0000 100%); 
+--neon-pink: #ff1493;
+--bg-dark: #08080a;
+--red-grad: linear-gradient(135deg, #500000 0%, #ff0000 100%);
+--transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@200;300;400;600&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
 
 * { 
 box-sizing: border-box; 
 margin: 0; 
 padding: 0; 
-outline: none; 
+outline: none;
+-ms-overflow-style: none;
+scrollbar-width: none;
+-webkit-tap-highlight-color: transparent;
 }
 
-body {
+::-webkit-scrollbar { display: none; }
+
+html, body {
 background-color: var(--bg-void);
 background: radial-gradient(circle at 80% 20%, #111 0%, var(--bg-void) 80%);
 color: var(--text-white);
@@ -28,6 +43,8 @@ font-family: 'Inter', sans-serif;
 height: 100vh;
 width: 100vw;
 overflow: hidden;
+font-size: 14px;
+line-height: 1.6;
 }
 
 .app-container {
@@ -227,7 +244,6 @@ border-left-color: var(--gold);
 padding-left: 20px; 
 text-shadow: 0 0 10px rgba(197, 160, 89, 0.4); 
 }
-
 /* =========================================
 3. RIGHT STAGE & COMMON UI
 ========================================= */
@@ -241,9 +257,15 @@ overflow: hidden;
 }
 
 .glass-card { 
-background: var(--glass); 
-backdrop-filter: blur(20px); 
-border: 1px solid var(--gold-dim); 
+background: var(--glass-bg);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border: 1px solid var(--glass-border);
+border-radius: 12px;
+padding: 12px;
+position: relative;
+overflow: visible !important;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Header & Kneel Button */
@@ -456,6 +478,51 @@ white-space: nowrap;
 #activeBadge.show { 
 display: block; 
 }
+
+/* Task content styling */
+#taskContent {
+margin-top: 40px !important; 
+padding-top: 10px !important;
+padding-bottom: 20px !important;
+border-left: 3px solid var(--gold) !important;
+padding-left: 25px !important;
+text-align: left !important;
+position: relative !important;
+}
+
+#readyText {
+font-family: 'Cinzel', serif !important;
+font-weight: 900 !important;
+color: var(--gold) !important;
+font-size: 1.2rem !important;
+letter-spacing: 5px !important;
+text-transform: uppercase !important;
+margin-bottom: 10px !important;
+display: block;
+text-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+}
+
+#newTaskBtn {
+background: transparent !important;
+border: 1px solid var(--gold) !important;
+color: var(--gold) !important;
+font-family: 'Cinzel', serif !important;
+font-weight: 700 !important;
+letter-spacing: 5px !important;
+text-transform: uppercase !important;
+padding: 15px 50px !important;
+width: auto !important;
+min-width: 280px;
+margin: 0 auto !important;
+display: block;
+border-radius: 0 !important;
+transition: all 0.4s ease;
+}
+
+#newTaskBtn:hover {
+background: var(--gold) !important;
+color: #000 !important;
+}
 /* =========================================
 5. CHAT SYSTEM
 ========================================= */
@@ -550,6 +617,57 @@ opacity: 0.7;
 font-family: 'Orbitron'; 
 }
 
+.msg-avatar {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+border: 2px solid var(--gold);
+object-fit: cover;
+flex-shrink: 0;
+box-shadow: 0 0 8px var(--gold-dim);
+background: var(--bg-dark);
+margin-right: 6px;
+}
+
+.msg-col {
+display: flex;
+flex-direction: row;
+align-items: flex-end;
+gap: 6px;
+max-width: 85%;
+}
+
+.mr-out .msg-col {
+justify-content: flex-end;
+}
+
+.mr-in .msg-col {
+justify-content: flex-start;
+}
+
+/* System messages */
+.msg-system {
+font-family: 'Inter', monospace !important;
+font-size: 0.65rem;
+letter-spacing: 2px;
+background: rgba(0, 0, 0, 0.4) !important;
+border: 1px solid #222 !important;
+border-radius: 2px !important;
+padding: 5px 15px;
+}
+
+.msg-system.sys-gold {
+color: var(--gold-bright) !important;
+border: 1px solid var(--gold-bright) !important;
+background: transparent !important;
+}
+
+.msg-system.sys-red {
+color: #8b4513 !important;
+border: 1px solid #8b4513 !important;
+background: transparent !important;
+}
+
 .overlay-center { 
 position: absolute; 
 inset: 0; 
@@ -558,6 +676,48 @@ z-index: 100;
 display: flex; 
 align-items: center; 
 justify-content: center; 
+}
+
+/* Chat header elements */
+.chat-header-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+margin-bottom: 10px;
+border-bottom: 1px solid rgba(255,255,255,0.1);
+padding-bottom: 8px;
+}
+
+.chat-avatar-container {
+position: relative;
+width: 40px;
+height: 40px;
+flex-shrink: 0;
+}
+
+.chat-header-title {
+font-family: 'Cinzel', serif;
+font-weight: 700;
+color: var(--elegant-white);
+font-size: 0.9rem;
+line-height: 1;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+.chat-status-text {
+font-family: 'Inter', sans-serif;
+font-size: 0.65rem;
+font-weight: 600;
+color: var(--soft-gray);
+line-height: 1;
+margin-top: 2px;
+}
+
+.chat-online {
+color: var(--gold);
+text-shadow: 0 0 8px var(--gold-dim);
 }
 
 /* =========================================
@@ -888,7 +1048,7 @@ grid-column: span 2;
 }
 
 /* =========================================
-FIX: HIDE BROKEN STICKERS / IMAGES
+UTILITY CLASSES & FIXES
 ========================================= */
 /* 1. Hide images with empty or 'undefined' sources immediately */
 img[src=""], img[src="undefined"], img[src="null"] {
@@ -896,13 +1056,11 @@ display: none !important;
 }
 
 /* 2. Hide the broken image icon/border for the Sticker class specifically */
-/* This ensures if the sticker fails to load, it becomes invisible instead of showing a broken icon over your photo */
 .gi-status-sticker {
 text-indent: -10000px; /* Hides 'broken image' text */
 }
 
-/* 3. Fallback: If the Sticker image is broken, it often has 0 natural width.
-We can try to ensure it doesn't block clicks or view if it fails. */
+/* 3. Fallback: If the Sticker image is broken, it often has 0 natural width */
 img:not([src]) {
 display: none !important;
 }
@@ -910,4 +1068,142 @@ display: none !important;
 /* 4. Ensure the Main Photo is always visible underneath */
 .gallery-item {
 background: #000; /* Keep background black so we don't see through to body */
+}
+
+/* Utility classes */
+.d-none {
+display: none !important;
+}
+
+.hidden-input {
+display: none;
+}
+
+.section-header {
+font-size: 0.9rem;
+color: #fff;
+font-weight: bold;
+padding-left: 5px;
+margin-bottom: 10px;
+border-bottom: 1px solid #333;
+padding-bottom: 5px;
+letter-spacing: 2px;
+}
+
+/* Navigation tabs */
+.nav-tabs {
+display: flex;
+flex-direction: column;
+gap: 8px;
+margin: 0 auto;
+margin-top: 20px;
+padding: 0;
+width: 75% !important;
+flex-wrap: wrap;
+}
+
+.tab-btn {
+width: 100%;
+padding: 8px;
+background: rgba(0,0,0,0.6);
+border: 1px solid var(--glass-border);
+color: var(--soft-gray);
+border-radius: 12px;
+font-family: 'Inter', sans-serif;
+font-weight: 600;
+font-size: 0.85rem;
+cursor: pointer;
+letter-spacing: 2px;
+text-transform: uppercase;
+transition: var(--transition);
+}
+
+.tab-btn.active {
+background: rgba(197, 160, 89, 0.15);
+color: var(--elegant-white);
+border: 2px solid var(--gold);
+box-shadow: 0 0 20px var(--gold-dim);
+}
+
+/* Profile card elements */
+.profile-card {
+background: linear-gradient(145deg, rgba(20,20,20,0.9) 0%, rgba(40,40,40,0.6) 100%);
+border: 1px solid var(--glass-border);
+box-shadow: 0 0 30px rgba(197, 160, 89, 0.1);
+padding: 20px;
+margin-bottom: 30px !important;
+overflow: hidden !important;
+margin-top: 0;
+}
+
+/* Avatar elements */
+.pc-avatar-section {
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+position: relative;
+z-index: 2;
+}
+
+.pc-avatar-box {
+width: 90px;
+height: 90px;
+border-radius: 50%;
+border: 2px solid var(--gold);
+padding: 3px;
+position: relative;
+box-shadow: 0 0 20px var(--gold-dim);
+cursor: pointer;
+overflow: hidden;
+margin-bottom: 8px;
+flex-shrink: 0;
+}
+
+.pc-avatar-img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 50%;
+background: #000;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+.layout-left {
+width: 100%;
+min-width: unset;
+height: auto;
+border-right: none;
+border-bottom: 1px solid var(--gold-dim);
+}
+
+.app-container {
+flex-direction: column;
+}
+
+.layout-right {
+flex: 1;
+}
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+.gallery-grid {
+grid-template-columns: repeat(5, 1fr) !important; 
+gap: 12px;
+}
+
+.app-container { 
+width: 80%; 
+max-width: 1600px; 
+margin: 0 auto;
+padding-top: 60px; 
+}
 }
