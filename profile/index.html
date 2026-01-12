@@ -44,7 +44,7 @@
 
 <div class="app-container">
     
-    <!-- HEADER: HIERARCHY + QUEEN KARIN + MENU -->
+    <!-- HEADER -->
     <div class="profile-crown-header">
         <div class="profile-crown-avatar">
             <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" alt="Profile Avatar">
@@ -55,7 +55,7 @@
             <div class="crown-name" style="font-family: 'Orbitron', sans-serif; color: white; font-weight: 900; letter-spacing: 1px;">of QUEEN KARIN</div>
         </div>
 
-        <!-- MENU: Using the EXACT keys 'serve', 'news', 'buy' etc. -->
+        <!-- MENU: Using YOUR logic keywords ('serve', 'buy', etc.) -->
         <div class="profile-crown-navigation">
             <span class="profile-crown-nav-item active" onclick="switchTab('serve')">HOME</span>
             <span class="profile-crown-nav-item" onclick="switchTab('protocol')">PROTOCOL</span>
@@ -71,11 +71,11 @@
     <!-- DYNAMIC CONTENT -->
     <div class="profile-content-views" style="margin-top: 20px;">
         
-        <!-- VIEW 1: HOME/DASHBOARD (Left: Profile/Task, Right: Chat) -->
+        <!-- HOME VIEW (ID mapped from 'serve') -->
         <div id="viewServingTop">
             <div class="profile-command-center">
                 
-                <!-- LEFT PILLAR -->
+                <!-- LEFT PILLAR: PROFILE + TASK -->
                 <div class="profile-command-pillar">
                     
                     <!-- Profile Card -->
@@ -208,13 +208,11 @@
             </div>
         </div>
             
-        <!-- OTHER VIEWS -->
+        <!-- OTHER VIEWS (Mapped from IDs) -->
         <div id="viewNews" class="hidden">
             <div class="glass-card" style="height: 100%; padding:0; overflow:hidden; background:#000;">
                 <div class="social-header">
-                    <div class="sh-avatar-frame">
-                        <img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" class="sh-avatar">
-                    </div>
+                    <div class="sh-avatar-frame"><img src="https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png" class="sh-avatar"></div>
                     <div class="sh-info">
                         <div class="sh-name">QUEEN KARIN</div>
                         <div class="sh-bio">Time to serve.</div>
@@ -266,7 +264,7 @@
             </div>
         </div>
 
-        <!-- STORE: Uses the exact buyRealCoins logic from your working code -->
+        <!-- STORE: ID mapped from 'buy' -->
         <div id="viewBuy" class="hidden" style="display:flex; flex-direction:column; gap:15px;">
             <div class="glass-card">
                 <h2 style="text-align:center; color:var(--neon-yellow); font-family:'Rubik Glitch', sans-serif; font-size:2rem; margin-bottom:5px;">BUY COINS</h2>
@@ -313,7 +311,7 @@
     </div>
 </div>
 
-<!-- SCRIPT: COPIED FROM YOUR WORKING CODE -->
+<!-- SCRIPT: COPIED EXACTLY FROM YOUR WORKING CODE -->
 <script>
     document.querySelectorAll("[data-include]").forEach(async el => {
     const file = el.getAttribute("data-include");
@@ -325,10 +323,12 @@
     }
     });
 
-    // EXACT LOGIC FROM YOUR FILE
+    // CUSTOM MENU LOGIC: COPIED FROM YOUR WORKING CODE
+    // This correctly maps 'buy' to 'viewBuy' and triggers the system
     window.switchTab = function(viewId) {
         // 1. Update the Header Menu Active State
         document.querySelectorAll('.profile-crown-nav-item').forEach(item => {
+            // Check if this item's onclick matches the viewId
             if(item.getAttribute('onclick').includes(viewId)) {
                 item.classList.add('active');
             } else {
@@ -364,7 +364,7 @@
                  target.style.display = 'flex';
             }
             
-            // 5. TRIGGER THE LOGIC (The most important part)
+            // 5. TRIGGER THE LOGIC (This makes the store buttons work)
             if (typeof window.showView === 'function') {
                 window.showView(targetId);
             }
