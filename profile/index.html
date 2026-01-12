@@ -153,10 +153,20 @@
                           </div>
                           
                           <div id="cooldownSection" class="hidden" style="display: flex; gap: 10px; align-items: center;">
-                              <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" onchange="handleEvidenceUpload(this)">
-                              <button onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
-                              <button id="btnSkip" onclick="cancelPendingTask()" class="btn-dim" style="background:transparent; border: 1px solid #444; color: #666; padding: 8px 20px; cursor: pointer;">SKIP</button>
-                          </div>
+    
+                            <!-- 1. The Input: We added 'showLoadingUI()' before the upload handler -->
+                            <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
+                                   onchange="showLoadingUI(); handleEvidenceUpload(this)">
+                        
+                            <!-- 2. The Button: Added ID="btnUpload" -->
+                            <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">
+                                UPLOAD PROOF
+                            </button>
+                        
+                            <button id="btnSkip" onclick="cancelPendingTask()" class="btn-dim" style="background:transparent; border: 1px solid #444; color: #666; padding: 8px 20px; cursor: pointer;">
+                                SKIP
+                            </button>
+                        </div>
                       </div>
                   </div>
               
@@ -268,55 +278,6 @@
     </div>
 </div>
 
-<script>
-    document.querySelectorAll("[data-include]").forEach(async el => {
-        const file = el.getAttribute("data-include");
-        try { const html = await fetch(file).then(r => r.text()); el.innerHTML = html; } catch (err) {}
-    });
-
-    window.switchTab = function(viewId) {
-        document.querySelectorAll('.nav-btn').forEach(item => {
-            if(item.getAttribute('onclick').includes(viewId)) item.classList.add('active');
-            else item.classList.remove('active');
-        });
-
-        // Hide ALL views
-        const views = ['viewServingTop', 'viewProtocol', 'viewNews', 'viewVault', 'viewBuy', 'historySection', 'viewRewards', 'viewHierarchy', 'viewSession'];
-        views.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            }
-        });
-
-        let targetId = viewId;
-        if(viewId === 'serve') targetId = 'viewServingTop';
-        if(viewId === 'news') targetId = 'viewNews';
-        if(viewId === 'buy') targetId = 'viewBuy';
-        if(viewId === 'vault') targetId = 'viewVault';
-        if(viewId === 'protocol') targetId = 'viewProtocol';
-        if(viewId === 'history') targetId = 'historySection';
-
-        const target = document.getElementById(targetId);
-        if(target) {
-            target.classList.remove('hidden');
-            if (targetId === 'viewNews' || targetId === 'viewVault' || targetId === 'viewServingTop' || targetId === 'historySection') {
-                 target.style.display = 'flex'; 
-                 target.style.flexDirection = 'column';
-            } else {
-                 target.style.display = 'block';
-            }
-            
-            if (typeof window.showView === 'function') window.showView(targetId);
-            
-            // THE FIX: Trigger Data Load for History
-            if(targetId === 'historySection' && typeof window.loadMoreHistory === 'function') {
-                window.loadMoreHistory();
-            }
-        }
-    }
-</script>
 
 </body>
 </html>
