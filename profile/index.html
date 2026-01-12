@@ -45,19 +45,15 @@
 
 <div class="app-container">
     
-    <!-- === LEFT PILLAR: IDENTITY (30%) === -->
+    <!-- === LEFT PILLAR: IDENTITY === -->
     <div class="layout-left">
-        
-        <!-- 1. HIERARCHY RANK (Top, Grey, Cinzel) -->
         <div id="subHierarchy" class="hierarchy-top">LOADING...</div>
 
-        <!-- 2. AVATAR -->
         <div class="avatar-container" onclick="document.getElementById('profileUploadInput').click()">
             <img id="profilePic" src="" alt="Avatar">
         </div>
         <div id="subName" class="identity-name">SLAVE</div>
 
-        <!-- 3. BASIC STATS (Vertical Stack) -->
         <div class="stats-stack">
             <div class="stat-row">
                 <span class="stat-lbl">MERIT</span>
@@ -69,7 +65,6 @@
             </div>
         </div>
 
-        <!-- 4. EXPANDED STATS & PROGRESS -->
         <div class="progress-section">
             <div class="prog-labels">
                 <span>NEXT: <span id="nextLevelName">-</span></span>
@@ -91,9 +86,7 @@
             </div>
         </div>
 
-        <!-- 5. NAVIGATION (Fixed Position) -->
         <div class="nav-menu">
-            <!-- switchTab() maps 'serve' to 'viewServingTop', etc. logic is at bottom -->
             <button class="nav-btn active" onclick="switchTab('serve')">CONSOLE</button>
             <button class="nav-btn" onclick="switchTab('history')">SLAVE RECORD</button>
             <button class="nav-btn" onclick="switchTab('news')">GALLERY</button>
@@ -103,10 +96,9 @@
         </div>
     </div>
 
-    <!-- === RIGHT STAGE: OPERATIONS (70%) === -->
+    <!-- === RIGHT STAGE: OPERATIONS === -->
     <div class="layout-right">
         
-        <!-- HEADER: CENTERED HUGE KNEEL BUTTON (Red Graphic) -->
         <div class="right-header">
             <div class="kneel-center-wrapper">
                 <div id="btn" class="kneel-bar-graphic" 
@@ -121,78 +113,56 @@
             </div>
         </div>
 
-        <!-- CONTENT STAGE -->
         <div class="content-stage">
             
-            <!-- VIEW 1: CONSOLE (Task + Chat) -->
-<div id="viewServingTop" class="view-wrapper">
-    
-    <!-- TOP: TASK RIBBON -->
-    <div id="taskCard" class="glass-card task-ribbon">
-        
-        <div class="ribbon-left">
-            <!-- 
-               ID: activeBadge 
-               LOGIC: Hidden by default via CSS. JS adds class "show".
-            -->
-            <div id="activeBadge">
-                <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
+            <!-- VIEW 1: CONSOLE -->
+            <div id="viewServingTop" class="view-wrapper">
+                <div id="taskCard" class="glass-card task-ribbon">
+                    <div class="ribbon-left">
+                        <!-- FIX: Added class="hidden" here so JS can remove it to show the timer -->
+                        <div id="activeBadge" class="hidden">
+                            <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div id="taskContent" class="ribbon-center">
+                        <span class="ribbon-label">CURRENT DIRECTIVE</span>
+                        <h2 id="readyText" class="ribbon-status">AWAITING ORDERS</h2>
+                    </div>
+
+                    <div class="ribbon-right">
+                        <div id="mainButtonsArea">
+                            <button id="newTaskBtn" onclick="getRandomTask()" class="action-btn">REQUEST TASK</button>
+                        </div>
+                        
+                        <div id="cooldownSection" class="hidden" style="display: flex; gap: 10px; align-items: center;">
+                            <!-- VISUAL FIX: Inline script to handle loading state -->
+                            <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
+                                   onchange="this.files.length > 0 ? (document.getElementById('btnUpload').innerHTML = 'TRANSMITTING...', document.getElementById('btnUpload').classList.add('btn-loading'), handleEvidenceUpload(this)) : null">
+                            
+                            <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
+                            <button id="btnSkip" onclick="cancelPendingTask()" class="btn-dim" style="background:transparent; border: 1px solid #444; color: #666; padding: 8px 20px; cursor: pointer;">SKIP</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT -->
+                <div id="chatCard" class="chat-container">
+                    <div id="chatBadge" class="hidden"></div>
+                    <div id="chatBox" class="chat-body-frame">
+                        <div id="kneelRewardOverlay" class="hidden overlay-center"><div style="text-align: center;"><h2 style="color:white; margin-bottom: 20px; font-family:'Orbitron';">DEVOTION RECOGNIZED</h2><div style="display:flex; gap:10px;"><button onclick="claimKneelReward('coins')" class="action-btn">COINS</button><button onclick="claimKneelReward('points')" class="action-btn">POINTS</button></div></div></div>
+                        <div id="chatMediaOverlay" class="hidden overlay-center"><div id="mediaOverlayClose" onclick="closeChatPreview()" style="position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer;">X</div><div id="chatMediaOverlayContent"></div></div>
+                        <div id="tributeHuntOverlay" class="hidden overlay-center" style="background:#000; padding:20px; flex-direction:column;"><button onclick="toggleTributeHunt()" style="color: white; align-self:flex-end; font-family:'Orbitron'; background:none; border:none; cursor:pointer;">CLOSE</button><div id="huntStoreGrid" class="store-grid" style="margin-top: 20px;"></div><textarea id="huntNote" class="hidden"></textarea><div id="huntProgress" class="hidden"></div></div>
+
+                        <div id="chatContent" class="chat-area"></div>
+                    </div>
+                    <div class="chat-footer">
+                        <button id="tributeHuntBtn" onclick="toggleTributeHunt()" class="icon-btn">🎁</button>
+                        <input type="text" id="chatMsgInput" class="chat-input" placeholder="Type..." onkeypress="handleChatKey(event)">
+                        <button class="chat-send" onclick="sendChatMessage()" class="icon-btn">></button>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div id="taskContent" class="ribbon-center">
-            <span class="ribbon-label">CURRENT DIRECTIVE</span>
-            <h2 id="readyText" class="ribbon-status">AWAITING ORDERS</h2>
-        </div>
-
-        <div class="ribbon-right">
-            <div id="mainButtonsArea">
-                <!-- Matches getRandomTask() in tasks.js -->
-                <button id="newTaskBtn" onclick="getRandomTask()" class="action-btn">REQUEST TASK</button>
-            </div>
-            
-            <div id="cooldownSection" class="hidden" style="display: flex; gap: 10px; align-items: center;">
-                
-                <!-- 
-                   UPLOAD LOGIC: 
-                   1. Visual: Change button text (Inline JS)
-                   2. Logic: handleEvidenceUpload (Main JS)
-                -->
-                <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
-                       onchange="this.files.length > 0 ? (document.getElementById('btnUpload').innerHTML = 'TRANSMITTING...', document.getElementById('btnUpload').classList.add('btn-loading'), handleEvidenceUpload(this)) : null">
-                
-                <!-- Added ID="btnUpload" for the visual effect -->
-                <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
-                
-                <!-- Matches cancelPendingTask() in tasks.js -->
-                <button id="btnSkip" onclick="cancelPendingTask()" class="btn-dim" style="background:transparent; border: 1px solid #444; color: #666; padding: 8px 20px; cursor: pointer;">SKIP</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTTOM: CHAT -->
-    <div id="chatCard" class="chat-container">
-        <div id="chatBadge" class="hidden"></div>
-        
-        <!-- 
-           RENAMED to 'chatBox' to match: 
-           document.getElementById('chatBox').scrollTop = ...
-        -->
-        <div id="chatBox" class="chat-body-frame">
-            <div id="kneelRewardOverlay" class="hidden overlay-center"><div style="text-align: center;"><h2 style="color:white; margin-bottom: 20px; font-family:'Orbitron';">DEVOTION RECOGNIZED</h2><div style="display:flex; gap:10px;"><button onclick="claimKneelReward('coins')" class="action-btn">COINS</button><button onclick="claimKneelReward('points')" class="action-btn">POINTS</button></div></div></div>
-            <div id="chatMediaOverlay" class="hidden overlay-center"><div id="mediaOverlayClose" onclick="closeChatPreview()" style="position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer;">X</div><div id="chatMediaOverlayContent"></div></div>
-            <div id="tributeHuntOverlay" class="hidden overlay-center" style="background:#000; padding:20px; flex-direction:column;"><button onclick="toggleTributeHunt()" style="color: white; align-self:flex-end; font-family:'Orbitron'; background:none; border:none; cursor:pointer;">CLOSE</button><div id="huntStoreGrid" class="store-grid" style="margin-top: 20px;"></div><textarea id="huntNote" class="hidden"></textarea><div id="huntProgress" class="hidden"></div></div>
-
-            <div id="chatContent" class="chat-area"></div>
-        </div>
-
-        <div class="chat-footer">
-            <button id="tributeHuntBtn" onclick="toggleTributeHunt()" class="icon-btn">🎁</button>
-            <input type="text" id="chatMsgInput" class="chat-input" placeholder="Type..." onkeypress="handleChatKey(event)">
-            <button class="chat-send" onclick="sendChatMessage()" class="icon-btn">></button>
-        </div>
-    </div>
-</div>
 
             <!-- VIEW 2: STORE -->
             <div id="viewBuy" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
@@ -208,77 +178,72 @@
             </div>
 
             <!-- VIEW 3: SLAVE RECORD (PENDING + HISTORY) -->
-            <!-- VIEW 3: SLAVE RECORD (PENDING + HISTORY) -->
-             <!-- VIEW 3: SLAVE RECORD (PENDING + HISTORY) -->
-<div id="historySection" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto; position: relative; min-height: 450px;">
-    
-    <!-- HEADER -->
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:0.8rem; color:#fff; font-weight:bold; padding-left: 5px;">
-        <div style="width:6px; height:6px; background:var(--neon-yellow); border-radius:50%;"></div> 
-        <span style="font-family:'Orbitron'">EVIDENCE LOG</span>
-    </div>
-
-    <!-- PENDING SECTION (Design: .pending-grid / .pending-card) -->
-    <!-- The JS removes 'hidden' from this ID when needed -->
-    <div id="pendingSection" class="hidden" style="width:100%; margin-bottom: 20px;">
-        <div class="section-header" style="color:var(--neon-yellow); border-color:var(--neon-yellow);">PENDING REVIEW</div>
-        <div id="pendingGrid" class="pending-grid"></div>
-    </div>
-
-    <!-- HISTORY SECTION (Design: .gallery-grid / .gallery-item) -->
-    <div class="section-header">HISTORY LOG</div>
-    
-    <!-- THE JAILED THEATER MODAL (Nested inside History) -->
-    <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
-        <div id="modalMediaContainer" class="modal-bg-photo"></div>
-        
-        <div id="modalGlassOverlay" class="modal-glass-overlay">
-            <div id="modalCloseX" onclick="closeModal(null)">×</div>
-    
-            <!-- MAIN CONTENT AREA (Covers the photo) -->
-            <div class="theater-content">
+            <div id="historySection" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto; position: relative; min-height: 450px;">
                 
-                <!-- VIEW: INFO (Default - Big Stamp & Points) -->
-                <div id="modalInfoView" class="sub-view">
-                    <div class="stamp-container">
-                        <img id="modalStatusSticker" src="" class="m-status-sticker-lg">
-                    </div>
-                    <div class="reward-container">
-                        <div id="modalPoints" class="m-points-lg">+0 PTS</div>
-                        <div id="modalSticker"></div> <!-- Reward Sticker -->
-                    </div>
+                <!-- HEADER -->
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:0.8rem; color:#fff; font-weight:bold; padding-left: 5px;">
+                    <div style="width:6px; height:6px; background:var(--neon-yellow); border-radius:50%;"></div> 
+                    <span style="font-family:'Orbitron'">EVIDENCE LOG</span>
                 </div>
-    
-                <!-- VIEW: FEEDBACK -->
-                <div id="modalFeedbackView" class="sub-view hidden">
-                    <h3 class="view-label">QUEEN'S FEEDBACK</h3>
-                    <div id="modalFeedbackMedia" class="fb-media-theater"></div>
-                    <div id="modalFeedbackText" class="theater-text-box"></div>
-                </div>
-    
-                <!-- VIEW: TASK -->
-                <div id="modalTaskView" class="sub-view hidden">
-                    <h3 class="view-label">THE ASSIGNMENT</h3>
-                    <div id="modalOrderText" class="theater-text-box"></div>
-                </div>
-            </div>
-    
-            <!-- BOTTOM ACTIONS -->
-            <div class="modal-footer-menu">
-                <button onclick="toggleHistoryView('feedback')" class="history-action-btn">FEEDBACK</button>
-                <button onclick="toggleHistoryView('task')" class="history-action-btn">THE TASK</button>
-                <button onclick="event.stopPropagation(); toggleHistoryView('proof')" class="history-action-btn">SEE PROOF</button>
-                <button onclick="toggleHistoryView('info')" class="history-action-btn">STATUS</button>
-                <button onclick="closeModal(null)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- THE ACTUAL HISTORY GRID -->
-    <div id="historyGrid" class="gallery-grid"></div>
-    
-    <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="display:none; margin:20px auto;">LOAD MORE...</button>
-</div>
+                <!-- PENDING SECTION (Design: .pending-grid / .pending-card) -->
+                <div id="pendingSection" class="hidden" style="width:100%; margin-bottom: 20px;">
+                    <div class="section-header" style="color:var(--neon-yellow); border-color:var(--neon-yellow);">PENDING REVIEW</div>
+                    <!-- JS Injects the Card Here -->
+                    <div id="pendingGrid" class="pending-grid"></div>
+                </div>
+
+                <!-- HISTORY SECTION (Design: .gallery-grid / .gallery-item) -->
+                <div class="section-header">HISTORY LOG</div>
+                
+                <!-- THE JAILED THEATER MODAL (Nested inside History) -->
+                <div id="glassModal" class="glass-modal" onclick="closeModal(event)">
+                    <div id="modalMediaContainer" class="modal-bg-photo"></div>
+                    
+                    <div id="modalGlassOverlay" class="modal-glass-overlay">
+                        <div id="modalCloseX" onclick="closeModal(null)">×</div>
+                
+                        <div class="theater-content">
+                            <!-- VIEW: INFO -->
+                            <div id="modalInfoView" class="sub-view">
+                                <div class="stamp-container">
+                                    <img id="modalStatusSticker" src="" class="m-status-sticker-lg">
+                                </div>
+                                <div class="reward-container">
+                                    <div id="modalPoints" class="m-points-lg">+0 PTS</div>
+                                    <div id="modalSticker"></div>
+                                </div>
+                            </div>
+                
+                            <!-- VIEW: FEEDBACK -->
+                            <div id="modalFeedbackView" class="sub-view hidden">
+                                <h3 class="view-label">QUEEN'S FEEDBACK</h3>
+                                <div id="modalFeedbackMedia" class="fb-media-theater"></div>
+                                <div id="modalFeedbackText" class="theater-text-box"></div>
+                            </div>
+                
+                            <!-- VIEW: TASK -->
+                            <div id="modalTaskView" class="sub-view hidden">
+                                <h3 class="view-label">THE ASSIGNMENT</h3>
+                                <div id="modalOrderText" class="theater-text-box"></div>
+                            </div>
+                        </div>
+                
+                        <!-- BOTTOM ACTIONS -->
+                        <div class="modal-footer-menu">
+                            <button onclick="toggleHistoryView('feedback')" class="history-action-btn">FEEDBACK</button>
+                            <button onclick="toggleHistoryView('task')" class="history-action-btn">THE TASK</button>
+                            <button onclick="event.stopPropagation(); toggleHistoryView('proof')" class="history-action-btn">SEE PROOF</button>
+                            <button onclick="toggleHistoryView('info')" class="history-action-btn">STATUS</button>
+                            <button onclick="closeModal(null)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THE ACTUAL HISTORY GRID -->
+                <div id="historyGrid" class="gallery-grid"></div>
+                <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="display:none; margin:20px auto;">LOAD MORE...</button>
+            </div>
 
             <!-- VIEW 4: GALLERY -->
             <div id="viewNews" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
@@ -307,26 +272,7 @@
     </div>
 </div>
 
-<!-- MODAL -->
-<div id="glassModal" class="glass-modal" onclick="closeModal(event)">
-    <div id="modalMediaContainer" class="modal-bg-photo"></div>
-    <div id="modalGlassOverlay" class="modal-glass-overlay">
-        <div id="modalCloseX" onclick="closeModal(null)">×</div>
-        <div class="theater-content">
-            <div id="modalInfoView" class="sub-view"><div class="stamp-container"><img id="modalStatusSticker" src="" class="m-status-sticker-lg"></div><div class="reward-container"><div id="modalPoints" class="m-points-lg">+0 PTS</div><div id="modalSticker"></div></div></div>
-            <div id="modalFeedbackView" class="sub-view hidden"><h3 class="view-label">QUEEN'S FEEDBACK</h3><div id="modalFeedbackMedia" class="fb-media-theater"></div><div id="modalFeedbackText" class="theater-text-box"></div></div>
-            <div id="modalTaskView" class="sub-view hidden"><h3 class="view-label">THE ASSIGNMENT</h3><div id="modalOrderText" class="theater-text-box"></div></div>
-        </div>
-        <div class="modal-footer-menu">
-            <button onclick="toggleHistoryView('feedback')" class="history-action-btn">FEEDBACK</button>
-            <button onclick="toggleHistoryView('task')" class="history-action-btn">THE TASK</button>
-            <button onclick="event.stopPropagation(); toggleHistoryView('proof')" class="history-action-btn">SEE PROOF</button>
-            <button onclick="toggleHistoryView('info')" class="history-action-btn">STATUS</button>
-            <button onclick="closeModal(null)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE</button>
-        </div>
-    </div>
-</div>
-
+<!-- REMOVED THE DUPLICATE MODAL THAT WAS HERE - IT WAS CAUSING CONFLICTS -->
 
 </body>
 </html>
