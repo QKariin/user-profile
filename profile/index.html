@@ -208,24 +208,37 @@
             </div>
 
             <!-- VIEW 3: SLAVE RECORD (PENDING + HISTORY) -->
-            <div id="historySection" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
-                <div class="glass-card" style="margin-bottom: 20px; text-align: center;"><h2 style="font-family:'Cinzel';">SLAVE RECORD</h2></div>
-                
-                <!-- PENDING TASKS (Limbo) -->
-                <!-- Main logic toggles this section directly via ID -->
-                <div id="pendingSection" class="hidden" style="width: 100%; margin-bottom: 30px;">
-                    <div style="font-family:'Cinzel'; color: var(--neon-yellow); margin-bottom: 15px; text-align: center; border-bottom:1px solid var(--neon-yellow); padding-bottom:5px;">PENDING REVIEW</div>
-                    <!-- The Grid logic injects into #pendingGrid -->
-                    <div id="pendingGrid" class="gallery-grid"></div>
-                </div>
-
-                <!-- HISTORY LOG (Record) -->
-                <div style="font-family:'Cinzel'; color: #666; margin-bottom: 15px; text-align: center; border-bottom:1px solid #333; padding-bottom:5px;">HISTORY LOG</div>
-                <!-- The Grid logic injects into #historyGrid -->
-                <div id="historyGrid" class="gallery-grid"></div>
-                
-                <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="display:none; margin:20px auto;">LOAD MORE...</button>
-            </div>
+            <!-- VIEW 3: SLAVE RECORD (PENDING + HISTORY) -->
+              <div id="historySection" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
+                  
+                  <div class="glass-card" style="margin-bottom: 20px; text-align: center;">
+                      <h2 style="font-family:'Cinzel';">SLAVE RECORD</h2>
+                  </div>
+                  
+                  <!-- PENDING SECTION (The Limbo State) -->
+                  <!-- 
+                     The JS should remove 'hidden' when a task is pending.
+                     If it stays hidden, manually remove the class "hidden" below to test.
+                  -->
+                  <div id="pendingSection" class="hidden">
+                      <div style="font-family:'Cinzel'; color: var(--neon-yellow); margin-bottom: 10px; text-align: center; border-bottom:1px solid rgba(255, 215, 0, 0.3); padding-bottom:5px;">
+                          PENDING REVIEW
+                      </div>
+                      <!-- The JS injects the <div class="gallery-item pending"> here -->
+                      <div id="pendingGrid" class="gallery-grid"></div>
+                  </div>
+              
+                  <!-- HISTORY LOG (Completed/Failed) -->
+                  <div style="margin-top: 20px;">
+                      <div style="font-family:'Cinzel'; color: #666; margin-bottom: 15px; text-align: center; border-bottom:1px solid #333; padding-bottom:5px;">
+                          HISTORY LOG
+                      </div>
+                      <!-- The JS injects the <div class="gallery-item"> here -->
+                      <div id="historyGrid" class="gallery-grid"></div>
+                  </div>
+                  
+                  <button id="loadMoreBtn" onclick="loadMoreHistory()" class="action-btn" style="display:none; margin:20px auto;">LOAD MORE...</button>
+              </div>
 
             <!-- VIEW 4: GALLERY -->
             <div id="viewNews" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
