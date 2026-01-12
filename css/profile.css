@@ -374,50 +374,41 @@ body {
 /* --- FIX BLACK SQUARES --- */
 
 /* 1. Force ANY image/video inside the card to fill the space */
+/* --- FIX BLACK SQUARES (Force Images to Fill) --- */
 .gallery-item img, 
 .gallery-item video {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important; /* Crops image to fit square without distortion */
+    object-fit: cover !important;
+    z-index: 1 !important; /* Sit above the black background */
     display: block !important;
     opacity: 1 !important;
-    min-height: 100%;
-    min-width: 100%;
 }
 
-/* 2. Optional: Remove the dark filter if it's too dark */
-.gallery-item .gi-thumb {
-    filter: brightness(0.8) !important; /* Lighter than before */
-}
-
-/* 3. Hover Effect: Light up the image */
-.gallery-item:hover img,
-.gallery-item:hover video {
-    filter: brightness(1.1) !important;
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-}
-
-/* 4. The Status Badge Overlay (Accepted/Rejected) */
+/* Ensure the Overlay Badges sit ON TOP of the image */
 .status-badge {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 4px 8px;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: white;
-    border: 1px solid white;
-    background: rgba(0,0,0,0.8);
-    z-index: 10;
-    pointer-events: none; /* Click goes through to card */
-    white-space: nowrap;
+    z-index: 10 !important;
 }
 
-/* Badge Colors */
-.status-badge.approved { color: var(--neon-green); border-color: var(--neon-green); }
-.status-badge.rejected { color: var(--neon-red, #ff003c); border-color: var(--neon-red, #ff003c); }
-.status-badge.pending { color: var(--neon-yellow); border-color: var(--neon-yellow); }
+/* --- 4 ROWS LIMIT (Initial State) --- */
+#historyGrid {
+    /* Limits height to roughly 4 rows */
+    max-height: 600px; 
+    overflow: hidden; 
+    transition: max-height 0.5s ease-in-out;
+    
+    /* Ensure Grid Layout is Locked */
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* 3 on Mobile */
+    gap: 5px !important;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    #historyGrid {
+        grid-template-columns: repeat(5, 1fr) !important; /* 5 on Desktop */
+    }
+}
