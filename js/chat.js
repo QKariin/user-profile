@@ -73,14 +73,16 @@ export async function renderChat(messages) {
         const senderLower = (m.sender || "").toLowerCase();
         const isMe = senderLower === 'user' || senderLower === 'slave';
         const isSystem = senderLower === 'system';
-        const isAdmin = senderLower === 'admin' || senderLower === 'queen';
 
-        // SYSTEM MESSAGE LOGIC
-        if (isSystem) {
-            let sysClass = "";
-            const lower = txt.toLowerCase();
-            if (lower.includes("tribute") || lower.includes("coins")) sysClass = "sys-gold";
-            else if (lower.includes("insufficient") || lower.includes("rejected")) sysClass = "sys-red";
+        // TACTICAL SYSTEM MESSAGE LOGIC (Task Verified, Rejected, or Kneeling)
+        // Detects status strings from your Velo logic like "TASK FAILED" or "Verified"
+        const isStatusUpdate = txt.includes("Verified") || txt.includes("Rejected") || txt.includes("FAILED") || txt.includes("earned");
+
+        if (isSystem || isStatusUpdate) {
+            let sysClass = "sys-gold"; // Default for Kneeling/Verified
+            if (txt.includes("Rejected") || txt.includes("FAILED") || txt.includes("Removed")) {
+                sysClass = "sys-red"; // Penalty style
+            }
 
             return `
                 <div class="msg-row system-row">
@@ -89,7 +91,7 @@ export async function renderChat(messages) {
         }
 
         // TRIBUTE CARD LOGIC (Luxury Layout)
-        if (txt.includes("💝 TRIBUTE:")) {
+        if (txt.includes("TRIBUTE:")) {
             const lines = txt.split('<br>');
             const item = lines.find(l => l.includes('ITEM:'))?.replace('ITEM:', '').trim() || "Tribute";
             const cost = lines.find(l => l.includes('COST:'))?.replace('COST:', '').trim() || "0";
@@ -104,12 +106,9 @@ export async function renderChat(messages) {
                 </div>`;
         }
 
-        // CHOOSE BUBBLE CLASS
-        let msgClass = isMe ? 'm-slave' : 'm-queen';
-        if (isAdmin) {
-            if (txt.includes("Verified")) msgClass = 'm-approve';
-            else if (txt.includes("Rejected")) msgClass = 'm-reject';
-        }
+        // NORMAL MESSAGES
+        const timeStr = new Date(m._createdDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgClass = isMe ? 'm-slave' : 'm-queen';
 
         let contentHtml = `<div class="msg ${msgClass}">${txt}</div>`;
 
@@ -138,22 +137,14 @@ export async function renderChat(messages) {
             }
         }
 
-        // AVATAR LOGIC (Correct Class for CSS)
-        const profilePic = document.getElementById('profilePic')?.src;
-        const slaveAvatar = profilePic ? `<img src="${profilePic}" class="chat-av">` : `<div class="chat-av-placeholder">S</div>`;
-        const queenAvatar = `<img src="${URLS.QUEEN_AVATAR}" class="chat-av">`;
-        
-        const avatar = isMe ? "" : queenAvatar;
-        const timeStr = new Date(m._createdDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+        // BUBBLE ALIGNMENT (No Avatars as ordered)
+        // mr-out = Slave (Left) | mr-in = Queen (Right)
         return `
             <div class="msg-row ${isMe ? 'mr-out' : 'mr-in'}">
-                ${avatar}
-                <div class="msg-col" style="justify-content:${isMe ? 'flex-end' : 'flex-start'};">
+                <div class="msg-col" style="align-items: ${isMe ? 'flex-start' : 'flex-end'};">
                     ${contentHtml}
                     <div class="msg-time">${timeStr}</div>
                 </div>
-                ${isMe ? slaveAvatar : ''}
             </div>`;
     }).join('');
 
