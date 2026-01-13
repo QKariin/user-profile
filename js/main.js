@@ -74,42 +74,40 @@ window.toggleTaskDetails = function(forceOpen = null) {
 };
 
 window.updateTaskUIState = function(isActive) {
-    // 1. LEFT COLUMN ELEMENTS
-    const statusLeftActive = document.getElementById('statusLeftActive');
+    // 1. STATUS TEXT (Single Element)
+    const statusText = document.getElementById('mainStatusText');
 
-    // 2. CENTER COLUMN ELEMENTS
-    const idleGroup = document.getElementById('idleGroup');
+    // 2. CENTER CONTENT
+    const idleMsg = document.getElementById('idleMessage');
     const timerRow = document.getElementById('activeTimerRow');
 
-    // 3. RIGHT COLUMN ELEMENTS
+    // 3. BUTTONS
     const reqBtn = document.getElementById('mainButtonsArea');
     const uploadArea = document.getElementById('uploadBtnContainer');
 
     if (isActive) {
-        // --- WORKING STATE ---
-        // Left: Show "WORKING"
-        if(statusLeftActive) statusLeftActive.classList.remove('hidden');
-        
-        // Center: Hide Idle Text, Show Timer
-        if(idleGroup) idleGroup.classList.add('hidden');
-        if(timerRow) timerRow.classList.remove('hidden');
+        // --- WORKING ---
+        if (statusText) {
+            statusText.innerText = "WORKING";
+            statusText.className = "status-text-lg status-working";
+        }
+        if (idleMsg) idleMsg.classList.add('hidden');
+        if (timerRow) timerRow.classList.remove('hidden');
 
-        // Right: Show Upload
-        if(reqBtn) reqBtn.classList.add('hidden');
-        if(uploadArea) uploadArea.classList.remove('hidden');
+        if (reqBtn) reqBtn.classList.add('hidden');
+        if (uploadArea) uploadArea.classList.remove('hidden');
         
     } else {
-        // --- UNPRODUCTIVE STATE ---
-        // Left: Hide "WORKING" (Just shows label "STATUS")
-        if(statusLeftActive) statusLeftActive.classList.add('hidden');
+        // --- UNPRODUCTIVE ---
+        if (statusText) {
+            statusText.innerText = "UNPRODUCTIVE";
+            statusText.className = "status-text-lg status-unproductive";
+        }
+        if (idleMsg) idleMsg.classList.remove('hidden');
+        if (timerRow) timerRow.classList.add('hidden');
 
-        // Center: Show "UNPRODUCTIVE", Hide Timer
-        if(idleGroup) idleGroup.classList.remove('hidden');
-        if(timerRow) timerRow.classList.add('hidden');
-
-        // Right: Show Request
-        if(reqBtn) reqBtn.classList.remove('hidden');
-        if(uploadArea) uploadArea.classList.add('hidden');
+        if (reqBtn) reqBtn.classList.remove('hidden');
+        if (uploadArea) uploadArea.classList.add('hidden');
         
         window.toggleTaskDetails(false);
     }
