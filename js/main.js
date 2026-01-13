@@ -24,21 +24,18 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. INITIALIZATION ---
+// --- 2. INITIALIZATION & DYNAMIC PROFILE LOAD ---
 
 async function injectProfileCard() {
     try {
         const response = await fetch('profileCard.html'); 
-        if (!response.ok) throw new Error('Profile card not found');
+        if (!response.ok) throw new Error('Profile card file not found');
         const html = await response.text();
         
-        // Target the ID hook exactly as it is in your index.html
         const hook = document.getElementById('profile-card-hook');
         if (hook) {
             hook.innerHTML = html;
             updateStats(); 
-        } else {
-            console.error("Hook ID 'profile-card-hook' not found in DOM");
         }
     } catch (err) {
         console.error("Profile Load Error:", err);
@@ -48,7 +45,6 @@ async function injectProfileCard() {
 document.addEventListener('DOMContentLoaded', () => {
     injectProfileCard(); 
     initDomProfile();
-    updateStats();
 });
 
 document.addEventListener('click', () => {
