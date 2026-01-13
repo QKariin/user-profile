@@ -152,165 +152,137 @@ body {
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* =========================================
-   4. TASK RIBBON & CONTROLS (FLEXBOX + SPLIT ACTIONS)
+   4. TASK RIBBON & CONTROLS (FINAL FIX)
    ========================================= */
 
-/* The Header Bar */
 .task-ribbon {
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    padding: 0 10px; 
+    padding: 0; 
     height: 100px; 
     background: rgba(10,10,10,0.95); 
     border: 1px solid var(--gold-dim);
     position: relative;
-    z-index: 100; /* Stays on top */
+    z-index: 100;
 }
 
-/* --- COLUMNS --- */
-.ribbon-left {
-    width: 30%; 
-    border-right: 1px solid rgba(255,255,255,0.1); 
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
+/* --- TYPOGRAPHY HIERARCHY --- */
+
+.ribbon-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    color: #555;
+    letter-spacing: 4px;
+    font-weight: 400;
+    margin-bottom: 5px;
+    text-transform: uppercase;
 }
 
-.ribbon-center {
-    width: 40%; border: none; 
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
+/* The Status Text (Rajdhani = Technical Look) */
+.status-text-lg {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; 
+    font-size: 1.4rem; /* Larger and thinner than Orbitron */
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1;
 }
 
-.ribbon-right {
-    width: 30%; 
-    display: flex; justify-content: center; align-items: center;
-    padding: 0 10px; /* Slight padding for the buttons */
+.status-unproductive { color: #666; text-shadow: none; }
+.status-working { 
+    color: var(--neon-green); 
+    text-shadow: 0 0 15px rgba(0, 255, 0, 0.4); 
 }
 
-/* --- TYPOGRAPHY --- */
-.ribbon-label { font-family: 'Cinzel', serif; font-size: 0.65rem; color: #444; letter-spacing: 3px; font-weight: 700; margin-bottom: 5px; }
-.status-text-lg { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
-.status-unproductive { color: #666; }
-.status-working { color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,0,0.4); }
-
-.ribbon-status { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem; color: #aaa; letter-spacing: 1px; text-transform: uppercase; }
-.ribbon-timer { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 2.2rem; color: white; line-height: 1; letter-spacing: 1px; }
-
-/* The Toggle Link (Hidden in favor of Ghost Button, but kept for safety) */
-.see-task-link {
-    font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.8rem; color: var(--gold); 
-    cursor: pointer; margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; padding: 5px;
-    pointer-events: auto;
+.ribbon-status {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: #666;
+    letter-spacing: 1px;
 }
-.see-task-link:hover { color: #fff; }
 
-/* --- THE DRAWER (PUSH STYLE) --- */
+/* The Timer (Clean Numbers) */
+.ribbon-timer {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600; 
+    font-size: 2.8rem; 
+    color: white; 
+    line-height: 1;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- BUTTONS --- */
+
+/* Primary */
+.action-btn { 
+    background: transparent; 
+    border: 1px solid var(--gold); 
+    color: var(--gold); 
+    padding: 12px 0; 
+    font-family: 'Cinzel', serif; 
+    font-weight: 700; 
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    width: 100%;
+}
+.action-btn:hover { 
+    background: var(--gold); 
+    color: #000; 
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); 
+}
+
+/* Secondary Ghost */
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #aaa;
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    font-size: 0.65rem;
+    padding: 12px 0;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.3s ease;
+}
+.btn-ghost:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-upload { flex: 1; background: rgba(255, 215, 0, 0.1); border-color: var(--gold); }
+
+/* --- DRAWER (Keep existing) --- */
 .task-detail-panel {
+    /* (Use previous drawer CSS here) */
     position: relative;
     width: 100%;
     background: #000;
     border: 1px solid #333;
     border-top: none;
     z-index: 50;
-    display: none; /* Hidden by default */
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 30px;
 }
-
-.task-detail-panel.open {
-    display: flex; 
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+.task-detail-panel.open { display: flex; animation: slideDown 0.3s ease-out; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 .drawer-task-text, #readyText {
-    font-family: 'Rajdhani', sans-serif; 
-    font-weight: 600; 
-    font-size: 1.4rem; 
-    color: #fff; 
-    text-align: center; 
-    line-height: 1.5; 
-    max-width: 90%;
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1.4rem; color: #fff; text-align: center; line-height: 1.5; max-width: 90%;
 }
-
-/* DRAWER FOOTER (Fixes the Skip/Hide layout) */
 .panel-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-.text-btn { 
-    background: transparent; border: none; color: #666; 
-    font-family: 'Cinzel', serif; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; 
-}
-.text-btn:hover { color: white; }
-
-.btn-skip-small {
-    background: transparent; border: 1px solid #333; color: #666; 
-    padding: 10px 25px; font-family: 'Orbitron'; font-size: 0.75rem; 
-    cursor: pointer; transition: 0.2s;
-}
-.btn-skip-small:hover { 
-    color: var(--neon-red); border-color: var(--neon-red); 
-    box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); 
-}
-
-/* --- MAIN ACTION BUTTONS --- */
-
-/* Base Style */
-.action-btn { 
-    background: transparent; border: 1px solid var(--gold); color: var(--gold); 
-    padding: 12px 25px; font-family: 'Cinzel'; font-weight: 700; 
-    cursor: pointer; transition: 0.3s; width: 100%;
-}
-.action-btn:hover { 
-    background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); 
-}
-
-/* Split Action Container */
-#uploadBtnContainer {
-    width: 100%;
-    display: flex;
-    gap: 8px; /* Space between buttons */
-    align-items: center;
-}
-
-/* 1. Ghost Button (See Task) */
-.btn-ghost {
-    background: transparent;
-    border: 1px solid rgba(197, 160, 89, 0.4); 
-    color: var(--gold);
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 0.7rem; 
-    padding: 12px 5px; 
-    cursor: pointer;
-    flex: 1; /* 50% width */
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-.btn-ghost:hover {
-    border-color: #fff; color: #fff; background: rgba(255, 255, 255, 0.05);
-}
-
-/* 2. Upload Button (Split Style) */
-.btn-upload { 
-    background: rgba(255, 215, 0, 0.15); 
-    flex: 1; /* 50% width */
-    padding: 12px 5px; 
-    white-space: nowrap;
-}
+.text-btn { background: transparent; border: none; color: #666; font-family: 'Cinzel', serif; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
+.btn-skip-small { background: transparent; border: 1px solid #333; color: #666; padding: 10px 25px; font-family: 'Orbitron'; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+.btn-skip-small:hover { color: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
 
 .hidden { display: none !important; }
 
