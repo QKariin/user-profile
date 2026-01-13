@@ -122,21 +122,17 @@
         <!-- 1. CONSOLE (Task & Chat) -->
         <div id="viewServingTop" class="view-wrapper" style="display: flex; flex-direction: column; height: 100%;">
             
-          <!-- TASK CARD (LUXURY TERMINAL LAYOUT) -->
+          <!-- TASK CARD (FIXED SINGLE STATUS SOURCE) -->
             <div id="taskCard" class="glass-card task-ribbon" style="margin: 20px 20px 0 20px; position: relative; z-index: 100; justify-content: space-between;">
                 
-                <!-- LEFT: STATE (Label + Data) -->
+                <!-- LEFT: STATUS (Single Element) -->
                 <div class="ribbon-left" style="width: 30%; border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <div class="ribbon-label">CURRENT STATUS</div>
-                    
-                    <!-- IDLE VALUE -->
-                    <div id="statusIndicator" class="status-text-lg status-unproductive">UNPRODUCTIVE</div>
-                    
-                    <!-- ACTIVE VALUE (Hidden by default) -->
-                    <div id="statusLeftActive" class="status-text-lg status-working hidden">WORKING</div>
+                    <!-- SINGLE ID for Status - JS changes text and color -->
+                    <div id="mainStatusText" class="status-text-lg status-unproductive">UNPRODUCTIVE</div>
                 </div>
                 
-                <!-- CENTER: THE CLOCK (Heartbeat) -->
+                <!-- CENTER: DATA (Timer OR Trash Talk) -->
                 <div class="ribbon-center" style="width: 40%; border: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     
                     <!-- IDLE MESSAGE -->
@@ -144,35 +140,31 @@
                         "Awaiting Royal Decree..."
                     </div>
             
-                    <!-- ACTIVE TIMER (Pure Data) -->
+                    <!-- ACTIVE TIMER -->
                     <div id="activeTimerRow" class="hidden">
                         <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
                     </div>
             
                 </div>
             
-                <!-- RIGHT: THE ACTION DECK -->
+                <!-- RIGHT: ACTION DECK -->
                 <div class="ribbon-right" style="width: 30%; display: flex; justify-content: center; align-items: center;">
                     
-                    <!-- IDLE ACTION -->
+                    <!-- REQUEST (Idle) -->
                     <div id="mainButtonsArea" style="width: 100%; padding: 0 10px;">
                         <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn" style="width: 100%;">REQUEST TASK</button>
                     </div>
                     
-                    <!-- ACTIVE ACTIONS (Split: Ghost + Solid) -->
-                    <div id="uploadBtnContainer" class="hidden" style="width: 100%; display: flex; gap: 15px; justify-content: center; align-items: center; padding: 0 10px;">
-                        
-                        <!-- Secondary: Ghost Button -->
-                        <button onclick="window.toggleTaskDetails(null)" class="btn-ghost see-task-link">SEE TASK</button>
-                        
-                        <!-- Primary: Solid Button -->
+                    <!-- ACTIONS (Active) -->
+                    <div id="uploadBtnContainer" class="hidden" style="width: 100%; display: flex; gap: 10px; justify-content: center; align-items: center; padding: 0 10px;">
+                        <!-- Ghost Button -->
+                        <button onclick="window.toggleTaskDetails(null)" class="btn-ghost">SEE TASK</button>
+                        <!-- Solid Button -->
                         <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" onchange="window.handleUploadStart(this)">
                         <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD</button>
-                        
                     </div>
                 </div>
             </div>
-
             <!-- DRAWER (Slides Down) -->
             <div id="taskDetailPanel" class="task-detail-panel">
                 <div class="detail-content">
