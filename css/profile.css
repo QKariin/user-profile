@@ -123,179 +123,130 @@ body {
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* =========================================
-   4. TASK RIBBON & CONTROLS (ANCHORED VERSION)
+   4. TASK RIBBON & CONTROLS (NO-FAIL VERSION)
    ========================================= */
 
-/* Main Container */
 .task-ribbon-container {
-    margin: 20px;
-    padding: 0; 
+    margin: 20px 20px 0 20px; /* Spacing */
     display: flex;
     flex-direction: column;
     background: rgba(10,10,10,0.95);
     border: 1px solid #333;
     border-radius: 4px;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    /* Ensure the container doesn't hide the button if it hangs low */
-    overflow: visible !important; 
     z-index: 10;
+    /* CRITICAL: Allow button to hang out if needed */
+    overflow: visible !important; 
 }
 
-/* TOP ROW - Fixed Height to prevent squashing */
+/* HEADER - Auto Height to fit content */
 .task-header-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Align to top so they don't jump */
+    align-items: center;
     padding: 15px 25px;
-    height: 110px; /* FIXED HEIGHT - CRITICAL */
-    min-height: 110px;
+    min-height: 100px; /* Grow if needed */
+    height: auto !important; 
     position: relative;
     z-index: 50; 
     background: rgba(5,5,5,0.9);
     border-bottom: 1px solid #222;
 }
 
-/* LEFT: STATUS & TRIGGER */
+/* LEFT SIDE */
 .task-info-block {
     position: relative;
     z-index: 50;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    height: 100%;
-    width: 60%; /* Give it space */
+    justify-content: center;
+    pointer-events: auto;
 }
 
-/* Status Text */
 .status-text-lg {
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     letter-spacing: 2px;
     margin-bottom: 5px;
+    color: #666;
 }
-.status-unproductive { color: #666; }
-.status-working { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
-
-/* Timer Container */
-#activeTimerRow {
-    display: flex; 
-    flex-direction: column;
-    position: relative;
-}
+/* JS Toggles these classes */
+.status-working { color: var(--neon-green) !important; text-shadow: 0 0 10px rgba(0,255,0,0.4); }
 
 .ribbon-timer {
-    font-family: 'Orbitron'; font-size: 2rem; color: white; font-weight: 700; line-height: 1;
+    font-family: 'Orbitron'; font-size: 1.8rem; color: white; font-weight: 700; line-height: 1.2;
 }
 
-/* --- THE BUTTON: ABSOLUTELY PINNED --- */
+/* THE BUTTON - Absolute Position to prevent "Pushing" */
 .see-task-link {
-    font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--gold); 
-    font-weight: 700; letter-spacing: 2px; cursor: pointer; 
-    
-    /* ANCHORING LOGIC */
-    position: absolute; 
-    top: 45px; /* Push it down below timer */
-    left: 0;
-    
-    padding: 10px 0; width: 200px; text-align: left;
-    white-space: nowrap; /* Never wrap */
-    
-    z-index: 9999 !important; 
-    pointer-events: auto !important;
-    
-    /* Ensure visibility */
-    opacity: 1 !important;
     display: block !important;
+    font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--gold); 
+    font-weight: 700; letter-spacing: 2px; cursor: pointer;
+    
+    /* Lock it in place so it never moves */
+    position: absolute;
+    bottom: -15px; /* Hang slightly below the text */
+    left: 0;
+    width: 200px;
+    
+    padding: 5px 0;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
 }
-.see-task-link:hover { color: #fff; transform: translateX(5px); }
+.see-task-link:hover { color: white; }
 
-/* RIGHT: CONTROLS & BUTTONS */
-.task-controls-block {
+/* Ensure the timer row has space for the absolute button */
+#activeTimerRow {
     position: relative;
-    z-index: 60;
+    padding-bottom: 20px; /* Reserve space for the button */
     display: flex;
-    align-items: center;
-    height: 100%;
+    flex-direction: column;
 }
 
-/* BUTTONS */
-.action-btn { 
-    background: transparent; 
-    border: 1px solid var(--gold); 
-    color: var(--gold); 
-    padding: 12px 25px; 
-    font-family: 'Cinzel'; 
-    font-weight: 700; 
-    cursor: pointer; 
-    transition: 0.3s; 
+/* RIGHT SIDE */
+.task-controls-block {
+    z-index: 60;
     position: relative;
-    z-index: 100; 
-    pointer-events: auto; 
 }
 
-.action-btn:hover { 
-    background: var(--gold); 
-    color: #000; 
-    box-shadow: 0 0 15px var(--gold); 
+/* Buttons */
+.action-btn { 
+    background: transparent; border: 1px solid var(--gold); color: var(--gold); 
+    padding: 10px 20px; font-family: 'Cinzel'; font-weight: 700; cursor: pointer; 
+    transition: 0.3s; position: relative; z-index: 100;
 }
+.action-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold); }
 
 .btn-upload { background: rgba(255, 215, 0, 0.1); }
 
-.btn-loading {
-    background: #333 !important; color: var(--neon-yellow) !important; 
-    border-color: var(--neon-yellow) !important;
-    cursor: wait !important; pointer-events: none;
-}
-
-/* SLIDE DOWN PANEL */
+/* SLIDE PANEL */
 .task-detail-panel {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    /* Slide from underneath the header */
-    transform: translateY(-20px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(15,15,15,0.98);
-    position: relative;
-    z-index: 1; /* MUST be lower than header */
+    max-height: 0; overflow: hidden; opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.4s ease;
+    background: #000;
+    position: relative; z-index: 1;
 }
-
 .task-detail-panel.open {
-    max-height: 400px;
-    opacity: 1;
-    transform: translateY(0);
-    padding-bottom: 20px;
+    max-height: 500px; opacity: 1; transform: translateY(0);
 }
 
-.detail-content {
-    padding: 30px 25px;
-    text-align: center;
-}
-
-.ribbon-status {
-    font-family: 'Inter', sans-serif; font-size: 1.2rem; 
-    color: #e0e0e0; line-height: 1.6; margin-bottom: 20px;
-}
+.detail-content { padding: 25px; text-align: center; }
+.ribbon-status { font-family: 'Inter'; font-size: 1.1rem; color: #ccc; line-height: 1.5; margin-bottom: 15px; }
 
 .panel-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid #333; padding-top: 15px; margin-top: 10px;
+    display: flex; justify-content: space-between; border-top: 1px solid #333; padding-top: 15px;
 }
-
-.text-btn {
-    background: none; border: none; font-family: 'Orbitron'; font-size: 0.7rem;
-    cursor: pointer; color: #888; letter-spacing: 1px; padding: 10px;
-    position: relative; z-index: 10;
-}
+.text-btn { background: none; border: none; font-family: 'Orbitron'; color: #666; font-size: 0.7rem; cursor: pointer; }
 .text-btn:hover { color: white; }
+.btn-skip { color: #888; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; }
+.btn-skip:hover { border-color: var(--neon-red); color: var(--neon-red); }
 
-.btn-skip { color: #888; border: 1px solid #333; padding: 5px 15px; border-radius: 4px; }
-.btn-skip:hover { color: var(--neon-red); border-color: var(--neon-red); background: rgba(255, 0, 60, 0.1); }
-
-/* Utility */
 .hidden { display: none !important; }
+@keyframes blinker { 50% { opacity: 0; } }
+
 
 /* Timer Badge */
 #activeBadge {
@@ -579,5 +530,3 @@ img:not([src]) {
 .gallery-item {
     background: #000; /* Keep background black so we don't see through to body */
 }
-
-
