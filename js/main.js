@@ -1,5 +1,4 @@
-
-// main.js - FIXED: BUTTON NEVER HIDES
+// main.js - 30/40/30 GRID LOGIC
 
 // --- 1. FULL IMPORTS ---
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -27,91 +26,57 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. CRITICAL UI FUNCTIONS ---
+// --- 2. DRAWER LOGIC (The Only Interactive Part) ---
 
-// Toggle the slide-down panel - NO HIDING THE BUTTON
-window.toggleTaskDetails = function(forceOpen = null) {
-    if (window.event) window.event.stopPropagation(); // Stop click conflicts
-
-    const panel = document.getElementById('taskDetailPanel');
-    const link = document.querySelector('.see-task-link'); 
+window.toggleTaskDrawer = function(forceOpen = null) {
+    const drawer = document.getElementById('taskDrawer');
+    const btn = document.querySelector('.drawer-toggle');
     
-    if (!panel) return;
+    if (!drawer) return;
 
-    const currentlyOpen = panel.classList.contains('open');
-    const shouldOpen = (forceOpen === true) || (forceOpen === null && !currentlyOpen);
+    const isOpen = drawer.classList.contains('open');
+    const shouldOpen = (forceOpen === true) || (forceOpen === null && !isOpen);
 
     if (shouldOpen) {
-        panel.classList.add('open');
-        panel.style.maxHeight = "500px";
-        panel.style.opacity = "1";
-        
-        // HERE IS THE FIX: Do NOT set opacity to 0. Just change text.
-        if(link) {
-            link.innerHTML = "▲ HIDE DIRECTIVE ▲";
-            link.style.opacity = "1"; 
-        }
+        drawer.classList.add('open');
+        if(btn) btn.innerHTML = "▲ HIDE ASSIGNMENT";
     } else {
-        panel.classList.remove('open');
-        panel.style.maxHeight = "0px";
-        panel.style.opacity = "0";
-        
-        if(link) {
-            link.innerHTML = "▼ SEE DIRECTIVE ▼";
-            link.style.opacity = "1";
-        }
+        drawer.classList.remove('open');
+        if(btn) btn.innerHTML = "▼ SEE ASSIGNMENT";
     }
 };
 
-// Handle UI State Switching
+// --- 3. UI STATE MACHINE (30/40/30 Logic) ---
+
 function updateTaskUIState(isActive) {
-    const statusLabel = document.getElementById('taskStatusLabel');
-    const timerRow = document.getElementById('activeTimerRow');
-    const reqBtn = document.getElementById('newTaskBtn');
-    const upContainer = document.getElementById('uploadBtnContainer');
+    // Middle Column Elements
+    const idleState = document.getElementById('stateIdle');
+    const activeState = document.getElementById('stateActive');
+    
+    // Right Column Elements
+    const btnRequest = document.getElementById('btnAreaRequest');
+    const btnUpload = document.getElementById('btnAreaUpload');
 
     if (isActive) {
-        // WORKING
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: <span style='color:var(--neon-green)'>WORKING</span>";
-            statusLabel.className = "status-text-lg status-working";
-        }
-        if(timerRow) {
-            timerRow.classList.remove('hidden');
-            timerRow.style.display = 'flex'; // Force show
-        }
-        if(reqBtn) reqBtn.classList.add('hidden');
-        if(upContainer) upContainer.classList.remove('hidden');
-    } else {
-        // UNPRODUCTIVE
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: UNPRODUCTIVE";
-            statusLabel.className = "status-text-lg status-unproductive";
-        }
-        if(timerRow) {
-            timerRow.classList.add('hidden');
-            timerRow.style.display = 'none'; // Force hide
-        }
-        if(reqBtn) reqBtn.classList.remove('hidden');
-        if(upContainer) upContainer.classList.add('hidden');
+        // --- SWITCH TO WORKING MODE ---
+        if(idleState) idleState.classList.add('hidden');
+        if(activeState) activeState.classList.remove('hidden');
         
-        window.toggleTaskDetails(false);
+        if(btnRequest) btnRequest.classList.add('hidden');
+        if(btnUpload) btnUpload.classList.remove('hidden');
+        
+    } else {
+        // --- SWITCH TO IDLE MODE ---
+        if(idleState) idleState.classList.remove('hidden');
+        if(activeState) activeState.classList.add('hidden');
+        
+        if(btnRequest) btnRequest.classList.remove('hidden');
+        if(btnUpload) btnUpload.classList.add('hidden');
+        
+        // Auto-close drawer when finished
+        window.toggleTaskDrawer(false);
     }
 }
-
-// --- 3. CLICK LISTENER ---
-document.addEventListener('click', function(event) {
-    const card = document.getElementById('taskCard');
-    const panel = document.getElementById('taskDetailPanel');
-    
-    // IMPORTANT: If clicking the button itself, do NOTHING. Let the button work.
-    if (event.target.closest('.see-task-link')) return;
-
-    // Only auto-close if clicking OUTSIDE the card while it is open
-    if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
-        window.toggleTaskDetails(false);
-    }
-});
 
 // --- 4. INITIALIZATION ---
 
@@ -149,7 +114,7 @@ function initDomProfile() {
 }
 initDomProfile();
 
-// --- 5. BRIDGE & DATA ---
+// --- 5. BRIDGE ---
 
 Bridge.listen((data) => {
     const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
@@ -267,13 +232,14 @@ window.addEventListener("message", (event) => {
                     if (pendingTaskState) {
                         setCurrentTask(pendingTaskState.task);
                         restorePendingUI();
-                        updateTaskUIState(true);
+                        updateTaskUIState(true); // Active
                         
+                        // Optional: Auto open drawer on reload
                         if (!isInitialLoad) {
-                             window.toggleTaskDetails(true);
+                             window.toggleTaskDrawer(true);
                         }
                     } else if (!resetUiTimer) {
-                        updateTaskUIState(false);
+                        updateTaskUIState(false); // Idle
                         const rt = document.getElementById('readyText');
                         if(rt) rt.innerText = "AWAITING ORDERS";
                     }
@@ -305,7 +271,7 @@ window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
         const btn = document.getElementById('btnUpload');
         if (btn) {
-            btn.innerHTML = 'TRANSMITTING...';
+            btn.innerHTML = '...';
             btn.style.background = '#333';
             btn.style.color = '#ffd700'; 
             btn.style.cursor = 'wait';
@@ -403,7 +369,7 @@ function updateStats() {
     updateKneelingStatus(); 
 }
 
-// ... (Rest of legacy code - unchanged) ...
+// ... (Rest of legacy handlers) ...
 let currentHuntIndex = 0;
 let filteredItems = [];
 let selectedReason = "";
