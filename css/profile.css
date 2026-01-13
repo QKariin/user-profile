@@ -167,6 +167,15 @@ body {
 .ribbon-timer {
     font-family: 'Orbitron'; font-size: 1.8rem; color: white; font-weight: 700; line-height: 1;
 }
+
+/* FORCE BUTTON TO TOP */
+.see-task-link, .task-info-block {
+    position: relative;
+    z-index: 9999 !important; /* Highest priority */
+    cursor: pointer;
+    pointer-events: auto !important;
+}
+
 .see-task-link {
     font-family: 'Cinzel'; font-size: 0.65rem; color: var(--gold); 
     cursor: pointer; margin-top: 5px; letter-spacing: 1px;
