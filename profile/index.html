@@ -123,18 +123,34 @@
         <div id="viewServingTop" class="view-wrapper" style="display: flex; flex-direction: column; height: 100%;">
             
             <!-- TASK CARD (Fixed) -->
+            <!-- TASK CARD (Status Value Moved to Center) -->
             <div id="taskCard" class="glass-card task-ribbon" style="margin: 20px 20px 0 20px; position: relative; z-index: 100; justify-content: space-between;">
+                
+                <!-- LEFT (30%): JUST THE LABEL -->
                 <div class="ribbon-left" style="width: 30%; border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <div class="ribbon-label">STATUS</div>
-                    <div id="statusIndicator" class="status-text-lg status-unproductive">UNPRODUCTIVE</div>
+                    <div class="ribbon-label" style="font-size: 1rem; letter-spacing: 4px;">STATUS</div>
                 </div>
+                
+                <!-- CENTER (40%): STATUS VALUE + DETAILS -->
                 <div class="ribbon-center" style="width: 40%; border: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <div id="idleMessage" class="ribbon-status" style="opacity: 0.7;">AWAITING DIRECTIVE...</div>
+                    
+                    <!-- 1. The Main Status (Changes from UNPRODUCTIVE to WORKING) -->
+                    <div id="statusIndicator" class="status-text-lg status-unproductive" style="font-size: 1.2rem; margin-bottom: 5px;">UNPRODUCTIVE</div>
+            
+                    <!-- 2. IDLE SUB-TEXT (Trash Talk) -->
+                    <div id="idleMessage" class="ribbon-status" style="opacity: 0.6; font-size: 0.65rem; font-style: italic;">
+                        "Awaiting Royal Decree..."
+                    </div>
+            
+                    <!-- 3. ACTIVE SUB-TEXT (Timer + Toggle) - Hidden by default -->
                     <div id="activeTimerRow" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
-                        <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
+                        <span id="timerDisplay" class="ribbon-timer" style="font-size: 1.5rem; line-height: 1;">00:00:00</span>
                         <div class="see-task-link" onclick="window.toggleTaskDetails(null)">▼ SEE DIRECTIVE ▼</div>
                     </div>
+            
                 </div>
+            
+                <!-- RIGHT (30%): BUTTONS (Unchanged) -->
                 <div class="ribbon-right" style="width: 30%; display: flex; justify-content: center; align-items: center;">
                     <div id="mainButtonsArea" style="width: 100%;">
                         <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn" style="width: 100%;">REQUEST TASK</button>
