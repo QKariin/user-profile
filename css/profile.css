@@ -207,10 +207,12 @@ body {
 }
 
 .ribbon-center {
-    flex: 0 0 40%; /* Fixed 40% */
-    max-width: 40%;
+    width: 40%; 
     border: none; 
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; /* Forces the fixed box to center */
     position: relative;
 }
 
@@ -260,40 +262,41 @@ body {
 
 /* --- THE TIMER (FIXED STABILITY) --- */
 .ribbon-timer {
-    /* Orbitron is wider and more stable for numbers */
-    font-family: 'Orbitron', monospace !important; 
+    font-family: 'Rajdhani', sans-serif !important; /* The Technical Font you liked */
     font-weight: 700;
-    font-size: 2.2rem; 
+    font-size: 2.4rem; 
     color: white; 
     line-height: 1;
-    letter-spacing: 2px;
     
-    /* NUCLEAR OPTION FOR STABILITY */
+    /* THE ANCHOR FIX */
+    display: inline-block;
+    min-width: 220px; /* Physical box size */
+    text-align: center; /* Center text inside the box */
+    
+    /* NUCLEAR STABILITY */
     font-variant-numeric: tabular-nums;
-    -moz-font-feature-settings: "tnum";
-    -webkit-font-feature-settings: "tnum";
     font-feature-settings: "tnum";
-    
-    /* Layout Lock */
-    display: block;
-    width: 100%;
-    text-align: center;
+    letter-spacing: 2px;
 }
 
 /* Toggle Link */
 .see-task-link {
-    font-family: 'Cinzel', serif; 
+    font-family: 'Cinzel', serif; /* Restored Luxury Font for link */
     font-weight: 700; 
-    font-size: 0.7rem; 
+    font-size: 0.65rem; 
     color: var(--gold); 
     cursor: pointer; 
     margin-top: 5px; 
     letter-spacing: 2px; 
     text-transform: uppercase; 
-    padding: 5px;
+    
+    /* Center this too */
+    display: block;
+    width: 100%;
+    text-align: center;
     pointer-events: auto;
 }
-.see-task-link:hover { color: #fff; }
+.see-task-link:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
 /* --- DRAWER --- */
 .task-detail-panel {
