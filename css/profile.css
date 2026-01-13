@@ -180,100 +180,199 @@ body {
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* =========================================
-   4. TASK RIBBON (GREY CINZEL / SILVER FRAMES)
+   4. TASK RIBBON & CONTROLS (ANTI-SQUASH FIX)
    ========================================= */
 
+/* The Header Bar */
 .task-ribbon {
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 10px; height: 100px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 15px; /* Clean padding */
+    height: 100px; 
     background: rgba(10,10,10,0.95); 
-    border: 1px solid #333; /* Dark Grey Border */
-    position: relative; z-index: 100;
+    border: 1px solid var(--gold-dim);
+    position: relative;
+    z-index: 100;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Include padding in width */
 }
 
-/* LEFT: Status (Grey Cinzel) */
+/* --- COLUMNS (FORCE WIDTHS) --- */
+
 .ribbon-left {
-    width: 30%; border-right: 1px solid rgba(255,255,255,0.05); 
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    width: 30%; 
+    min-width: 30%; /* FORCE IT: Cannot shrink */
+    flex-shrink: 0; /* STOP SQUASHING */
+    border-right: 1px solid rgba(255,255,255,0.1); 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    overflow: hidden; /* Safety */
 }
-.ribbon-label { 
-    font-family: 'Cinzel', serif; font-size: 0.6rem; color: #444; 
-    letter-spacing: 4px; font-weight: 700; margin-bottom: 5px; 
-}
-.status-text-lg { 
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem; 
-    letter-spacing: 3px; text-transform: uppercase; color: #888; /* Grey */
-}
-/* Override colors only if strictly needed, but base is grey */
-.status-unproductive { color: #666; }
-.status-working { color: #aaa; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
 
-/* CENTER: Timer (Grey Cinzel) */
 .ribbon-center {
-    width: 40%; border: none; 
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-}
-.ribbon-status { 
-    font-family: 'Cinzel', serif; font-weight: 600; font-size: 0.8rem; 
-    color: #666; letter-spacing: 2px; font-style: italic;
-}
-.ribbon-timer { 
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 2.2rem; 
-    color: #888; /* Grey */
-    line-height: 1; letter-spacing: 2px; 
+    width: 40%; 
+    min-width: 40%; /* FORCE IT */
+    flex-shrink: 0; 
+    border: none; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    overflow: hidden;
 }
 
-/* RIGHT: Actions */
 .ribbon-right {
-    width: 30%; display: flex; justify-content: center; align-items: center; padding: 0 10px;
+    width: 30%; 
+    min-width: 30%; /* FORCE IT */
+    flex-shrink: 0;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    padding-left: 10px;
+    overflow: visible; /* Let buttons glow */
 }
 
-/* --- SILVER FRAME BUTTONS (No Background) --- */
-.action-btn, .btn-ghost, .btn-upload { 
-    background: transparent !important; 
-    border: 1px solid #666 !important; /* Silver Frame */
-    color: #aaa !important; /* Silver Text */
-    padding: 12px 10px; 
-    font-family: 'Cinzel', serif !important; font-weight: 700; 
+/* --- TYPOGRAPHY (Alignment Fixes) --- */
+
+.ribbon-label { 
+    font-family: 'Cinzel', serif; 
+    font-size: 0.65rem; 
+    color: #555; 
+    letter-spacing: 3px; 
+    font-weight: 700; 
+    margin-bottom: 5px; 
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.status-text-lg { 
+    font-family: 'Rajdhani', sans-serif; 
+    font-weight: 700; 
+    font-size: 1.2rem; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    white-space: nowrap; /* Prevent wrapping */
+}
+.status-unproductive { color: #666; }
+.status-working { color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,0,0.4); }
+
+.ribbon-status { 
+    font-family: 'Rajdhani', sans-serif; 
+    font-weight: 600; 
+    font-size: 0.8rem; 
+    color: #aaa; 
+    letter-spacing: 1px; 
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.ribbon-timer { 
+    font-family: 'Rajdhani', sans-serif; 
+    font-weight: 700; 
+    font-size: 2.2rem; 
+    color: white; 
+    line-height: 1; 
+    letter-spacing: 1px; 
+}
+
+/* Toggle Link */
+.see-task-link {
+    font-family: 'Rajdhani', sans-serif; 
+    font-weight: 700; 
     font-size: 0.75rem; 
-    cursor: pointer; transition: 0.3s; width: 100%;
-    box-shadow: none !important;
+    color: var(--gold); 
+    cursor: pointer; 
+    margin-top: 5px; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    padding: 5px;
+    white-space: nowrap;
 }
-.action-btn:hover, .btn-ghost:hover, .btn-upload:hover { 
-    border-color: #fff !important; 
-    color: #fff !important; 
-    box-shadow: 0 0 10px rgba(255,255,255,0.1) !important;
-}
+.see-task-link:hover { color: #fff; }
 
-/* Split Container */
-#uploadBtnContainer {
-    width: 100%; display: flex; gap: 8px; align-items: center;
-}
-.btn-ghost { flex: 1; }
-.btn-upload { flex: 1; }
-
-/* DRAWER */
+/* --- DRAWER --- */
 .task-detail-panel {
-    position: relative; width: 100%; background: #000; border: 1px solid #333; border-top: none;
-    z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
+    position: relative;
+    width: 100%;
+    background: #000;
+    border: 1px solid #333;
+    border-top: none;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
 }
 .task-detail-panel.open { display: flex; animation: slideDown 0.3s ease-out; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 .drawer-task-text, #readyText {
-    font-family: 'Cinzel', serif; font-weight: 600; font-size: 1.4rem; color: #ccc; 
-    text-align: center; line-height: 1.5; max-width: 90%;
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1.4rem; color: #fff; text-align: center; line-height: 1.5; max-width: 90%;
 }
 
 .panel-footer {
-    display: flex; justify-content: space-between; align-items: center; width: 100%;
-    margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-.text-btn { background: transparent; border: none; color: #666; font-family: 'Cinzel', serif; font-size: 0.7rem; cursor: pointer; letter-spacing: 2px; }
+.text-btn { background: transparent; border: none; color: #666; font-family: 'Cinzel', serif; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
 .text-btn:hover { color: white; }
-.btn-skip-small { background: transparent; border: 1px solid #333; color: #666; padding: 8px 20px; font-family: 'Cinzel', serif; font-size: 0.7rem; cursor: pointer; transition: 0.2s; }
-.btn-skip-small:hover { color: var(--neon-red); border-color: var(--neon-red); }
 
+.btn-skip-small {
+    background: transparent; border: 1px solid #333; color: #666; padding: 10px 25px; font-family: 'Orbitron'; font-size: 0.75rem; cursor: pointer; transition: 0.2s;
+}
+.btn-skip-small:hover { color: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
+
+/* --- BUTTONS (Fixed Sizing) --- */
+.action-btn { 
+    background: transparent; 
+    border: 1px solid var(--gold); 
+    color: var(--gold); 
+    padding: 12px 0; /* Removed side padding, rely on width */
+    font-family: 'Cinzel', serif; 
+    font-weight: 700; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    width: 100%; /* Fill container */
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+.action-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+
+/* Split Container */
+#uploadBtnContainer {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(197, 160, 89, 0.4); 
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.65rem; 
+    padding: 12px 0; 
+    cursor: pointer;
+    flex: 1; /* Equal Width */
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+}
+.btn-ghost:hover { border-color: #fff; color: #fff; background: rgba(255, 255, 255, 0.05); }
+
+.btn-upload { 
+    background: rgba(255, 215, 0, 0.15); 
+    flex: 1; /* Equal Width */
+    padding: 12px 0; 
+    white-space: nowrap;
+}
+
+.hidden { display: none !important; }
 /* =========================================
    5. CHAT SYSTEM (CINZEL UPDATE)
    ========================================= */
