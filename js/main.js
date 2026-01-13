@@ -25,6 +25,28 @@ import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus 
 import { Bridge } from './bridge.js';
 
 // --- 2. INITIALIZATION ---
+
+async function injectProfileCard() {
+    try {
+        const response = await fetch('profileCard.html'); 
+        if (!response.ok) throw new Error('Profile card not found');
+        const html = await response.text();
+        const hook = document.querySelector('.layout-left');
+        if (hook) {
+            hook.innerHTML = html;
+            updateStats(); 
+        }
+    } catch (err) {
+        console.error("Profile Load Error:", err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    injectProfileCard(); // This triggers the load of your profileCard.html
+    initDomProfile();
+    updateStats();
+});
+
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
         ['msgSound', 'coinSound', 'skipSound', 'sfx-buy', 'sfx-deny'].forEach(id => {
@@ -68,7 +90,6 @@ function initDomProfile() {
         frame.src = `https://player.twitch.tv/?channel=${CONFIG.TWITCH_CHANNEL}${parentString}&muted=true&autoplay=true`;
     }
 }
-initDomProfile();
 
 Bridge.listen((data) => {
     const ignoreList = [
@@ -305,12 +326,16 @@ window.switchTab = function(viewId) {
 
 function updateStats() {
     const subName = document.getElementById('subName');
+    const subHierarchy = document.getElementById('subHierarchy');
+    const coinsEl = document.getElementById('coins');
+    const pointsEl = document.getElementById('points');
+
     if (!subName || !userProfile || !gameStats) return; 
 
     subName.textContent = userProfile.name || "Slave";
-    document.getElementById('subHierarchy').textContent = userProfile.hierarchy || "HallBoy";
-    document.getElementById('coins').textContent = gameStats.coins ?? 0;
-    document.getElementById('points').textContent = gameStats.points ?? 0;
+    if (subHierarchy) subHierarchy.textContent = userProfile.hierarchy || "HallBoy";
+    if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
+    if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
 
     const setVal = (id, val) => {
         const el = document.getElementById(id);
@@ -330,8 +355,11 @@ function updateStats() {
 
     if (typeof LEVELS !== 'undefined' && LEVELS.length > 0) {
         let nextLevel = LEVELS.find(l => l.min > gameStats.points) || LEVELS[LEVELS.length - 1];
-        document.getElementById('nextLevelName').innerText = nextLevel.name;
-        document.getElementById('pointsNeeded').innerText = Math.max(0, nextLevel.min - gameStats.points) + " to go";
+        const nln = document.getElementById('nextLevelName');
+        const pnd = document.getElementById('pointsNeeded');
+        if(nln) nln.innerText = nextLevel.name;
+        if(pnd) pnd.innerText = Math.max(0, nextLevel.min - gameStats.points) + " to go";
+        
         const prevLevel = [...LEVELS].reverse().find(l => l.min <= gameStats.points) || {min: 0};
         const range = nextLevel.min - prevLevel.min;
         const progress = range > 0 ? ((gameStats.points - prevLevel.min) / range) * 100 : 100;
