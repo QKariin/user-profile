@@ -123,45 +123,55 @@
         <div id="viewServingTop" class="view-wrapper" style="display: flex; flex-direction: column; height: 100%;">
             
           <!-- TASK CARD (HYBRID LAYOUT) -->
-            <div id="taskCard" class="glass-card task-ribbon" style="margin: 20px 20px 0 20px; position: relative; z-index: 100; justify-content: space-between;">
-                
-                <!-- LEFT: Label + (Hidden Active Status) -->
-                <div class="ribbon-left" style="width: 30%; border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <div class="ribbon-label" style="font-size: 1rem; letter-spacing: 4px;">STATUS</div>
-                    <!-- THIS APPEARS ONLY WHEN WORKING -->
-                    <div id="statusLeftActive" class="status-text-lg status-working hidden" style="font-size: 1.2rem;">WORKING</div>
-                </div>
-                
-                <!-- CENTER: Idle Status OR Timer -->
-                <div class="ribbon-center" style="width: 40%; border: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    
-                    <!-- IDLE GROUP (Visible when Unproductive) -->
-                    <div id="idleGroup" style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="status-text-lg status-unproductive" style="font-size: 1.2rem; margin-bottom: 5px;">UNPRODUCTIVE</div>
-                        <div class="ribbon-status" style="opacity: 0.6; font-size: 0.65rem; font-style: italic;">
-                            "Awaiting Royal Decree..."
-                        </div>
-                    </div>
-            
-                    <!-- ACTIVE GROUP (Timer + Toggle) - Hidden by default -->
-                    <div id="activeTimerRow" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
-                        <span id="timerDisplay" class="ribbon-timer" style="font-size: 1.5rem; line-height: 1;">00:00:00</span>
-                        <div class="see-task-link" onclick="window.toggleTaskDetails(null)">▼ SEE DIRECTIVE ▼</div>
-                    </div>
-            
-                </div>
-            
-                <!-- RIGHT: BUTTONS -->
-                <div class="ribbon-right" style="width: 30%; display: flex; justify-content: center; align-items: center;">
-                    <div id="mainButtonsArea" style="width: 100%;">
-                        <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn" style="width: 100%;">REQUEST TASK</button>
-                    </div>
-                    <div id="uploadBtnContainer" class="hidden" style="width: 100%;">
-                        <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" onchange="window.handleUploadStart(this)">
-                        <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload" style="width: 100%;">UPLOAD PROOF</button>
-                    </div>
-                </div>
-            </div>
+            <!-- TASK CARD (HYBRID LAYOUT + SPLIT ACTIONS) -->
+              <div id="taskCard" class="glass-card task-ribbon" style="margin: 20px 20px 0 20px; position: relative; z-index: 100; justify-content: space-between;">
+                  
+                  <!-- LEFT: Label + Active Status -->
+                  <div class="ribbon-left" style="width: 30%; border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                      <div class="ribbon-label" style="font-size: 1rem; letter-spacing: 4px;">STATUS</div>
+                      <!-- ACTIVE STATUS (Hidden by default) -->
+                      <div id="statusLeftActive" class="status-text-lg status-working hidden" style="font-size: 1.2rem;">WORKING</div>
+                  </div>
+                  
+                  <!-- CENTER: Idle Message OR Pure Timer -->
+                  <div class="ribbon-center" style="width: 40%; border: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                      
+                      <!-- IDLE GROUP -->
+                      <div id="idleGroup" style="display: flex; flex-direction: column; align-items: center;">
+                          <div class="status-text-lg status-unproductive" style="font-size: 1.2rem; margin-bottom: 5px;">UNPRODUCTIVE</div>
+                          <div class="ribbon-status" style="opacity: 0.6; font-size: 0.65rem; font-style: italic;">
+                              "Awaiting Royal Decree..."
+                          </div>
+                      </div>
+              
+                      <!-- ACTIVE GROUP (Timer Only - Clean) -->
+                      <div id="activeTimerRow" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
+                          <span id="timerDisplay" class="ribbon-timer" style="font-size: 1.8rem; line-height: 1;">00:00:00</span>
+                      </div>
+              
+                  </div>
+              
+                  <!-- RIGHT: ACTION DECK -->
+                  <div class="ribbon-right" style="width: 30%; display: flex; justify-content: center; align-items: center;">
+                      
+                      <!-- REQUEST BUTTON (Idle) -->
+                      <div id="mainButtonsArea" style="width: 100%;">
+                          <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn" style="width: 100%;">REQUEST TASK</button>
+                      </div>
+                      
+                      <!-- SPLIT ACTION BUTTONS (Active) -->
+                      <div id="uploadBtnContainer" class="hidden" style="width: 100%; display: flex; gap: 5px; justify-content: center;">
+                          
+                          <!-- 1. GHOST BUTTON (See Task) -->
+                          <button onclick="window.toggleTaskDetails(null)" class="btn-ghost">SEE TASK</button>
+                          
+                          <!-- 2. SOLID BUTTON (Upload) -->
+                          <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" onchange="window.handleUploadStart(this)">
+                          <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD</button>
+                          
+                      </div>
+                  </div>
+              </div>
 
             <!-- DRAWER (Slides Down) -->
             <div id="taskDetailPanel" class="task-detail-panel">
