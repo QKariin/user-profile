@@ -110,58 +110,34 @@
         <div class="content-stage">
             
             <div id="viewServingTop" class="view-wrapper">
-            
-    <!-- NEW TASK CARD STRUCTURE -->
-    <div id="taskCard" class="task-ribbon-container">
-        
-        <!-- 1. TOP HEADER (Always Visible) -->
-        <div class="task-header-row">
-            
-            <!-- LEFT: STATUS & TOGGLE -->
-            <div class="task-info-block">
-                <div id="taskStatusLabel" class="status-text-lg status-unproductive">STATUS: UNPRODUCTIVE</div>
-                
-                <!-- This row appears when working -->
-                <div id="activeTimerRow" class="hidden">
-                    <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
-                    <!-- THIS IS THE BUTTON TO OPEN THE WINDOW -->
-                    <div class="see-task-link" onclick="window.toggleTaskDetails(null)">▼ SEE DIRECTIVE ▼</div>
-                </div>
-            </div>
-
-            <!-- RIGHT: CONTROLS -->
-            <div class="task-controls-block">
-                <!-- Request Button -->
-                <div id="mainButtonsArea">
-                    <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn">REQUEST TASK</button>
-                </div>
-                
-                <!-- Upload/Proof Controls (Hidden until needed) -->
-                <div id="uploadBtnContainer" class="hidden" style="display: flex; gap: 10px;">
-                    <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
-                           onchange="window.handleUploadStart(this)">
-                    
-                    <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. THE WINDOW (The Slide Down Panel) -->
-        <div id="taskDetailPanel" class="task-detail-panel">
-            <div class="detail-content">
-                <div class="ribbon-label">CURRENT ORDER</div>
-                <h2 id="readyText" class="ribbon-status">AWAITING ORDERS</h2>
-                
-                <div class="panel-footer">
-                    <button onclick="window.toggleTaskDetails(false)" class="text-btn">▲ HIDE DETAILS</button>
-                    <!-- Skip Button lives here now -->
-                    <button id="btnSkip" onclick="window.cancelPendingTask()" class="btn-skip">SKIP TASK</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <!-- END NEW TASK CARD -->
+              
+              <!-- TASK CARD -->
+              <div id="taskCard" class="task-ribbon-container">
+                  
+                  <!-- HEADER -->
+                  <div class="task-header-row">
+                      <div class="task-info-block">
+                          <!-- Status Text -->
+                          <div id="taskStatusLabel" class="status-text-lg">STATUS: UNPRODUCTIVE</div>
+                          
+                          <!-- Timer & Toggle Button -->
+                          <div id="activeTimerRow" class="hidden">
+                              <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
+                              <div class="see-task-link" onclick="window.toggleTaskDetails(null)">▼ SEE DIRECTIVE ▼</div>
+                          </div>
+                      </div>
+          
+                      <!-- Controls -->
+                      <div class="task-controls-block">
+                          <div id="mainButtonsArea">
+                              <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn">REQUEST TASK</button>
+                          </div>
+                          <div id="uploadBtnContainer" class="hidden" style="display:flex; gap:10px;">
+                              <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" onchange="window.handleUploadStart(this)">
+                              <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
+                          </div>
+                      </div>
+                  </div>
 
     <!-- CHAT (Unchanged) -->
     <div id="chatCard" class="chat-container">
