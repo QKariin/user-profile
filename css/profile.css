@@ -484,12 +484,88 @@ body {
 .pc-badge { font-family: 'Cinzel'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 6px; background: #000; border-radius: 0; display: inline-block; margin-bottom: 4px; }
 .pc-title { font-family: 'Cinzel'; font-size: 0.95rem; color: #ccc; line-height: 1.1; font-weight: bold; }
 
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px; width: 100%; padding-bottom: 50px; }
-.gallery-item { position: relative; aspect-ratio: 1 / 1; background: #111; border: 1px solid #222; overflow: hidden; cursor: pointer; }
-.gallery-item:hover { border-color: #666; }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: opacity 0.2s; }
-.gallery-item:hover img { opacity: 1; }
+/* --- GALLERY GRID: COMPACT & TACTICAL --- */
+.gallery-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* Slightly larger for detail */
+    gap: 3px; /* Tighter gap for a solid wall look */
+    width: 100%; 
+    padding-bottom: 50px; 
+}
 
+.gallery-item { 
+    position: relative; 
+    aspect-ratio: 1 / 1; 
+    background: #050505; 
+    border: 1px solid rgba(197, 160, 89, 0.15); 
+    overflow: hidden; 
+    cursor: pointer; 
+    transition: transform 0.3s ease;
+}
+
+/* Image/Video Styling */
+.gi-thumb { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    filter: grayscale(100%) brightness(0.6); /* Muted by default */
+    transition: all 0.5s ease; 
+}
+
+.gallery-item:hover .gi-thumb { 
+    filter: grayscale(0%) brightness(1); 
+    transform: scale(1.08); 
+}
+
+/* --- THE MERIT TAG (High-End Plaque) --- */
+.merit-tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--gold);
+    color: #000;
+    padding: 2px 8px;
+    z-index: 25;
+    /* This creates the sharp angled dossier look */
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+    box-shadow: -2px 2px 8px rgba(0,0,0,0.4);
+    text-align: right;
+}
+
+.tag-label { font-size: 0.4rem; font-family: 'Cinzel'; font-weight: 900; line-height: 1; }
+.tag-val { font-size: 0.85rem; font-family: 'Rajdhani'; font-weight: 700; line-height: 1; }
+
+/* --- SUBTLE STATUS STAMP --- */
+.gi-status-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    width: 60%;
+    opacity: 0.15; /* Nearly invisible until hover */
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.gallery-item:hover .gi-status-overlay {
+    opacity: 0.6;
+}
+
+/* --- TACTICAL CORNERS --- */
+.corner-target {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--gold);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.gallery-item:hover .corner-target { opacity: 1; }
+.tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+.tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+.bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+.br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
 .glass-modal.active { display: flex; animation: fadeIn 0.3s; }
