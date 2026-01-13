@@ -1,4 +1,4 @@
-// main.js - UPDATED WITH NEW TASK UI LOGIC
+// main.js - FIXED BUTTONS & AUTO-EXPAND
 
 // --- 1. FULL IMPORTS ---
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -26,7 +26,72 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. INITIALIZATION ---
+// --- 2. CRITICAL UI FUNCTIONS (Defined Early) ---
+
+// Toggle the slide-down panel
+window.toggleTaskDetails = function(show) {
+    const panel = document.getElementById('taskDetailPanel');
+    const link = document.querySelector('.see-task-link'); 
+    
+    if (!panel) return; // Safety
+
+    if (show) {
+        panel.classList.add('open');
+        if(link) link.style.opacity = '0'; // Hide the "See" button
+    } else {
+        panel.classList.remove('open');
+        if(link) link.style.opacity = '1';
+    }
+};
+
+// Handle UI State Switching
+function updateTaskUIState(isActive) {
+    const statusLabel = document.getElementById('taskStatusLabel');
+    const timerRow = document.getElementById('activeTimerRow');
+    const reqBtn = document.getElementById('newTaskBtn');
+    const upContainer = document.getElementById('uploadBtnContainer');
+
+    if (isActive) {
+        // WORKING STATE
+        if(statusLabel) {
+            statusLabel.innerHTML = "STATUS: <span style='color:var(--neon-green)'>WORKING</span>";
+            statusLabel.className = "status-text-lg status-working";
+        }
+        if(timerRow) timerRow.classList.remove('hidden');
+        if(reqBtn) reqBtn.classList.add('hidden');
+        if(upContainer) upContainer.classList.remove('hidden');
+        
+    } else {
+        // UNPRODUCTIVE STATE
+        if(statusLabel) {
+            statusLabel.innerHTML = "STATUS: UNPRODUCTIVE";
+            statusLabel.className = "status-text-lg status-unproductive";
+        }
+        if(timerRow) timerRow.classList.add('hidden');
+        if(reqBtn) reqBtn.classList.remove('hidden');
+        if(upContainer) upContainer.classList.add('hidden');
+        
+        // Force close details when task ends
+        window.toggleTaskDetails(false);
+    }
+}
+
+// Auto-Collapse when clicking outside
+document.addEventListener('click', function(event) {
+    const card = document.getElementById('taskCard');
+    const panel = document.getElementById('taskDetailPanel');
+    
+    // Ignore clicks if they are inside the "See Task" link itself
+    if (event.target.classList.contains('see-task-link')) return;
+
+    if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
+        window.toggleTaskDetails(false);
+    }
+});
+
+
+// --- 3. INITIALIZATION & LISTENERS ---
+
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
         ['msgSound', 'coinSound', 'skipSound', 'sfx-buy', 'sfx-deny'].forEach(id => {
@@ -54,17 +119,7 @@ resizer.observe(document.body);
 function initDomProfile() {
     const frame = document.getElementById('twitchFrame');
     if(frame && !frame.src) {
-        const parents = [
-            "qkarin.com", 
-            "www.qkarin.com", 
-            "entire-ecosystem.vercel.app", 
-            "html-components.wixusercontent.com", 
-            "filesusr.com", 
-            "editor.wix.com", 
-            "manage.wix.com", 
-            "localhost"
-        ];
-        
+        const parents = ["qkarin.com", "www.qkarin.com", "entire-ecosystem.vercel.app", "html-components.wixusercontent.com", "filesusr.com", "editor.wix.com", "manage.wix.com", "localhost"];
         let parentString = "";
         parents.forEach(p => parentString += `&parent=${p}`);
         frame.src = `https://player.twitch.tv/?channel=${CONFIG.TWITCH_CHANNEL}${parentString}&muted=true&autoplay=true`;
@@ -72,90 +127,16 @@ function initDomProfile() {
 }
 initDomProfile();
 
-// --- 3. NEW TASK UI HELPERS (Collapsible Logic) ---
-
-// Toggle the slide-down panel
-window.toggleTaskDetails = function(show) {
-    const panel = document.getElementById('taskDetailPanel');
-    const link = document.querySelector('.see-task-link'); // The "SEE DIRECTIVE" text
-    
-    if (show) {
-        if(panel) panel.classList.add('open');
-        if(link) link.style.opacity = '0'; // Hide the "See" button when open
-    } else {
-        if(panel) panel.classList.remove('open');
-        if(link) link.style.opacity = '1';
-    }
-};
-
-// Handle Switching between "Unproductive" and "Working" states
-function updateTaskUIState(isActive) {
-    const statusLabel = document.getElementById('taskStatusLabel');
-    const timerRow = document.getElementById('activeTimerRow');
-    const reqBtn = document.getElementById('newTaskBtn');
-    const upContainer = document.getElementById('uploadBtnContainer');
-
-    if (isActive) {
-        // --- WORKING STATE ---
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: <span style='color:var(--neon-green)'>WORKING</span>";
-            statusLabel.className = "status-text-lg status-working";
-        }
-        if(timerRow) timerRow.classList.remove('hidden');
-        if(reqBtn) reqBtn.classList.add('hidden');
-        if(upContainer) upContainer.classList.remove('hidden');
-        
-    } else {
-        // --- UNPRODUCTIVE STATE ---
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: UNPRODUCTIVE";
-            statusLabel.className = "status-text-lg status-unproductive";
-        }
-        if(timerRow) timerRow.classList.add('hidden');
-        if(reqBtn) reqBtn.classList.remove('hidden');
-        if(upContainer) upContainer.classList.add('hidden');
-        
-        // Always close the panel when finishing/skipping
-        window.toggleTaskDetails(false);
-    }
-}
-
-// Auto-Collapse when clicking outside
-document.addEventListener('click', function(event) {
-    const card = document.getElementById('taskCard');
-    const panel = document.getElementById('taskDetailPanel');
-    
-    // If panel is open AND click is OUTSIDE the card
-    if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
-        window.toggleTaskDetails(false);
-    }
-});
-
-
-// --- 4. BACKEND LISTENER ---
-
 Bridge.listen((data) => {
-    const ignoreList = [
-        "CHAT_ECHO", 
-        "UPDATE_FULL_DATA", 
-        "UPDATE_DOM_STATUS", 
-        "instantUpdate", 
-        "instantReviewSuccess"
-    ];
-
-    if (ignoreList.includes(data.type)) {
-        return; 
-    }
-
+    const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
+    if (ignoreList.includes(data.type)) return; 
     window.postMessage(data, "*"); 
 });
 
 window.addEventListener("message", (event) => {
     const data = event.data;
 
-    if (data.type === "CHAT_ECHO" && data.msgObj) {
-        renderChat([data.msgObj], true);
-    }
+    if (data.type === "CHAT_ECHO" && data.msgObj) renderChat([data.msgObj], true);
 
     if (data.type === 'UPDATE_RULES') {
         const rules = data.payload || {};
@@ -167,12 +148,9 @@ window.addEventListener("message", (event) => {
 
     if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
     if (data.type === "INIT_WISHLIST" || data.wishlist) {
-        const items = data.wishlist || [];
-        if (Array.isArray(items) && items.length > 0) {
-            setWishlistItems(items);
-            window.WISHLIST_ITEMS = items; 
-            renderWishlist();
-        }
+        setWishlistItems(data.wishlist || []);
+        window.WISHLIST_ITEMS = data.wishlist || []; 
+        renderWishlist();
     }
 
     if (data.type === "UPDATE_DOM_STATUS") {
@@ -198,60 +176,49 @@ window.addEventListener("message", (event) => {
     
     if (payload) {
         if (data.profile && !ignoreBackendUpdates) {
-        setGameStats(data.profile);
-        setUserProfile({
-            name: data.profile.name || "Slave",
-            hierarchy: data.profile.hierarchy || "HallBoy",
-            memberId: data.profile.memberId || "",
-            joined: data.profile.joined
-        });
-        
-        if (data.profile.taskQueue) {
-            setTaskQueue(data.profile.taskQueue);
-        }
-        if (data.profile.activeRevealMap) {
-            let map = [];
-            try { 
-                map = (typeof data.profile.activeRevealMap === 'string') 
-                    ? JSON.parse(data.profile.activeRevealMap) 
-                    : data.profile.activeRevealMap;
-            } catch(e) { map = []; }
-            setActiveRevealMap(map);
-        }
-        
-        if (data.profile.rewardVault) {
-            let vault = [];
-            try { 
-                vault = (typeof data.profile.rewardVault === 'string') 
-                        ? JSON.parse(data.profile.rewardVault) 
-                        : data.profile.rewardVault; 
-            } catch(e) { vault = []; }
-            setVaultItems(vault);
-        }
-
-        setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
-        setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
-
-        renderRewardGrid();
-        if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
-        setStats(migrateGameStatsToStats(data.profile, stats));
-        if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
-        updateStats(); 
-    }
-
-    if (data.type === "INSTANT_REVEAL_SYNC") {
-        if (data.currentLibraryMedia) {
-            setCurrentLibraryMedia(data.currentLibraryMedia);
-        }
-        renderRewardGrid(); 
-        setTimeout(() => {
-            const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
-            runTargetingAnimation(winnerId, () => {
-                setActiveRevealMap(data.activeRevealMap || []);
-                renderRewardGrid(); 
+            setGameStats(data.profile);
+            setUserProfile({
+                name: data.profile.name || "Slave",
+                hierarchy: data.profile.hierarchy || "HallBoy",
+                memberId: data.profile.memberId || "",
+                joined: data.profile.joined
             });
-        }, 50); 
-    }
+            
+            if (data.profile.taskQueue) setTaskQueue(data.profile.taskQueue);
+            
+            if (data.profile.activeRevealMap) {
+                let map = [];
+                try { map = (typeof data.profile.activeRevealMap === 'string') ? JSON.parse(data.profile.activeRevealMap) : data.profile.activeRevealMap; } catch(e) { map = []; }
+                setActiveRevealMap(map);
+            }
+            
+            if (data.profile.rewardVault) {
+                let vault = [];
+                try { vault = (typeof data.profile.rewardVault === 'string') ? JSON.parse(data.profile.rewardVault) : data.profile.rewardVault; } catch(e) { vault = []; }
+                setVaultItems(vault);
+            }
+
+            setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
+            setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
+
+            renderRewardGrid();
+            if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
+            setStats(migrateGameStatsToStats(data.profile, stats));
+            if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
+            updateStats(); 
+        }
+
+        if (data.type === "INSTANT_REVEAL_SYNC") {
+            if (data.currentLibraryMedia) setCurrentLibraryMedia(data.currentLibraryMedia);
+            renderRewardGrid(); 
+            setTimeout(() => {
+                const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
+                runTargetingAnimation(winnerId, () => {
+                    setActiveRevealMap(data.activeRevealMap || []);
+                    renderRewardGrid(); 
+                });
+            }, 50); 
+        }
 
         if (payload.galleryData) {
             const currentGalleryJson = JSON.stringify(payload.galleryData);
@@ -263,7 +230,7 @@ window.addEventListener("message", (event) => {
             }
         }
 
-        // --- TASK UI LOGIC INTEGRATION ---
+        // --- THE TASK UPDATE LOGIC ---
         if (payload.pendingState !== undefined) {
             if (!taskJustFinished && !ignoreBackendUpdates) {
                 setPendingTaskState(payload.pendingState);
@@ -271,21 +238,18 @@ window.addEventListener("message", (event) => {
                     setCurrentTask(pendingTaskState.task);
                     restorePendingUI();
                     
-                    // NEW: Update UI to "Working" mode
+                    // 1. Switch UI to "Working" Mode
                     updateTaskUIState(true);
-                    
-                    // OPTIONAL: If it's a fresh load (not initial), auto-expand
+
+                    // 2. AUTO-EXPAND FIX (The logic you asked for)
+                    // If it is NOT the first page load, expand the window automatically
                     if (!isInitialLoad) {
-                         // window.toggleTaskDetails(true); // Uncomment if you want auto-expand on every update
+                         window.toggleTaskDetails(true);
                     }
 
                 } else if (!resetUiTimer) {
-                    // NEW: Update UI to "Unproductive" mode
+                    // Switch UI to "Unproductive" Mode
                     updateTaskUIState(false);
-                    
-                    document.getElementById('taskContent').innerHTML = `
-                         <!-- Content handled by HTML structure now, text injected into readyText -->
-                    `;
                     document.getElementById('readyText').innerText = "AWAITING ORDERS";
                 }
             }
@@ -299,9 +263,7 @@ window.addEventListener("message", (event) => {
         import('../profile/kneeling/reward.js').then(({ runTargetingAnimation, renderRewardGrid }) => {
             runTargetingAnimation(fragmentNumber, () => {
                 renderRewardGrid();
-                if (isComplete) {
-                    triggerSound('coinSound');
-                }
+                if (isComplete) triggerSound('coinSound');
             });
         });
     }
@@ -309,7 +271,7 @@ window.addEventListener("message", (event) => {
 });
 
 // ==========================================
-// GLOBAL UI HELPERS (ATTACHED TO WINDOW)
+// GLOBAL UI HELPERS
 // ==========================================
 
 window.handleUploadStart = function(inputElement) {
@@ -321,12 +283,7 @@ window.handleUploadStart = function(inputElement) {
             btn.style.color = '#ffd700'; 
             btn.style.cursor = 'wait';
         }
-        
-        if (typeof handleEvidenceUpload === 'function') {
-            handleEvidenceUpload(inputElement);
-        } else {
-            console.error("handleEvidenceUpload function is missing!");
-        }
+        if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
     }
 };
 
@@ -359,17 +316,13 @@ window.switchTab = function(viewId) {
     const target = document.getElementById(targetId);
     if (target) {
         target.classList.remove('hidden');
-        
         if (['viewNews', 'viewVault', 'viewServingTop', 'historySection'].includes(targetId)) {
              target.style.display = 'flex'; 
              target.style.flexDirection = 'column';
         } else {
              target.style.display = 'block';
         }
-        
-        if (targetId === 'historySection' && typeof loadMoreHistory === 'function') {
-            loadMoreHistory();
-        }
+        if (targetId === 'historySection' && typeof loadMoreHistory === 'function') loadMoreHistory();
     }
 };
 
@@ -386,10 +339,7 @@ function updateStats() {
     if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
     if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
 
-    const setVal = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val ?? 0;
-    };
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? 0; };
 
     setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
     setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
@@ -415,10 +365,11 @@ function updateStats() {
         const pb = document.getElementById('progressBar');
         if (pb) pb.style.width = Math.min(100, Math.max(0, progress)) + "%";
     }
-
     updateKneelingStatus(); 
 }
 
+// ... (Rest of existing code: Tribute, Coins, etc. - unchanged) ...
+// Ensure window assignments remain
 let currentHuntIndex = 0;
 let filteredItems = [];
 let selectedReason = "";
@@ -427,99 +378,48 @@ let selectedItem = null;
 
 function toggleTributeHunt() {
     const overlay = document.getElementById('tributeHuntOverlay');
-    
     if (overlay.classList.contains('hidden')) {
-        selectedReason = "";
-        selectedItem = null;
+        selectedReason = ""; selectedItem = null;
         if(document.getElementById('huntNote')) document.getElementById('huntNote').value = "";
-        overlay.classList.remove('hidden');
-        showTributeStep(1);
+        overlay.classList.remove('hidden'); showTributeStep(1);
     } else {
-        overlay.classList.add('hidden');
-        resetTributeFlow();
+        overlay.classList.add('hidden'); resetTributeFlow();
     }
 }
-
 function showTributeStep(step) {
     document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById('tributeStep' + step);
-    if (target) {
-        target.classList.remove('hidden');
-    }
+    if (target) target.classList.remove('hidden');
     const labels = ["", "INTENTION", "THE HUNT", "CONFESSION"];
     const progressEl = document.getElementById('huntProgress');
     if (progressEl) progressEl.innerText = labels[step] || "";
 }
-
-function selectTributeReason(reason) {
-    selectedReason = reason;
-    renderHuntStore(gameStats.coins); 
-    showTributeStep(2);
-}
-
-function setTributeNote(note) {
-    showTributeStep(3);
-}
-
-function filterByBudget(max) {
-    renderHuntStore(max); 
-    showTributeStep(3);
-}
-
+function selectTributeReason(reason) { selectedReason = reason; renderHuntStore(gameStats.coins); showTributeStep(2); }
+function setTributeNote(note) { showTributeStep(3); }
+function filterByBudget(max) { renderHuntStore(max); showTributeStep(3); }
 function renderHuntStore(budget) {
     const grid = document.getElementById('huntStoreGrid');
     if (!grid) return;
     const items = window.WISHLIST_ITEMS || [];
     filteredItems = items.filter(item => Number(item.price || item.Price || 0) <= budget);
     currentHuntIndex = 0; 
-
-    if (filteredItems.length === 0) {
-        grid.innerHTML = '<div style="color:#666; text-align:center; padding:40px;">NO TRIBUTES IN THIS TIER...</div>';
-        return;
-    }
-
+    if (filteredItems.length === 0) { grid.innerHTML = '<div style="color:#666; text-align:center; padding:40px;">NO TRIBUTES IN THIS TIER...</div>'; return; }
     showTinderCard();
 }
-
 function showTinderCard() {
     const grid = document.getElementById('huntStoreGrid');
     const item = filteredItems[currentHuntIndex];
-
     if (!item) {
-        grid.innerHTML = `
-            <div style="text-align:center; padding:40px;">
-                <div style="font-size:2rem; margin-bottom:10px;">💨</div>
-                <div style="color:#666; font-size:0.7rem;">NO MORE ITEMS IN THIS TIER</div>
-                <button class="tab-btn" onclick="showTributeStep(2)" style="margin-top:15px; width:auto; padding:5px 15px;">CHANGE BUDGET</button>
-            </div>`;
+        grid.innerHTML = `<div style="text-align:center; padding:40px;"><div style="font-size:2rem; margin-bottom:10px;">💨</div><div style="color:#666; font-size:0.7rem;">NO MORE ITEMS IN THIS TIER</div><button class="tab-btn" onclick="showTributeStep(2)" style="margin-top:15px; width:auto; padding:5px 15px;">CHANGE BUDGET</button></div>`;
         return;
     }
-
     grid.style.perspective = "1000px";
-    grid.innerHTML = `
-        <div id="tinderCard" class="tinder-card-main">
-            <div id="likeLabel" class="swipe-indicator like">SACRIFICE</div>
-            <div id="nopeLabel" class="swipe-indicator nope">SKIP</div>
-            <img src="${item.img || item.image}" draggable="false">
-            <div class="tinder-card-info">
-                <div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div>
-                <div style="color:white; letter-spacing:2px; font-weight:bold; font-size:0.8rem;">${item.name.toUpperCase()}</div>
-            </div>
-        </div>
-    `;
-
+    grid.innerHTML = `<div id="tinderCard" class="tinder-card-main"><div id="likeLabel" class="swipe-indicator like">SACRIFICE</div><div id="nopeLabel" class="swipe-indicator nope">SKIP</div><img src="${item.img || item.image}" draggable="false"><div class="tinder-card-info"><div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div><div style="color:white; letter-spacing:2px; font-weight:bold; font-size:0.8rem;">${item.name.toUpperCase()}</div></div></div>`;
     initSwipeEvents(document.getElementById('tinderCard'), item);
 }
-
 function initSwipeEvents(card, item) {
-    let startX = 0;
-    let currentX = 0;
-
-    const handleStart = (e) => {
-        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        card.style.transition = 'none';
-    };
-
+    let startX = 0; let currentX = 0;
+    const handleStart = (e) => { startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; card.style.transition = 'none'; };
     const handleMove = (e) => {
         if (!startX) return;
         currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -530,11 +430,9 @@ function initSwipeEvents(card, item) {
         if(likeLabel) likeLabel.style.opacity = diff > 0 ? (diff / 100) : 0;
         if(nopeLabel) nopeLabel.style.opacity = diff < 0 ? (Math.abs(diff) / 100) : 0;
     };
-
     const handleEnd = () => {
         const diff = currentX - startX;
         card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-
         if (diff > 120) {
             card.style.transform = `translateX(600px) rotate(45deg)`;
             selectedItem = item;
@@ -543,10 +441,7 @@ function initSwipeEvents(card, item) {
             if(document.getElementById('huntSelectedPrice')) document.getElementById('huntSelectedPrice').innerText = item.price + " 🪙";
             setTimeout(() => { showTributeStep(4); }, 200);
         } else if (diff < -120) {
-            card.style.transform = `translateX(-600px) rotate(-45deg)`;
-            card.style.opacity = "0";
-            currentHuntIndex++;
-            setTimeout(() => { showTinderCard(); }, 300);
+            card.style.transform = `translateX(-600px) rotate(-45deg)`; card.style.opacity = "0"; currentHuntIndex++; setTimeout(() => { showTinderCard(); }, 300);
         } else {
             card.style.transform = `translateX(0) rotate(0)`;
             if(document.getElementById('likeLabel')) document.getElementById('likeLabel').style.opacity = 0;
@@ -554,84 +449,36 @@ function initSwipeEvents(card, item) {
         }
         startX = 0;
     };
-
-    card.addEventListener('mousedown', handleStart);
-    card.addEventListener('touchstart', handleStart);
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('touchmove', handleMove);
-    window.addEventListener('mouseup', handleEnd);
-    window.addEventListener('touchend', handleEnd);
+    card.addEventListener('mousedown', handleStart); card.addEventListener('touchstart', handleStart);
+    window.addEventListener('mousemove', handleMove); window.addEventListener('touchmove', handleMove);
+    window.addEventListener('mouseup', handleEnd); window.addEventListener('touchend', handleEnd);
 }
-
 function toggleHuntNote(show) {
-    const container = document.getElementById('huntNoteContainer');
-    const btn = document.getElementById('btnShowNote');
+    const container = document.getElementById('huntNoteContainer'); const btn = document.getElementById('btnShowNote');
     if (!container || !btn) return;
-    if (show) {
-        container.classList.remove('hidden');
-        btn.classList.add('hidden');
-        document.getElementById('huntNote').focus();
-    } else {
-        container.classList.add('hidden');
-        btn.classList.remove('hidden');
-    }
+    if (show) { container.classList.remove('hidden'); btn.classList.add('hidden'); document.getElementById('huntNote').focus(); } 
+    else { container.classList.add('hidden'); btn.classList.remove('hidden'); }
 }
-
 function finalizeSacrifice() {
-    const noteEl = document.getElementById('huntNote');
-    const note = noteEl ? noteEl.value.trim() : "";
+    const noteEl = document.getElementById('huntNote'); const note = noteEl ? noteEl.value.trim() : "";
     if (!selectedItem || !selectedReason) return;
     if (gameStats.coins < selectedItem.price) { triggerSound('sfx-deny'); alert('Insufficient coins!'); return; }
     const tributeMessage = `💝 TRIBUTE: ${selectedReason}\n🎁 ITEM: ${selectedItem.name}\n💰 COST: ${selectedItem.price}\n💌 "${note || "A silent tribute."}"`;
-    window.parent.postMessage({ 
-        type: "PURCHASE_ITEM",
-        itemName: selectedItem.name,
-        cost: selectedItem.price,
-        messageToDom: tributeMessage
-    }, "*");
-    triggerSound('sfx-buy');
-    triggerCoinShower();
-    toggleTributeHunt();
+    window.parent.postMessage({ type: "PURCHASE_ITEM", itemName: selectedItem.name, cost: selectedItem.price, messageToDom: tributeMessage }, "*");
+    triggerSound('sfx-buy'); triggerCoinShower(); toggleTributeHunt();
 }
-
-function buyRealCoins(amount) {
-    triggerSound('sfx-buy');
-    window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*");
-}
-
+function buyRealCoins(amount) { triggerSound('sfx-buy'); window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*"); }
 function triggerCoinShower() {
     for (let i = 0; i < 40; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin-particle';
+        const coin = document.createElement('div'); coin.className = 'coin-particle';
         coin.innerHTML = `<svg style="width:100%; height:100%; fill:gold;"><use href="#icon-coin"></use></svg>`;
-        coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`);
-        coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`);
-        document.body.appendChild(coin);
-        setTimeout(() => coin.remove(), 2000);
+        coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`); coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`);
+        document.body.appendChild(coin); setTimeout(() => coin.remove(), 2000);
     }
 }
-
-function breakGlass(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    const overlay = document.getElementById('specialGlassOverlay');
-    if (overlay) overlay.classList.remove('active');
-    window.parent.postMessage({ type: "GLASS_BROKEN" }, "*");
-}
-
-function submitSessionRequest() {
-    const checked = document.querySelector('input[name="sessionType"]:checked');
-    if (!checked) return;
-    window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*");
-}
-
-function resetTributeFlow() {
-    selectedReason = "";
-    selectedNote = "";
-    selectedItem = null;
-    const note = document.getElementById('huntNote');
-    if (note) note.value = "";
-    showTributeStep(1);
-}
+function breakGlass(e) { if (e && e.stopPropagation) e.stopPropagation(); const overlay = document.getElementById('specialGlassOverlay'); if (overlay) overlay.classList.remove('active'); window.parent.postMessage({ type: "GLASS_BROKEN" }, "*"); }
+function submitSessionRequest() { const checked = document.querySelector('input[name="sessionType"]:checked'); if (!checked) return; window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*"); }
+function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedItem = null; const note = document.getElementById('huntNote'); if (note) note.value = ""; showTributeStep(1); }
 
 setInterval(updateKneelingStatus, 1000);
 setInterval(() => { window.parent.postMessage({ type: "heartbeat", view: currentView }, "*"); }, 5000);
