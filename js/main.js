@@ -33,6 +33,7 @@ window.toggleTaskDetails = function(forceOpen = null) {
 
     const panel = document.getElementById('taskDetailPanel');
     const link = document.querySelector('.see-task-link'); 
+    const chatBox = document.getElementById('chatBox'); // GET CHAT BOX
     
     if (!panel) return;
 
@@ -48,17 +49,23 @@ window.toggleTaskDetails = function(forceOpen = null) {
     }
 
     if (shouldOpen) {
+        // OPEN DRAWER
         panel.classList.add('open');
-        panel.style.maxHeight = "500px";
-        panel.style.opacity = "1";
+        
+        // ADD BLUR TO CHAT
+        if(chatBox) chatBox.classList.add('focused-task');
+        
         if(link) {
             link.innerHTML = "▲ HIDE DIRECTIVE ▲";
             link.style.opacity = "1"; 
         }
     } else {
+        // CLOSE DRAWER
         panel.classList.remove('open');
-        panel.style.maxHeight = "0px";
-        panel.style.opacity = "0";
+        
+        // REMOVE BLUR FROM CHAT
+        if(chatBox) chatBox.classList.remove('focused-task');
+        
         if(link) {
             link.innerHTML = "▼ SEE DIRECTIVE ▼";
             link.style.opacity = "1";
