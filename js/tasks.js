@@ -1,16 +1,14 @@
 // Task management functions - WITH 300 COIN COLLATERAL & AUTO-PENALTY
 import { 
     currentTask, pendingTaskState, taskDatabase, taskQueue, gameStats, 
-    resetUiTimer, cooldownInterval, taskJustFinished, ignoreBackendUpdates 
-} from './state.js';
-import { 
+    resetUiTimer, cooldownInterval, taskJustFinished, ignoreBackendUpdates, 
     setCurrentTask, setPendingTaskState, setGameStats, 
     setIgnoreBackendUpdates, setTaskJustFinished, setResetUiTimer, setCooldownInterval
 } from './state.js';
 import { triggerSound } from './utils.js';
 
 export function getRandomTask() {
-    // --- 1. COLLATERAL CHECK (NEW) ---
+    // --- 1. COLLATERAL CHECK ---
     // Slave must have 300 coins to even see a task
     if (gameStats.coins < 300) {
         triggerSound('sfx-deny');
@@ -25,13 +23,12 @@ export function getRandomTask() {
                         ACCESS DENIED: 300 🪙 REQUIRED TO RECEIVE ORDERS
                     </div>
                 </div>`;
-            // Scroll to bottom
             const b = document.getElementById('chatBox');
             if (b) b.scrollTop = b.scrollHeight;
         }
         
         alert("You are too poor to serve. Earn 300 coins first.");
-        return; // STOP - Do not give a task
+        return; 
     }
 
     // --- 2. PROCEED WITH TASK GENERATION ---
@@ -42,7 +39,6 @@ export function getRandomTask() {
         setResetUiTimer(null); 
     }
     
-    // --- FIXED: REMOVED "Waiting for orders..." ---
     let taskText = "AWAITING DIRECTIVE..."; 
     
     if (taskQueue && taskQueue.length > 0) {
@@ -81,12 +77,14 @@ export function restorePendingUI() {
     // Clear old interval if it exists
     if (cooldownInterval) clearInterval(cooldownInterval);
     
+    // THIS IS THE PART I BROKE BEFORE - IT IS FIXED HERE
     document.getElementById('mainButtonsArea').classList.add('hidden');
     document.getElementById('activeBadge').classList.add('show');
     
     if (currentTask) {
         // Render the task text nicely
-        document.getElementById('taskContent').innerHTML = `<div style="font-family:'Cinzel', serif; font-size:1.1rem; color:#e0e0e0; padding:10px; line-height:1.4;">${currentTask.text}</div>`;
+        const tc = document.getElementById('taskContent');
+        if(tc) tc.innerHTML = `<div style="font-family:'Cinzel', serif; font-size:1.1rem; color:#e0e0e0; padding:10px; line-height:1.4;">${currentTask.text}</div>`;
     }
     
     document.getElementById('cooldownSection').classList.remove('hidden');
@@ -98,14 +96,13 @@ export function restorePendingUI() {
         const diff = targetTime - Date.now();
         
         if (diff <= 0) {
-            // --- 3. AUTO-PENALTY ON EXPIRY (NEW) ---
             clearInterval(newInterval);
             setCooldownInterval(null);
             
             const td = document.getElementById('timerDisplay');
             if(td) td.textContent = "00:00:00";
 
-            applyPenaltyFail("TIMEOUT"); // New failure logic
+            applyPenaltyFail("TIMEOUT"); 
             return;
         }
 
@@ -120,27 +117,21 @@ export function restorePendingUI() {
     setCooldownInterval(newInterval);
 }
 
-// NEW HELPER FUNCTION: Handles the actual coin theft and failure
 function applyPenaltyFail(reason) {
-    // 1. Visual/Sound Feedback
     triggerSound('sfx-deny');
 
-    // 2. Subtract 300 coins locally
     const newBalance = Math.max(0, gameStats.coins - 300);
     setGameStats({ coins: newBalance });
     
-    // Update the UI immediately
     const coinsEl = document.getElementById('coins');
     if (coinsEl) coinsEl.textContent = newBalance;
 
-    // 3. Tell Wix to take the real money
     window.parent.postMessage({ 
         type: "taskSkipped", 
         taskTitle: currentTask ? currentTask.text : "Unknown Task",
         reason: reason
     }, "*");
 
-    // 4. Reset UI to show they are pathetic
     finishTask(false);
 }
 
@@ -168,14 +159,12 @@ export function finishTask(success) {
 export function cancelPendingTask() {
     if (!currentTask) return;
     
-    // Check coins for manual skip
     if (gameStats.coins < 300) {
         triggerSound('sfx-deny');
         alert("You cannot afford the 300 coin skip fee.");
         return;
     }
     
-    // Use the penalty function
     applyPenaltyFail("MANUAL_SKIP");
 }
 
@@ -184,27 +173,24 @@ export function resetTaskDisplay(success) {
     document.getElementById('activeBadge').classList.remove('show');
     document.getElementById('mainButtonsArea').classList.remove('hidden');
     
-    // Luxury Terminal Colors (Gold/Red) instead of Neon
     const color = success ? '#c5a059' : '#8b0000';
     const text = success ? 'DIRECTIVE COMPLETE' : 'FAILURE RECORDED (-300 🪙)';
     
     const tc = document.getElementById('taskContent');
-    // Using Cinzel font for the status message
     if(tc) tc.innerHTML = `<h2 style="font-family:'Cinzel', serif; font-weight:700; font-size:1.2rem; color:${color}; margin-top:20px;">${text}</h2>`;
     
     setCurrentTask(null);
     
     if (resetUiTimer) clearTimeout(resetUiTimer);
     
-    // The Reset Timer
+    // THIS RESTORES THE DEFAULT TEXT AFTER A DELAY
     const timer = setTimeout(() => {
         if(tc) {
-            // RESTORES THE LUXURY "VACANT ASSET" UI
             tc.innerHTML = `
                 <h2 id="readyText">VACANT ASSET</h2>
-                <p class="inter">
-                    Current status: Unproductive. <br>
-                    Standby for mandatory labor assignment.
+                <p class="inter" style="color: var(--gold); opacity: 0.6; font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 2px;">
+                    STATUS: UNPRODUCTIVE <br>
+                    SYSTEM: AWAITING ROYAL DECREE
                 </p>
             `;
         }
