@@ -24,7 +24,7 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. CRITICAL UI FUNCTIONS (Defined Early to prevent errors) ---
+// --- 2. CRITICAL UI FUNCTIONS ---
 
 // Toggle the slide-down panel
 window.toggleTaskDetails = function(forceOpen = null) {
@@ -75,8 +75,14 @@ function updateTaskUIState(isActive) {
     }
 }
 
-// Global Click Listener for Task Interaction
+// --- 3. FIXED CLICK LISTENER (PREVENTS CONFLICT) ---
 document.addEventListener('click', function(event) {
+    
+    // FIX: If clicking the actual link/button, IGNORE this global listener
+    // (Let the button handle itself)
+    if (event.target.closest('.see-task-link')) return;
+
+    // Only handle clicks on the GENERAL info block
     const infoBlock = event.target.closest('.task-info-block');
     if (infoBlock) {
         const timerRow = document.getElementById('activeTimerRow');
@@ -84,6 +90,8 @@ document.addEventListener('click', function(event) {
             window.toggleTaskDetails(null);
         }
     }
+
+    // Auto-close if clicking outside
     const card = document.getElementById('taskCard');
     const panel = document.getElementById('taskDetailPanel');
     if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
@@ -91,7 +99,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// --- 3. INITIALIZATION ---
+// --- 4. INITIALIZATION ---
 
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
@@ -127,7 +135,7 @@ function initDomProfile() {
 }
 initDomProfile();
 
-// --- 4. BRIDGE LISTENER (DATA HANDLER) ---
+// --- 5. BRIDGE & DATA ---
 
 Bridge.listen((data) => {
     const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
@@ -179,7 +187,6 @@ window.addEventListener("message", (event) => {
         const payload = data.profile || data.galleryData || data.pendingState ? data : (data.type === "UPDATE_FULL_DATA" ? data : null);
         
         if (payload) {
-            // 1. UPDATE PROFILE STATS
             if (data.profile && !ignoreBackendUpdates) {
                 setGameStats(data.profile);
                 setUserProfile({
@@ -216,7 +223,6 @@ window.addEventListener("message", (event) => {
                 updateStats(); 
             }
 
-            // 2. REVEAL SYNC
             if (data.type === "INSTANT_REVEAL_SYNC") {
                 if (data.currentLibraryMedia) setCurrentLibraryMedia(data.currentLibraryMedia);
                 renderRewardGrid(); 
@@ -231,7 +237,6 @@ window.addEventListener("message", (event) => {
                 }, 50); 
             }
 
-            // 3. GALLERY SYNC
             if (payload.galleryData) {
                 const currentGalleryJson = JSON.stringify(payload.galleryData);
                 if (currentGalleryJson !== lastGalleryJson) {
@@ -242,20 +247,19 @@ window.addEventListener("message", (event) => {
                 }
             }
 
-            // 4. TASK SYNC (WITH NEW UI LOGIC)
             if (payload.pendingState !== undefined) {
                 if (!taskJustFinished && !ignoreBackendUpdates) {
                     setPendingTaskState(payload.pendingState);
                     if (pendingTaskState) {
                         setCurrentTask(pendingTaskState.task);
                         restorePendingUI();
-                        updateTaskUIState(true); // Switch to Working Mode
+                        updateTaskUIState(true);
                         
                         if (!isInitialLoad) {
-                             window.toggleTaskDetails(true); // Auto Expand
+                             window.toggleTaskDetails(true);
                         }
                     } else if (!resetUiTimer) {
-                        updateTaskUIState(false); // Switch to Unproductive
+                        updateTaskUIState(false);
                         const rt = document.getElementById('readyText');
                         if(rt) rt.innerText = "AWAITING ORDERS";
                     }
@@ -280,7 +284,7 @@ window.addEventListener("message", (event) => {
 });
 
 // ==========================================
-// HELPERS
+// HELPERS & EXPORTS
 // ==========================================
 
 window.handleUploadStart = function(inputElement) {
@@ -341,7 +345,6 @@ function updateStats() {
     const coinsEl = document.getElementById('coins');
     const pointsEl = document.getElementById('points');
 
-    // Force default if data missing to prevent crash
     const name = (userProfile && userProfile.name) ? userProfile.name : "Slave";
     const hierarchy = (userProfile && userProfile.hierarchy) ? userProfile.hierarchy : "HallBoy";
     const coins = (gameStats && gameStats.coins) ? gameStats.coins : 0;
@@ -386,7 +389,7 @@ function updateStats() {
     updateKneelingStatus(); 
 }
 
-// ... (Rest of existing code: Tribute, Coins, etc. - UNCHANGED) ...
+// ... (Legacy code maintained for safety) ...
 let currentHuntIndex = 0;
 let filteredItems = [];
 let selectedReason = "";
