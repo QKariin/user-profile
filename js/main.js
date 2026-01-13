@@ -31,7 +31,9 @@ async function injectProfileCard() {
         const response = await fetch('profileCard.html'); 
         if (!response.ok) throw new Error('Profile card not found');
         const html = await response.text();
-        const hook = document.querySelector('.layout-left');
+        
+        // FIX: Target only the hook so the nav-menu is not deleted
+        const hook = document.getElementById('profile-card-hook');
         if (hook) {
             hook.innerHTML = html;
             updateStats(); 
@@ -42,7 +44,7 @@ async function injectProfileCard() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    injectProfileCard(); // This triggers the load of your profileCard.html
+    injectProfileCard(); 
     initDomProfile();
     updateStats();
 });
@@ -330,9 +332,9 @@ function updateStats() {
     const coinsEl = document.getElementById('coins');
     const pointsEl = document.getElementById('points');
 
-    if (!subName || !userProfile || !gameStats) return; 
+    if (!userProfile || !gameStats) return; 
 
-    subName.textContent = userProfile.name || "Slave";
+    if (subName) subName.textContent = userProfile.name || "Slave";
     if (subHierarchy) subHierarchy.textContent = userProfile.hierarchy || "HallBoy";
     if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
     if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
