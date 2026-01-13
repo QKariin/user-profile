@@ -1,5 +1,3 @@
-// gallery.js - ANTI-AVATAR OVERLAY VERSION
-
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
     setCurrentHistoryIndex, setHistoryLimit, setTouchStartX 
@@ -14,93 +12,77 @@ const PLACEHOLDER_IMG = "https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce4
 
 let isInProofMode = false; 
 
-// --- HELPER: DETECT & REMOVE AVATAR URLS ---
-function isAvatarUrl(url) {
-    if (!url || typeof url !== 'string') return false;
-    
-    // 1. Get current Avatar from the DOM (Left Sidebar)
-    const domAvatar = document.getElementById('profilePic');
-    const currentSrc = domAvatar ? domAvatar.src : "";
-    
-    // 2. Check strict match
-    if (currentSrc && url === currentSrc) return true;
-    if (url.includes("profile") || url.includes("avatar")) return true;
-
-    // 3. Compare Base Filenames (ignore Wix resizing params)
-    // Wix URLs look like: /file.jpg/v1/fill...
-    const base1 = currentSrc.split('/v1/')[0];
-    const base2 = url.split('/v1/')[0];
-    
-    return (base1.length > 10 && base1 === base2);
-}
-
-// --- HELPER: NORMALIZE DATA ---
+// --- 1. STRICT DATA CLEANING ---
 function normalizeGalleryItem(item) {
-    // 1. SANITIZE STICKERS (The "Covered" Bug Fix)
-    // If the sticker field contains the avatar, DELETE IT.
-    if (item.sticker && isAvatarUrl(item.sticker)) {
-        item.sticker = null;
+    // 1. If we have a proofUrl, verify it is NOT the avatar
+    if (item.proofUrl) {
+        if (item.proofUrl.includes("profile") || item.proofUrl.includes("avatar")) {
+            item.proofUrl = ""; // Kill it immediately
+        }
     }
 
-    // 2. FIND PROOF URL (If missing)
-    if (!item.proofUrl || item.proofUrl.length < 5 || isAvatarUrl(item.proofUrl)) {
-        
-        // Priority list of keys to look for evidence
-        const candidates = [
-            'proof', 'evidence', 'media', 'file', 'image', 'url', 'src'
+    // 2. If no proofUrl, look ONLY at these specific fields.
+    // I have REMOVED the loop that scans the whole object. 
+    // This prevents it from accidentally finding 'ownerProfilePic'.
+    if (!item.proofUrl) {
+        const safeCandidates = [
+            item.proof, 
+            item.evidence, 
+            item.media, 
+            item.file, 
+            item.fileUrl, 
+            item.url,
+            item.attachment
         ];
 
-        let found = null;
-        
-        // Check specific keys first
-        for (let key of candidates) {
-            let val = item[key];
-            // Handle Objects (e.g. item.image.src)
-            if (val && typeof val === 'object' && val.src) val = val.src;
+        // Find the first valid string that is NOT an avatar
+        const found = safeCandidates.find(val => 
+            val && 
+            typeof val === 'string' && 
+            val.length > 5 && 
+            !val.includes("profile") && 
+            !val.includes("avatar")
+        );
 
-            if (val && typeof val === 'string' && val.length > 5) {
-                if (!isAvatarUrl(val)) {
-                    found = val;
-                    break;
-                }
-            }
+        if (found) {
+            item.proofUrl = found;
         }
-
-        // Assign if found, otherwise keep what we had (or empty)
-        if (found) item.proofUrl = found;
     }
 
-    // 3. FALLBACK TEXT
+    // 3. Fallback Description
     if (!item.text) item.text = item.description || "Record entry.";
 }
 
 export async function renderGallery() {
     if (!galleryData || !Array.isArray(galleryData)) return;
 
-    // --- STEP 1: CLEAN DATA ---
+    // STEP 1: Run the Strict Normalizer
     galleryData.forEach(normalizeGalleryItem);
 
-    // --- STEP 2: RENDER GRID (Immediate) ---
+    // STEP 2: Render Immediately with what we have
     renderGridHTML(); 
 
-    // --- STEP 3: SECURE SIGNING (Background) ---
+    // STEP 3: Handle Security Signing (Background)
     let needsUpdate = false;
     const signingPromises = galleryData.map(async (item) => {
+        // Only touch UpCDN urls
         if (item.proofUrl && typeof item.proofUrl === 'string' && item.proofUrl.includes("upcdn.io")) {
             try {
-                // Generate Thumbnail
                 const rawThumb = item.proofUrl.replace("/raw/", "/thumbnail/");
                 const signedThumb = await signUpcdnUrl(rawThumb);
                 if (signedThumb) item.proofUrlThumb = signedThumb;
 
-                // Generate Full
                 const signedFull = await signUpcdnUrl(item.proofUrl);
-                if (signedFull && signedFull !== item.proofUrl) {
-                    item.proofUrl = signedFull;
-                    needsUpdate = true;
+                
+                // CRITICAL: Only update if the result is valid and NOT an avatar
+                if (signedFull && !signedFull.includes("profile")) {
+                    if (item.proofUrl !== signedFull) {
+                        item.proofUrl = signedFull;
+                        needsUpdate = true;
+                    }
                 }
             } catch (e) {
-                // Ignore signing errors
+                // Fail silently, keep original URL
             }
         }
     });
@@ -111,31 +93,41 @@ export async function renderGallery() {
     }
 }
 
-// --- HTML GENERATORS ---
+// --- HTML RENDERER ---
 function renderGridHTML() {
     const pGrid = document.getElementById('pendingGrid');
     const hGrid = document.getElementById('historyGrid');
     
-    // Pending
+    // PENDING ITEMS
     const pItems = galleryData.filter(i => (i.status || "").toLowerCase() === 'pending');
-    if (pGrid) pGrid.innerHTML = pItems.slice(0, pendingLimit).map(createPendingCardHTML).join('');
     
-    document.getElementById('pendingSection').style.display = pItems.length > 0 ? 'block' : 'none';
+    if (pGrid) {
+        pGrid.innerHTML = pItems.slice(0, pendingLimit).map(createPendingCardHTML).join('');
+    }
+    
+    const pSection = document.getElementById('pendingSection');
+    if (pSection) pSection.style.display = pItems.length > 0 ? 'block' : 'none';
 
-    // History
+    // HISTORY ITEMS
     const hItems = galleryData.filter(i => {
         const s = (i.status || "").toLowerCase();
         return (s.includes('app') || s.includes('rej'));
     });
 
-    if (hGrid) hGrid.innerHTML = hItems.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
+    if (hGrid) {
+        hGrid.innerHTML = hItems.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
+    }
     
-    document.getElementById('historySection').style.display = (hItems.length > 0 || pItems.length === 0) ? 'block' : 'none';
-    document.getElementById('loadMoreBtn').style.display = hItems.length > historyLimit ? 'block' : 'none';
+    const hSection = document.getElementById('historySection');
+    if (hSection) hSection.style.display = (hItems.length > 0 || pItems.length === 0) ? 'block' : 'none';
+    
+    const loadBtn = document.getElementById('loadMoreBtn');
+    if (loadBtn) loadBtn.style.display = hItems.length > historyLimit ? 'block' : 'none';
 }
 
 function createPendingCardHTML(item) {
     const cleanText = cleanHTML(item.text || "").replace(/"/g, '&quot;');
+    // Use Placeholder if proofUrl is missing. NEVER fallback to a random variable.
     const url = item.proofUrlThumb || item.proofUrl || PLACEHOLDER_IMG;
     const isVideo = (item.proofUrl || "").match(/\.(mp4|webm|mov)($|\?)/i);
     
@@ -165,8 +157,9 @@ function createGalleryItemHTML(item, index) {
     const statusSticker = s.includes('app') ? STICKER_APPROVE : STICKER_DENIED;
     const isVideo = (item.proofUrl || "").match(/\.(mp4|webm|mov)($|\?)/i);
 
-    // FIX: Ensure sticker is valid and NOT the avatar
-    const hasRewardSticker = item.sticker && !isAvatarUrl(item.sticker);
+    // SAFETY CHECK: Sticker cannot be an avatar
+    let rewardSticker = item.sticker || "";
+    if (rewardSticker.includes("profile") || rewardSticker.includes("avatar")) rewardSticker = "";
 
     return `
         <div class="gallery-item" onclick='window.openHistoryModal(${index})'>
@@ -175,11 +168,11 @@ function createGalleryItemHTML(item, index) {
                 : `<img src="${url}" class="gi-thumb" loading="lazy" style="opacity: ${s.includes('rej') ? '0.3' : '0.7'};" onerror="this.src='${PLACEHOLDER_IMG}'">`
             }
             <img src="${statusSticker}" class="gi-status-sticker" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:70%; height:70%; z-index:10; pointer-events:none;">
-            ${hasRewardSticker ? `<img src="${item.sticker}" class="gi-reward-sticker" style="position:absolute; bottom:5px; left:5px; width:30px; height:30px; z-index:10;">` : ''}
+            ${rewardSticker ? `<img src="${rewardSticker}" class="gi-reward-sticker" style="position:absolute; bottom:5px; left:5px; width:30px; height:30px; z-index:10;">` : ''}
         </div>`;
 }
 
-// --- MODAL FUNCTIONS ---
+// --- MODAL LOGIC ---
 export function openHistoryModal(index) {
     const hItems = galleryData.filter(i => {
         const s = (i.status || "").toLowerCase();
@@ -201,8 +194,7 @@ export function openHistoryModal(index) {
             : `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
     }
 
-    const pointsEl = document.getElementById('modalPoints');
-    if (pointsEl) pointsEl.innerText = `+${item.points || 0} PTS`;
+    if(document.getElementById('modalPoints')) document.getElementById('modalPoints').innerText = `+${item.points || 0} PTS`;
 
     const stickerEl = document.getElementById('modalStatusSticker');
     if (stickerEl) {
@@ -212,16 +204,15 @@ export function openHistoryModal(index) {
 
     const rewardStickerEl = document.getElementById('modalSticker');
     if (rewardStickerEl) {
-        // Double check sticker isn't avatar in modal too
-        const safeSticker = (item.sticker && !isAvatarUrl(item.sticker)) ? item.sticker : "";
+        // Double Safety Check
+        let safeSticker = item.sticker || "";
+        if (safeSticker.includes("profile") || safeSticker.includes("avatar")) safeSticker = "";
+        
         rewardStickerEl.innerHTML = safeSticker ? `<img src="${safeSticker}" style="width:80px; height:80px; object-fit:contain;">` : "";
     }
 
-    const fbText = document.getElementById('modalFeedbackText');
-    if (fbText) fbText.innerHTML = (item.adminComment || "The Queen has observed your work.").replace(/\n/g, '<br>');
-    
-    const taskText = document.getElementById('modalOrderText');
-    if (taskText) taskText.innerHTML = (item.text || "No task description.").replace(/\n/g, '<br>');
+    if(document.getElementById('modalFeedbackText')) document.getElementById('modalFeedbackText').innerHTML = (item.adminComment || "The Queen has observed your work.").replace(/\n/g, '<br>');
+    if(document.getElementById('modalOrderText')) document.getElementById('modalOrderText').innerHTML = (item.text || "No task description.").replace(/\n/g, '<br>');
 
     toggleHistoryView(isInProofMode ? 'proof' : 'info');
     document.getElementById('glassModal').classList.add('active');
