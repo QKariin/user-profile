@@ -192,41 +192,66 @@ body {
     border-bottom-color: var(--gold);
 }
 
-/* --- DRAWER & LAYOUT --- */
+/* =========================================
+   DRAWER OVERLAY (COVERS CHAT)
+   ========================================= */
+
+/* Ensure the parent view allows absolute positioning */
+#viewServingTop {
+    position: relative; 
+}
+
 .task-detail-panel {
-    background: #000;
+    /* POSITIONING: Cover the chat area */
+    position: absolute;
+    top: 125px; /* Fits perfectly under the 100px header + margins */
+    left: 20px;
+    right: 20px;
+    bottom: 20px; /* Stretch to bottom of screen */
+    
+    /* APPEARANCE */
+    background: #000; /* Solid black to hide chat */
     border: 1px solid #333;
-    border-top: none; 
-    margin-top: -5px; 
-    max-height: 0;
-    overflow: hidden;
+    border-top: none; /* Looks connected to header */
+    
+    /* LAYERING */
+    z-index: 50; /* Above Chat (1), Below Header Buttons (100) */
+    
+    /* ANIMATION STATE: CLOSED */
     opacity: 0;
-    transition: max-height 0.4s ease, opacity 0.3s ease;
-    position: relative;
-    z-index: 1; 
+    pointer-events: none; /* Click through to chat when closed */
+    transform: translateY(-20px); /* Start slightly up */
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .task-detail-panel.open {
-    max-height: 400px;
+    /* ANIMATION STATE: OPEN */
     opacity: 1;
-    padding-bottom: 10px;
+    pointer-events: auto; /* Capture clicks */
+    transform: translateY(0);
+    max-height: none !important; /* Allow full screen height */
 }
 
 .detail-content {
-    padding: 20px;
+    padding: 40px; /* More breathing room since we have full screen */
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%; /* Center vertical content */
 }
 
 /* Text Button (Hide/Show) */
 .text-btn {
     background: none; border: none; 
     color: #666; 
-    font-family: 'Rajdhani', sans-serif; /* Consistent font */
+    font-family: 'Rajdhani', sans-serif;
     font-weight: 700;
     font-size: 0.8rem; 
     cursor: pointer;
     letter-spacing: 1px;
     text-transform: uppercase;
+    margin-top: 30px;
 }
 .text-btn:hover { color: white; }
 
