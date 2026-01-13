@@ -111,31 +111,60 @@
         
         <div id="viewServingTop" class="view-wrapper">
             
-            <div id="taskCard" class="glass-card task-ribbon">
-                <div class="ribbon-left">
-                    <div id="activeBadge" class="hidden">
-                        <span id="timerDisplay" class="ribbon-timer">00:00:00</span>
-                    </div>
-                </div>
+            <!-- TASK CARD: 30/40/30 GRID LAYOUT -->
+            <div id="taskCard" class="task-card-container">
                 
-                <div id="taskContent" class="ribbon-center">
-                    <span class="ribbon-label">CURRENT DIRECTIVE</span>
-                    <h2 id="readyText" class="ribbon-status">AWAITING ORDERS</h2>
-                </div>
-
-                <div class="ribbon-right">
-                    <div id="mainButtonsArea">
-                        <button id="newTaskBtn" onclick="getRandomTask()" class="action-btn">REQUEST TASK</button>
-                    </div>
+                <!-- THE COMMAND RIBBON (Fixed Grid) -->
+                <div class="task-header-grid">
                     
-                    <div id="cooldownSection" class="hidden" style="display: flex; gap: 10px; align-items: center;">
-                        <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
-                               onchange="this.files.length > 0 ? (document.getElementById('btnUpload').innerHTML = 'TRANSMITTING...', document.getElementById('btnUpload').classList.add('btn-loading'), handleEvidenceUpload(this)) : null">
+                    <!-- 30% LEFT: STATIC LABEL -->
+                    <div class="th-col th-left">
+                        <div class="static-label">STATUS</div>
+                    </div>
+            
+                    <!-- 40% CENTER: DYNAMIC INFO -->
+                    <div class="th-col th-center">
                         
-                        <button id="btnUpload" onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD PROOF</button>
-                        <button id="btnSkip" onclick="cancelPendingTask()" class="btn-dim" style="background:transparent; border: 1px solid #444; color: #666; padding: 8px 20px; cursor: pointer;">SKIP</button>
+                        <!-- STATE A: IDLE (Trash Talk) -->
+                        <div id="stateIdle" class="state-block">
+                            <div class="status-val-idle">UNPRODUCTIVE</div>
+                            <div class="trash-talk">Wasting Oxygen...</div>
+                        </div>
+            
+                        <!-- STATE B: ACTIVE (Timer + Toggle) -->
+                        <div id="stateActive" class="state-block hidden">
+                            <div class="status-val-working">WORKING</div>
+                            <div id="timerDisplay" class="grid-timer">00:00:00</div>
+                            <div class="drawer-toggle" onclick="window.toggleTaskDrawer()">▼ SEE ASSIGNMENT</div>
+                        </div>
+            
+                    </div>
+            
+                    <!-- 30% RIGHT: ACTION BUTTON -->
+                    <div class="th-col th-right">
+                        <!-- Request Button -->
+                        <div id="btnAreaRequest">
+                            <button id="newTaskBtn" onclick="window.getRandomTask()" class="action-btn">REQUEST</button>
+                        </div>
+                        
+                        <!-- Upload Button (Hidden by default) -->
+                        <div id="btnAreaUpload" class="hidden">
+                            <input type="file" id="evidenceInput" accept="image/*,video/*" class="hidden" 
+                                   onchange="window.handleUploadStart(this)">
+                            <button onclick="document.getElementById('evidenceInput').click()" class="action-btn btn-upload">UPLOAD</button>
+                        </div>
+                    </div>
+            
+                </div>
+            
+                <!-- THE DRAWER (Hidden Task Details) -->
+                <div id="taskDrawer" class="task-drawer">
+                    <div class="drawer-content">
+                        <h2 id="readyText" class="drawer-task-text">AWAITING ORDERS</h2>
+                        <button id="btnSkip" onclick="window.cancelPendingTask()" class="btn-skip-small">SKIP / CANCEL</button>
                     </div>
                 </div>
+            
             </div>
 
             <div id="chatCard" class="chat-container">
