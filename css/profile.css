@@ -271,3 +271,28 @@ body {
 
 img[src=""], img[src="undefined"], img[src="null"] { display: none !important; }
 img:not([src]) { display: none !important; }
+
+/* =========================================
+   CINEMA FOCUS MODE (BLUR CHAT)
+   ========================================= */
+
+/* The Chat Container needs to handle the transition */
+#chatBox {
+    transition: filter 0.5s ease, opacity 0.5s ease;
+    will-change: filter, opacity;
+}
+
+/* When Task Drawer is OPEN, this class is added */
+#chatBox.focused-task {
+    filter: blur(12px) grayscale(80%); /* Heavy blur + desaturate */
+    opacity: 0.2; /* Fade it out significantly */
+    pointer-events: none; /* Disable scrolling/clicking messages */
+    user-select: none; /* Prevent text selection */
+}
+
+/* Ensure Footer stays sharp and on top */
+.chat-footer {
+    position: relative;
+    z-index: 200; /* Higher than the blurred content */
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.8); /* Stronger shadow to separate */
+}
