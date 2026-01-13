@@ -301,24 +301,26 @@ img:not([src]) { display: none !important; }
    PUNISHMENT OVERLAY STYLES
    ========================================= */
 
-/* Default is Green (Success), this overrides it for Failure */
+/* Override the default green border when punished */
 .glass-card.punishment {
-    border-color: var(--neon-red) !important;
-    box-shadow: 0 0 50px rgba(255, 0, 60, 0.3) !important;
+    border-color: #ff003c !important;
+    box-shadow: 0 0 50px rgba(255, 0, 60, 0.4) !important;
 }
 
 .punish-title {
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
-    font-size: 1.8rem;
-    color: var(--neon-red);
-    text-shadow: 0 0 15px var(--neon-red);
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #ff003c; /* NEON RED */
+    text-shadow: 0 0 10px #ff003c;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .punish-cost {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: #fff;
     margin-bottom: 15px;
@@ -326,10 +328,10 @@ img:not([src]) { display: none !important; }
 
 .punish-trash {
     font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    color: #aaa;
+    font-size: 0.9rem;
+    color: #ccc;
     font-style: italic;
-    max-width: 80%;
+    max-width: 300px;
     margin: 0 auto;
     line-height: 1.4;
 }
