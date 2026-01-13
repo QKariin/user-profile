@@ -316,12 +316,26 @@ body {
 }
 
 /* When in Proof Mode, hide the overlay interface but keep it clickable */
+/* --- FIXED PROOF MODE (X stays visible) --- */
+
+/* 1. When in Proof Mode (Clean), allow clicks everywhere */
 .modal-glass-overlay.clean {
     background: transparent;
-    pointer-events: auto; /* CRITICAL: Allows click to restore menu */
+    pointer-events: auto; 
 }
-.modal-glass-overlay.clean > * {
-    opacity: 0; pointer-events: none;
+
+/* 2. Hide the Text and Bottom Buttons */
+.modal-glass-overlay.clean .theater-content,
+.modal-glass-overlay.clean .modal-footer-menu {
+    opacity: 0; 
+    pointer-events: none; /* Let clicks pass through to the photo layer */
+}
+
+/* 3. KEEP THE 'X' VISIBLE AND CLICKABLE */
+.modal-glass-overlay.clean #modalCloseX {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    text-shadow: 0 0 5px black; /* Add shadow so it's visible on bright photos */
 }
 
 /* 3. CONTENT STYLING */
