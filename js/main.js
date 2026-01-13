@@ -73,45 +73,41 @@ window.toggleTaskDetails = function(forceOpen = null) {
     }
 };
 
-// Update Buttons & Status Text
 window.updateTaskUIState = function(isActive) {
-    const statusLabel = document.getElementById('taskStatusLabel');
+    // 1. LEFT COLUMN ELEMENTS
+    const statusLeftActive = document.getElementById('statusLeftActive');
+
+    // 2. CENTER COLUMN ELEMENTS
+    const idleGroup = document.getElementById('idleGroup');
     const timerRow = document.getElementById('activeTimerRow');
-    const reqBtn = document.getElementById('mainButtonsArea'); 
+
+    // 3. RIGHT COLUMN ELEMENTS
+    const reqBtn = document.getElementById('mainButtonsArea');
     const uploadArea = document.getElementById('uploadBtnContainer');
-    
-    const statusInd = document.getElementById('statusIndicator');
-    const idleMsg = document.getElementById('idleMessage');
 
     if (isActive) {
-        // ACTIVE STATE
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: <span style='color:var(--neon-green)'>WORKING</span>";
-            statusLabel.className = "status-text-lg status-working";
-        }
-        if(statusInd) {
-            statusInd.innerText = "WORKING";
-            statusInd.className = "status-text-lg status-working";
-        }
-        if(idleMsg) idleMsg.classList.add('hidden');
-
+        // --- WORKING STATE ---
+        // Left: Show "WORKING"
+        if(statusLeftActive) statusLeftActive.classList.remove('hidden');
+        
+        // Center: Hide Idle Text, Show Timer
+        if(idleGroup) idleGroup.classList.add('hidden');
         if(timerRow) timerRow.classList.remove('hidden');
+
+        // Right: Show Upload
         if(reqBtn) reqBtn.classList.add('hidden');
         if(uploadArea) uploadArea.classList.remove('hidden');
         
     } else {
-        // IDLE STATE
-        if(statusLabel) {
-            statusLabel.innerHTML = "STATUS: UNPRODUCTIVE";
-            statusLabel.className = "status-text-lg status-unproductive";
-        }
-        if(statusInd) {
-            statusInd.innerText = "UNPRODUCTIVE";
-            statusInd.className = "status-text-lg status-unproductive";
-        }
-        if(idleMsg) idleMsg.classList.remove('hidden');
+        // --- UNPRODUCTIVE STATE ---
+        // Left: Hide "WORKING" (Just shows label "STATUS")
+        if(statusLeftActive) statusLeftActive.classList.add('hidden');
 
+        // Center: Show "UNPRODUCTIVE", Hide Timer
+        if(idleGroup) idleGroup.classList.remove('hidden');
         if(timerRow) timerRow.classList.add('hidden');
+
+        // Right: Show Request
         if(reqBtn) reqBtn.classList.remove('hidden');
         if(uploadArea) uploadArea.classList.add('hidden');
         
