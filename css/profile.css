@@ -116,39 +116,126 @@ body {
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* =========================================
-   4. ORIGINAL TASK RIBBON (REVERTED)
+   TASK COMMAND CENTER (30/40/30 GRID)
    ========================================= */
-.task-ribbon {
-    flex-shrink: 0; margin: 20px; display: flex; align-items: center; justify-content: space-between; padding: 15px 30px;
-    height: 100px; background: rgba(10,10,10,0.8); border: 1px solid var(--gold-dim);
-}
-.ribbon-left { width: 150px; text-align: left; }
-.ribbon-timer { font-family: 'Orbitron'; font-size: 2.5rem; color: #fff; font-weight: 900; }
-.ribbon-center { flex: 1; text-align: center; border-left: 1px solid var(--gold-dim); border-right: 1px solid var(--gold-dim); height: 70%; display: flex; flex-direction: column; justify-content: center; }
-.ribbon-label { display: block; font-family: 'Cinzel'; font-size: 0.6rem; color: var(--gold); letter-spacing: 3px; margin-bottom: 5px; }
-.ribbon-status { margin: 0; font-family: 'Cinzel'; font-size: 1.4rem; color: white; text-transform: uppercase; }
-.ribbon-right { width: 180px; display: flex; justify-content: flex-end; }
 
-/* Buttons */
-.action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; font-family: 'Cinzel'; font-weight: 700; cursor: pointer; transition: 0.3s; }
-.action-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
-.btn-dim { border-color: #444; color: #666; padding: 12px 25px; background: transparent; cursor: pointer; font-family: 'Cinzel'; }
-.icon-btn { background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-
-.btn-loading {
-    background: #333 !important; color: var(--neon-yellow) !important; border-color: var(--neon-yellow) !important;
-    cursor: wait !important; pointer-events: none;
+.task-card-container {
+    margin: 20px;
+    background: rgba(10,10,10,0.95);
+    border: 1px solid #333;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Clean edges */
 }
-.blink { animation: blinker 1s linear infinite; }
-@keyframes blinker { 50% { opacity: 0; } }
 
-#activeBadge {
-    display: block; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    width: auto; padding: 4px 20px; background: black; border: 1px solid var(--neon-green);
-    color: var(--neon-green); border-radius: 20px; font-size: 0.65rem; letter-spacing: 2px;
-    font-weight: 900; box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); z-index: 10; white-space: nowrap;
+/* --- THE GRID HEADER --- */
+.task-header-grid {
+    display: grid;
+    grid-template-columns: 3fr 4fr 3fr; /* 30% 40% 30% */
+    height: 100px;
+    background: rgba(5,5,5,0.9);
+    border-bottom: 1px solid #222;
+    position: relative;
+    z-index: 10;
 }
-#activeBadge.show { display: block; }
+
+/* COLUMN STYLING */
+.th-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+.th-col:last-child { border-right: none; }
+
+/* LEFT (30%): Static Label */
+.static-label {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #444;
+    letter-spacing: 3px;
+    font-size: 1rem;
+}
+
+/* CENTER (40%): Dynamic State */
+.state-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Idle State Text */
+.status-val-idle {
+    font-family: 'Orbitron'; font-weight: 900; color: var(--neon-red); letter-spacing: 2px; margin-bottom: 5px;
+}
+.trash-talk {
+    font-family: 'Inter'; font-size: 0.7rem; color: #666; font-style: italic;
+}
+
+/* Active State Text */
+.status-val-working {
+    font-family: 'Orbitron'; font-weight: 900; color: var(--neon-green); letter-spacing: 2px; font-size: 0.8rem;
+}
+.grid-timer {
+    font-family: 'Orbitron'; font-size: 1.8rem; color: white; font-weight: 700; line-height: 1; margin: 2px 0;
+}
+.drawer-toggle {
+    font-family: 'Cinzel'; font-size: 0.65rem; color: var(--gold); cursor: pointer; margin-top: 5px; letter-spacing: 1px;
+    transition: 0.2s; pointer-events: auto;
+}
+.drawer-toggle:hover { color: white; }
+
+/* RIGHT (30%): Buttons */
+.action-btn { 
+    background: transparent; border: 1px solid var(--gold); color: var(--gold); 
+    padding: 12px 15px; font-family: 'Cinzel'; font-weight: 700; cursor: pointer; 
+    font-size: 0.8rem; width: 100%; min-width: 100px; transition: 0.3s; 
+}
+.action-btn:hover { background: var(--gold); color: black; }
+.btn-upload { background: rgba(255, 215, 0, 0.1); }
+
+/* --- THE DRAWER (Slide Down) --- */
+.task-drawer {
+    background: #000;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+    border-top: 1px solid #333;
+}
+.task-drawer.open {
+    max-height: 300px; /* Expands to fit text */
+}
+
+.drawer-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.drawer-task-text {
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.btn-skip-small {
+    background: transparent; border: 1px solid #444; color: #666;
+    padding: 5px 15px; font-family: 'Orbitron'; font-size: 0.65rem;
+    cursor: pointer; margin-top: 10px;
+}
+.btn-skip-small:hover { color: var(--neon-red); border-color: var(--neon-red); }
+
+/* Utility */
+.hidden { display: none !important; }
 
 /* =========================================
    5. CHAT, STORE, GALLERY & MODAL (UNCHANGED)
