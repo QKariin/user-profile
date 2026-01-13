@@ -1,4 +1,4 @@
-// main.js - RESTORED UI HELPERS FOR DRAWER
+// main.js - FIXED TOGGLE LOGIC & SAFETY CHECKS
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -25,10 +25,10 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. THE MISSING UI HELPERS (DRAWER LOGIC) ---
+// --- 2. CRITICAL UI FUNCTIONS ---
 
+// FIXED: Explicit logic to handle null/true/false correctly
 window.toggleTaskDetails = function(forceOpen = null) {
-    // Prevent click conflicts
     if (window.event) window.event.stopPropagation();
 
     const panel = document.getElementById('taskDetailPanel');
@@ -37,12 +37,19 @@ window.toggleTaskDetails = function(forceOpen = null) {
     if (!panel) return;
 
     const isOpen = panel.classList.contains('open');
-    const shouldOpen = (forceOpen === true) || (forceOpen === null && !isOpen);
+    let shouldOpen;
+
+    if (forceOpen === true) {
+        shouldOpen = true;
+    } else if (forceOpen === false) {
+        shouldOpen = false;
+    } else {
+        shouldOpen = !isOpen; // Standard Toggle
+    }
 
     if (shouldOpen) {
         panel.classList.add('open');
-        // Force style for smooth animation
-        panel.style.maxHeight = "500px"; 
+        panel.style.maxHeight = "500px";
         panel.style.opacity = "1";
         if(link) link.innerHTML = "▲ HIDE DIRECTIVE ▲";
     } else {
@@ -53,12 +60,16 @@ window.toggleTaskDetails = function(forceOpen = null) {
     }
 };
 
+// FIXED: Added safety checks (?) to prevent crashing if ID is missing
 window.updateTaskUIState = function(isActive) {
     const statusLabel = document.getElementById('taskStatusLabel');
     const timerRow = document.getElementById('activeTimerRow');
-    const btnArea = document.getElementById('mainButtonsArea');
+    const reqBtn = document.getElementById('mainButtonsArea'); // Changed to match HTML container
     const uploadArea = document.getElementById('uploadBtnContainer');
-    const statusInd = document.getElementById('statusIndicator'); // For the 30/40/30 layout if used
+    
+    // Middle Column Status Logic (For 30/40/30 layout compatibility)
+    const statusInd = document.getElementById('statusIndicator');
+    const idleMsg = document.getElementById('idleMessage');
 
     if (isActive) {
         // ACTIVE STATE
@@ -67,12 +78,13 @@ window.updateTaskUIState = function(isActive) {
             statusLabel.className = "status-text-lg status-working";
         }
         if(statusInd) {
-            statusInd.innerHTML = "WORKING";
+            statusInd.innerText = "WORKING";
             statusInd.className = "status-text-lg status-working";
         }
+        if(idleMsg) idleMsg.classList.add('hidden');
 
         if(timerRow) timerRow.classList.remove('hidden');
-        if(btnArea) btnArea.classList.add('hidden');
+        if(reqBtn) reqBtn.classList.add('hidden');
         if(uploadArea) uploadArea.classList.remove('hidden');
         
     } else {
@@ -82,25 +94,24 @@ window.updateTaskUIState = function(isActive) {
             statusLabel.className = "status-text-lg status-unproductive";
         }
         if(statusInd) {
-            statusInd.innerHTML = "UNPRODUCTIVE";
+            statusInd.innerText = "UNPRODUCTIVE";
             statusInd.className = "status-text-lg status-unproductive";
         }
+        if(idleMsg) idleMsg.classList.remove('hidden');
 
         if(timerRow) timerRow.classList.add('hidden');
-        if(btnArea) btnArea.classList.remove('hidden');
+        if(reqBtn) reqBtn.classList.remove('hidden');
         if(uploadArea) uploadArea.classList.add('hidden');
         
-        // Auto-close drawer on reset
         window.toggleTaskDetails(false);
     }
 };
 
-// Global Click Listener to close drawer when clicking outside
+// Global Click Listener
 document.addEventListener('click', function(event) {
     const card = document.getElementById('taskCard');
     const panel = document.getElementById('taskDetailPanel');
     
-    // Ignore clicks on the toggle button itself
     if (event.target.closest('.see-task-link')) return;
 
     if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
@@ -108,7 +119,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// --- 3. INITIALIZATION & BRIDGE ---
+// --- 3. INITIALIZATION ---
 
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
@@ -251,17 +262,15 @@ window.addEventListener("message", (event) => {
                 }
             }
 
-            // --- TASK UPDATE LOGIC ---
             if (payload.pendingState !== undefined) {
                 if (!taskJustFinished && !ignoreBackendUpdates) {
                     setPendingTaskState(payload.pendingState);
                     if (pendingTaskState) {
                         setCurrentTask(pendingTaskState.task);
                         restorePendingUI();
-                        // CALL THE HELPER
+                        // Call the FIXED helper
                         window.updateTaskUIState(true);
                         
-                        // Auto-expand if reloading
                         if (!isInitialLoad) {
                              window.toggleTaskDetails(true);
                         }
@@ -288,12 +297,20 @@ window.addEventListener("message", (event) => {
     } catch(err) { console.error("Main error:", err); }
 });
 
-// --- EXPORTS TO WINDOW ---
-window.getRandomTask = getRandomTask;
-window.cancelPendingTask = cancelPendingTask;
-window.handleEvidenceUpload = handleEvidenceUpload;
-window.handleProfileUpload = handleProfileUpload;
-window.handleAdminUpload = handleAdminUpload;
+// --- EXPORTS & HELPERS ---
+window.handleUploadStart = function(inputElement) {
+    if (inputElement.files && inputElement.files.length > 0) {
+        const btn = document.getElementById('btnUpload');
+        if (btn) {
+            btn.innerHTML = '...';
+            btn.style.background = '#333';
+            btn.style.color = '#ffd700'; 
+            btn.style.cursor = 'wait';
+        }
+        if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
+    }
+};
+
 window.switchTab = switchTab;
 window.toggleStats = toggleStats;
 window.openSessionUI = openSessionUI;
@@ -324,10 +341,14 @@ window.toggleHuntNote = toggleHuntNote;
 window.finalizeSacrifice = finalizeSacrifice;
 window.resetTributeFlow = resetTributeFlow;
 window.buyRealCoins = buyRealCoins;
+window.getRandomTask = getRandomTask;
+window.cancelPendingTask = cancelPendingTask;
+window.handleEvidenceUpload = handleEvidenceUpload;
+window.handleProfileUpload = handleProfileUpload;
+window.handleAdminUpload = handleAdminUpload;
 window.WISHLIST_ITEMS = WISHLIST_ITEMS;
 window.gameStats = gameStats;
 
-// Legacy updateStats (Must remain)
 function updateStats() {
     const subName = document.getElementById('subName');
     const subHierarchy = document.getElementById('subHierarchy');
@@ -351,8 +372,12 @@ function updateStats() {
     }
 
     const sinceEl = document.getElementById('slaveSinceDate');
-    if (sinceEl && userProfile.joined) {
-        try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
+    if (sinceEl) {
+        if (userProfile && userProfile.joined) {
+            try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
+        } else {
+            sinceEl.textContent = "--/--/--";
+        }
     }
 
     if (typeof LEVELS !== 'undefined' && LEVELS.length > 0) {
