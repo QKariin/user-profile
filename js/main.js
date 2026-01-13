@@ -1,5 +1,3 @@
-// main.js - FIXED: ROBUST CLICK HANDLING
-
 // --- 1. FULL IMPORTS ---
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -26,7 +24,7 @@ import { handleEvidenceUpload, handleProfileUpload, handleAdminUpload } from './
 import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus } from '../profile/kneeling/kneeling.js';
 import { Bridge } from './bridge.js';
 
-// --- 2. CRITICAL UI FUNCTIONS (Defined Globally) ---
+// --- 2. CRITICAL UI FUNCTIONS (Defined Early to prevent errors) ---
 
 // Toggle the slide-down panel
 window.toggleTaskDetails = function(forceOpen = null) {
@@ -35,14 +33,13 @@ window.toggleTaskDetails = function(forceOpen = null) {
     
     if (!panel) return;
 
-    // Determine state: if forceOpen is boolean use it, otherwise toggle
     const shouldOpen = (forceOpen === true) || (forceOpen === null && !panel.classList.contains('open'));
 
     if (shouldOpen) {
         panel.classList.add('open');
-        panel.style.maxHeight = "500px"; // Force CSS override if class fails
+        panel.style.maxHeight = "500px";
         panel.style.opacity = "1";
-        if(link) link.style.opacity = '0'; // Hide the "See" button
+        if(link) link.style.opacity = '0';
     } else {
         panel.classList.remove('open');
         panel.style.maxHeight = "0px";
@@ -59,7 +56,6 @@ function updateTaskUIState(isActive) {
     const upContainer = document.getElementById('uploadBtnContainer');
 
     if (isActive) {
-        // WORKING STATE
         if(statusLabel) {
             statusLabel.innerHTML = "STATUS: <span style='color:var(--neon-green)'>WORKING</span>";
             statusLabel.className = "status-text-lg status-working";
@@ -67,9 +63,7 @@ function updateTaskUIState(isActive) {
         if(timerRow) timerRow.classList.remove('hidden');
         if(reqBtn) reqBtn.classList.add('hidden');
         if(upContainer) upContainer.classList.remove('hidden');
-        
     } else {
-        // UNPRODUCTIVE STATE
         if(statusLabel) {
             statusLabel.innerHTML = "STATUS: UNPRODUCTIVE";
             statusLabel.className = "status-text-lg status-unproductive";
@@ -77,40 +71,27 @@ function updateTaskUIState(isActive) {
         if(timerRow) timerRow.classList.add('hidden');
         if(reqBtn) reqBtn.classList.remove('hidden');
         if(upContainer) upContainer.classList.add('hidden');
-        
-        // Close panel when finished
         window.toggleTaskDetails(false);
     }
 }
 
-// --- 3. ROBUST EVENT LISTENERS ---
-
-// Global Click Listener (Fixes the "Button doesn't work" issue)
+// Global Click Listener for Task Interaction
 document.addEventListener('click', function(event) {
-    // 1. Handle "See Directive" Click (Anywhere in the info block)
     const infoBlock = event.target.closest('.task-info-block');
-    const seeLink = event.target.closest('.see-task-link');
-    
-    if (infoBlock || seeLink) {
-        // Only toggle if we are in "Working" mode (timer row is visible)
+    if (infoBlock) {
         const timerRow = document.getElementById('activeTimerRow');
         if (timerRow && !timerRow.classList.contains('hidden')) {
-            window.toggleTaskDetails(null); // Toggle
+            window.toggleTaskDetails(null);
         }
     }
-
-    // 2. Auto-Collapse when clicking outside
     const card = document.getElementById('taskCard');
     const panel = document.getElementById('taskDetailPanel');
-    
-    // If clicking outside the card AND panel is open
     if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
         window.toggleTaskDetails(false);
     }
 });
 
-
-// --- 4. INITIALIZATION ---
+// --- 3. INITIALIZATION ---
 
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
@@ -130,7 +111,6 @@ document.addEventListener('click', () => {
     }
 }, { once: true });
 
-
 const resizer = new ResizeObserver(() => { 
     if(window.parent) window.parent.postMessage({ iframeHeight: document.body.scrollHeight }, '*'); 
 });
@@ -147,6 +127,8 @@ function initDomProfile() {
 }
 initDomProfile();
 
+// --- 4. BRIDGE LISTENER (DATA HANDLER) ---
+
 Bridge.listen((data) => {
     const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
     if (ignoreList.includes(data.type)) return; 
@@ -154,144 +136,151 @@ Bridge.listen((data) => {
 });
 
 window.addEventListener("message", (event) => {
-    const data = event.data;
+    try {
+        const data = event.data;
 
-    if (data.type === "CHAT_ECHO" && data.msgObj) renderChat([data.msgObj], true);
+        if (data.type === "CHAT_ECHO" && data.msgObj) renderChat([data.msgObj], true);
 
-    if (data.type === 'UPDATE_RULES') {
-        const rules = data.payload || {};
-        for (let i = 1; i <= 8; i++) {
-            const el = document.getElementById('r' + i);
-            if (el && rules['rule' + i]) el.innerHTML = rules['rule' + i];
-        }
-    }
-
-    if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
-    if (data.type === "INIT_WISHLIST" || data.wishlist) {
-        setWishlistItems(data.wishlist || [];
-        window.WISHLIST_ITEMS = data.wishlist || []; 
-        renderWishlist();
-    }
-
-    if (data.type === "UPDATE_DOM_STATUS") {
-        const badge = document.getElementById('chatStatusBadge');
-        const ring = document.getElementById('chatStatusRing');
-        const domBadge = document.getElementById('domStatusBadge');
-        if(badge) { badge.innerHTML = data.online ? "ONLINE" : data.text; badge.className = data.online ? "chat-status-text chat-online" : "chat-status-text"; }
-        if(ring) ring.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
-        if(domBadge) { domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; domBadge.className = data.online ? "dom-status status-online" : "dom-status"; }
-    }
-
-    if (data.type === "UPDATE_Q_FEED") {
-        const feedData = data.domVideos || data.posts || data.feed;
-        if (feedData && Array.isArray(feedData)) {
-            renderDomVideos(feedData);
-            renderNews(feedData);
-            const pc = document.getElementById('cntPosts');
-            if (pc) pc.innerText = feedData.length;
-        }
-    }
-
-    const payload = data.profile || data.galleryData || data.pendingState ? data : (data.type === "UPDATE_FULL_DATA" ? data : null);
-    
-    if (payload) {
-        if (data.profile && !ignoreBackendUpdates) {
-            setGameStats(data.profile);
-            setUserProfile({
-                name: data.profile.name || "Slave",
-                hierarchy: data.profile.hierarchy || "HallBoy",
-                memberId: data.profile.memberId || "",
-                joined: data.profile.joined
-            });
-            
-            if (data.profile.taskQueue) setTaskQueue(data.profile.taskQueue);
-            
-            if (data.profile.activeRevealMap) {
-                let map = [];
-                try { map = (typeof data.profile.activeRevealMap === 'string') ? JSON.parse(data.profile.activeRevealMap) : data.profile.activeRevealMap; } catch(e) { map = []; }
-                setActiveRevealMap(map);
+        if (data.type === 'UPDATE_RULES') {
+            const rules = data.payload || {};
+            for (let i = 1; i <= 8; i++) {
+                const el = document.getElementById('r' + i);
+                if (el && rules['rule' + i]) el.innerHTML = rules['rule' + i];
             }
-            
-            if (data.profile.rewardVault) {
-                let vault = [];
-                try { vault = (typeof data.profile.rewardVault === 'string') ? JSON.parse(data.profile.rewardVault) : data.profile.rewardVault; } catch(e) { vault = []; }
-                setVaultItems(vault);
-            }
-
-            setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
-            setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
-
-            renderRewardGrid();
-            if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
-            setStats(migrateGameStatsToStats(data.profile, stats));
-            if(data.profile.profilePicture) document.getElementById('profilePic').src = getOptimizedUrl(data.profile.profilePicture, 150);
-            updateStats(); 
         }
 
-        if (data.type === "INSTANT_REVEAL_SYNC") {
-            if (data.currentLibraryMedia) setCurrentLibraryMedia(data.currentLibraryMedia);
-            renderRewardGrid(); 
-            setTimeout(() => {
-                const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
-                runTargetingAnimation(winnerId, () => {
-                    setActiveRevealMap(data.activeRevealMap || []);
-                    renderRewardGrid(); 
+        if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
+        
+        if (data.type === "INIT_WISHLIST" || data.wishlist) {
+            setWishlistItems(data.wishlist || []);
+            window.WISHLIST_ITEMS = data.wishlist || []; 
+            renderWishlist();
+        }
+
+        if (data.type === "UPDATE_DOM_STATUS") {
+            const badge = document.getElementById('chatStatusBadge');
+            const ring = document.getElementById('chatStatusRing');
+            const domBadge = document.getElementById('domStatusBadge');
+            if(badge) { badge.innerHTML = data.online ? "ONLINE" : data.text; badge.className = data.online ? "chat-status-text chat-online" : "chat-status-text"; }
+            if(ring) ring.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
+            if(domBadge) { domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; domBadge.className = data.online ? "dom-status status-online" : "dom-status"; }
+        }
+
+        if (data.type === "UPDATE_Q_FEED") {
+            const feedData = data.domVideos || data.posts || data.feed;
+            if (feedData && Array.isArray(feedData)) {
+                renderDomVideos(feedData);
+                renderNews(feedData);
+                const pc = document.getElementById('cntPosts');
+                if (pc) pc.innerText = feedData.length;
+            }
+        }
+
+        const payload = data.profile || data.galleryData || data.pendingState ? data : (data.type === "UPDATE_FULL_DATA" ? data : null);
+        
+        if (payload) {
+            // 1. UPDATE PROFILE STATS
+            if (data.profile && !ignoreBackendUpdates) {
+                setGameStats(data.profile);
+                setUserProfile({
+                    name: data.profile.name || "Slave",
+                    hierarchy: data.profile.hierarchy || "HallBoy",
+                    memberId: data.profile.memberId || "",
+                    joined: data.profile.joined
                 });
-            }, 50); 
-        }
+                
+                if (data.profile.taskQueue) setTaskQueue(data.profile.taskQueue);
+                
+                if (data.profile.activeRevealMap) {
+                    let map = [];
+                    try { map = (typeof data.profile.activeRevealMap === 'string') ? JSON.parse(data.profile.activeRevealMap) : data.profile.activeRevealMap; } catch(e) { map = []; }
+                    setActiveRevealMap(map);
+                }
+                
+                if (data.profile.rewardVault) {
+                    let vault = [];
+                    try { vault = (typeof data.profile.rewardVault === 'string') ? JSON.parse(data.profile.rewardVault) : data.profile.rewardVault; } catch(e) { vault = []; }
+                    setVaultItems(vault);
+                }
 
-        if (payload.galleryData) {
-            const currentGalleryJson = JSON.stringify(payload.galleryData);
-            if (currentGalleryJson !== lastGalleryJson) {
-                setLastGalleryJson(currentGalleryJson);
-                setGalleryData(payload.galleryData);
-                renderGallery();
-                updateStats();
+                setLibraryProgressIndex(data.profile.libraryProgressIndex || 1);
+                setCurrentLibraryMedia(data.profile.currentLibraryMedia || "");
+
+                renderRewardGrid();
+                if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
+                setStats(migrateGameStatsToStats(data.profile, stats));
+                if(data.profile.profilePicture) {
+                    const picEl = document.getElementById('profilePic');
+                    if(picEl) picEl.src = getOptimizedUrl(data.profile.profilePicture, 150);
+                }
+                updateStats(); 
             }
-        }
 
-        // --- THE TASK UPDATE LOGIC ---
-        if (payload.pendingState !== undefined) {
-            if (!taskJustFinished && !ignoreBackendUpdates) {
-                setPendingTaskState(payload.pendingState);
-                if (pendingTaskState) {
-                    setCurrentTask(pendingTaskState.task);
-                    restorePendingUI();
-                    
-                    // 1. Switch UI to "Working" Mode
-                    updateTaskUIState(true);
-
-                    // 2. AUTO-EXPAND FIX
-                    // Automatically open the task details if the user has a task
-                    if (!isInitialLoad) {
-                         window.toggleTaskDetails(true);
+            // 2. REVEAL SYNC
+            if (data.type === "INSTANT_REVEAL_SYNC") {
+                if (data.currentLibraryMedia) setCurrentLibraryMedia(data.currentLibraryMedia);
+                renderRewardGrid(); 
+                setTimeout(() => {
+                    if(data.activeRevealMap) {
+                        const winnerId = data.activeRevealMap[data.activeRevealMap.length - 1];
+                        runTargetingAnimation(winnerId, () => {
+                            setActiveRevealMap(data.activeRevealMap || []);
+                            renderRewardGrid(); 
+                        });
                     }
+                }, 50); 
+            }
 
-                } else if (!resetUiTimer) {
-                    // Switch UI to "Unproductive" Mode
-                    updateTaskUIState(false);
-                    document.getElementById('readyText').innerText = "AWAITING ORDERS";
+            // 3. GALLERY SYNC
+            if (payload.galleryData) {
+                const currentGalleryJson = JSON.stringify(payload.galleryData);
+                if (currentGalleryJson !== lastGalleryJson) {
+                    setLastGalleryJson(currentGalleryJson);
+                    setGalleryData(payload.galleryData);
+                    renderGallery();
+                    updateStats();
+                }
+            }
+
+            // 4. TASK SYNC (WITH NEW UI LOGIC)
+            if (payload.pendingState !== undefined) {
+                if (!taskJustFinished && !ignoreBackendUpdates) {
+                    setPendingTaskState(payload.pendingState);
+                    if (pendingTaskState) {
+                        setCurrentTask(pendingTaskState.task);
+                        restorePendingUI();
+                        updateTaskUIState(true); // Switch to Working Mode
+                        
+                        if (!isInitialLoad) {
+                             window.toggleTaskDetails(true); // Auto Expand
+                        }
+                    } else if (!resetUiTimer) {
+                        updateTaskUIState(false); // Switch to Unproductive
+                        const rt = document.getElementById('readyText');
+                        if(rt) rt.innerText = "AWAITING ORDERS";
+                    }
                 }
             }
         }
-    }
 
-    if (data.type === "UPDATE_CHAT" || data.chatHistory) renderChat(data.chatHistory || data.messages);
+        if (data.type === "UPDATE_CHAT" || data.chatHistory) renderChat(data.chatHistory || data.messages);
 
-    if (data.type === "FRAGMENT_REVEALED") {
-        const { fragmentNumber, day, totalRevealed, isComplete } = data;
-        import('../profile/kneeling/reward.js').then(({ runTargetingAnimation, renderRewardGrid }) => {
-            runTargetingAnimation(fragmentNumber, () => {
-                renderRewardGrid();
-                if (isComplete) triggerSound('coinSound');
+        if (data.type === "FRAGMENT_REVEALED") {
+            const { fragmentNumber, isComplete } = data;
+            import('../profile/kneeling/reward.js').then(({ runTargetingAnimation, renderRewardGrid }) => {
+                runTargetingAnimation(fragmentNumber, () => {
+                    renderRewardGrid();
+                    if (isComplete) triggerSound('coinSound');
+                });
             });
-        });
+        }
+    } catch(err) {
+        console.error("Main Loop Error:", err);
     }
-
 });
 
 // ==========================================
-// GLOBAL EXPORTS & HELPERS
+// HELPERS
 // ==========================================
 
 window.handleUploadStart = function(inputElement) {
@@ -352,27 +341,36 @@ function updateStats() {
     const coinsEl = document.getElementById('coins');
     const pointsEl = document.getElementById('points');
 
-    if (!subName || !userProfile || !gameStats) return; 
+    // Force default if data missing to prevent crash
+    const name = (userProfile && userProfile.name) ? userProfile.name : "Slave";
+    const hierarchy = (userProfile && userProfile.hierarchy) ? userProfile.hierarchy : "HallBoy";
+    const coins = (gameStats && gameStats.coins) ? gameStats.coins : 0;
+    const points = (gameStats && gameStats.points) ? gameStats.points : 0;
 
-    subName.textContent = userProfile.name || "Slave";
-    if (subHierarchy) subHierarchy.textContent = userProfile.hierarchy || "HallBoy";
-    if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
-    if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
+    if (subName) subName.textContent = name;
+    if (subHierarchy) subHierarchy.textContent = hierarchy;
+    if (coinsEl) coinsEl.textContent = coins;
+    if (pointsEl) pointsEl.textContent = points;
 
     const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? 0; };
-
-    setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
-    setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
-    setVal('statCompleted', gameStats.taskdom_completed_tasks || gameStats.completedTasks);
-    setVal('statSkipped', gameStats.skippedTasks || stats.skippedTasks);
-    setVal('statTotalKneels', gameStats.kneelCount || gameStats.totalKneels);
-
-    const sinceEl = document.getElementById('slaveSinceDate');
-    if (sinceEl && userProfile.joined) {
-        try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
+    if (gameStats) {
+        setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
+        setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
+        setVal('statCompleted', gameStats.taskdom_completed_tasks || gameStats.completedTasks);
+        setVal('statSkipped', gameStats.skippedTasks || (stats ? stats.skippedTasks : 0));
+        setVal('statTotalKneels', gameStats.kneelCount || gameStats.totalKneels);
     }
 
-    if (typeof LEVELS !== 'undefined' && LEVELS.length > 0) {
+    const sinceEl = document.getElementById('slaveSinceDate');
+    if (sinceEl) {
+        if (userProfile && userProfile.joined) {
+            try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
+        } else {
+            sinceEl.textContent = "--/--/--";
+        }
+    }
+
+    if (typeof LEVELS !== 'undefined' && LEVELS.length > 0 && gameStats) {
         let nextLevel = LEVELS.find(l => l.min > gameStats.points) || LEVELS[LEVELS.length - 1];
         const nln = document.getElementById('nextLevelName');
         const pnd = document.getElementById('pointsNeeded');
@@ -388,7 +386,7 @@ function updateStats() {
     updateKneelingStatus(); 
 }
 
-// ... (Rest of existing code: Tribute, Coins, etc.) ...
+// ... (Rest of existing code: Tribute, Coins, etc. - UNCHANGED) ...
 let currentHuntIndex = 0;
 let filteredItems = [];
 let selectedReason = "";
