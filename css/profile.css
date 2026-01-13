@@ -116,10 +116,10 @@ body {
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* =========================================
-   4. TASK RIBBON & CONTROLS (RESTORED BUTTONS + FIXED DRAWER)
+   4. TASK RIBBON & CONTROLS (RELATIVE PUSH)
    ========================================= */
 
-/* The Header Bar (ALWAYS VISIBLE) */
+/* The Header Bar */
 .task-ribbon {
     display: flex; 
     align-items: center; 
@@ -129,88 +129,27 @@ body {
     background: rgba(10,10,10,0.95); 
     border: 1px solid var(--gold-dim);
     position: relative;
-    /* CRITICAL: Force Header on top of everything */
-    z-index: 9999; 
+    z-index: 100; /* Stays on top */
 }
 
-/* --- RAJDHANI FONT STYLING FOR STATUS --- */
-
-.status-text-lg {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-weight: 700; 
-    font-size: 1.1rem; 
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-    margin-top: 5px;
-}
-.status-unproductive { color: #666; }
-.status-working { color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,0,0.4); }
-
-.ribbon-status {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-weight: 600;
-    font-size: 0.95rem; 
-    color: #aaa; 
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.ribbon-timer {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-weight: 700;
-    font-size: 2.2rem; 
-    color: white; 
-    line-height: 1;
-    letter-spacing: 1px;
-}
-
-.see-task-link {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--gold); 
-    cursor: pointer; 
-    margin-top: 5px; 
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-    padding: 5px;
-    border-bottom: 1px solid transparent;
-    transition: 0.3s;
-    pointer-events: auto !important;
-}
-.see-task-link:hover {
-    color: #fff;
-    border-bottom-color: var(--gold);
-}
-
-/* --- SOLID DRAWER (SITS UNDER HEADER) --- */
-
+/* --- THE DRAWER (PUSHES CONTENT) --- */
 .task-detail-panel {
-    /* POSITIONING */
-    position: absolute;
-    /* Start BELOW the header (100px header + 20px top margin of container) */
-    top: 120px; 
-    left: 20px;
-    right: 20px;
-    bottom: 20px; /* Cover rest of screen */
+    /* REMOVED absolute: now sits in flow */
+    position: relative; 
+    width: 100%;
+    margin: 0 20px; /* Match header margins */
+    width: calc(100% - 40px); /* Adjust width */
     
     /* STYLE */
-    background: #000 !important; 
+    background: #000; 
     border: 1px solid #333;
     border-top: none; 
-    box-shadow: 0 50px 50px #000;
     
-    /* LAYER: Below Header (9999), Above Chat (1) */
-    z-index: 100; 
-    opacity: 0;
-    pointer-events: none; 
-    
-    /* ANIMATION */
-    transform: translateY(-20px); 
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* LAYER */
+    z-index: 50; 
+    display: none; /* Hidden by default */
     
     /* LAYOUT */
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -218,83 +157,55 @@ body {
 }
 
 .task-detail-panel.open {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
+    display: flex; /* Flex when open */
+    animation: slideDown 0.3s ease-out;
 }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- FONTS & ELEMENTS --- */
+
+.status-text-lg {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px;
+}
+.status-unproductive { color: #666; }
+.status-working { color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,0,0.4); }
+
+.ribbon-status {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.9rem; color: #aaa; letter-spacing: 1px; text-transform: uppercase;
+}
+
+.ribbon-timer {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 2.2rem; color: white; line-height: 1; letter-spacing: 1px;
+}
+
+.see-task-link {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.8rem; color: var(--gold); cursor: pointer; margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; padding: 5px;
+}
+.see-task-link:hover { color: #fff; }
 
 .drawer-task-text, #readyText {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-size: 1.4rem;
-    color: #fff;
-    text-align: center;
-    line-height: 1.5;
-    max-width: 90%;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(0,0,0,1);
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1.4rem; color: #fff; text-align: center; line-height: 1.5; max-width: 90%;
 }
 
-/* Footer Container for Drawer Buttons */
-.panel-footer {
-    width: 80%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #333;
-    padding-top: 20px;
-    margin-top: 10px;
-}
-
-/* RESTORED BUTTON STYLES (EXACT ORIGINAL) */
-
-/* Main Action Button (Request / Upload) */
+/* BUTTONS (Restored) */
 .action-btn { 
-    background: transparent; 
-    border: 1px solid var(--gold); 
-    color: var(--gold); 
-    padding: 12px 25px; /* Restored original padding */
-    font-family: 'Cinzel'; 
-    font-weight: 700; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    /* Force on top */
-    position: relative; 
-    z-index: 10000; 
+    background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; font-family: 'Cinzel'; font-weight: 700; cursor: pointer; transition: 0.3s; 
 }
-.action-btn:hover { 
-    background: var(--gold); 
-    color: #000; 
-    box-shadow: 0 0 15px var(--gold); 
-}
+.action-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
 
-/* Skip Task Button (Original .btn-dim style) */
-.btn-dim, .btn-skip { 
-    border-color: #444; 
-    color: #666; 
-    padding: 12px 25px; /* Restored padding */
-    background: transparent; 
-    cursor: pointer; 
-    font-family: 'Cinzel'; /* Restored font */
-    font-size: 0.8rem;
-    border: 1px solid #444;
+.btn-skip-small {
+    background: transparent; border: 1px solid #333; color: #666; padding: 10px 25px; font-family: 'Cinzel'; font-size: 0.75rem; cursor: pointer; transition: 0.2s;
 }
-.btn-dim:hover, .btn-skip:hover {
-    color: var(--neon-red);
-    border-color: var(--neon-red);
-    box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);
-}
+.btn-skip-small:hover { color: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
 
-/* Hide Button */
-.text-btn {
-    background: transparent; border: none;
-    color: #666; font-family: 'Cinzel', serif; /* Restored font */
-    font-size: 0.8rem; cursor: pointer; letter-spacing: 2px;
-}
+.text-btn { background: none; border: none; color: #666; font-family: 'Cinzel'; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
 .text-btn:hover { color: white; }
 
 .btn-upload { background: rgba(255, 215, 0, 0.1); }
-
-/* Utility */
 .hidden { display: none !important; }
 
 /* =========================================
