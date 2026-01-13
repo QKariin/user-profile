@@ -1,4 +1,4 @@
-// gallery.js - ADDED DENIED FILTER
+// gallery.js - FIXED PENDING TASKS & NORMALIZATION
 
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
@@ -12,27 +12,41 @@ const STICKER_DENIED = "https://static.wixstatic.com/media/ce3e5b_63a0c8320e2941
 
 let activeStickerFilter = "ALL"; 
 
-// --- SHARED HELPER: GET THE EXACT LIST DISPLAYED ---
+// --- 1. DATA NORMALIZER (THE FIX) ---
+// Ensures 'proofUrl' exists even if backend sends 'media' or 'file'
+function normalizeGalleryItem(item) {
+    if (item.proofUrl) return; // Already good
+
+    // Look for common Wix field names
+    const candidates = ['media', 'file', 'evidence', 'url', 'image', 'src'];
+    
+    for (let key of candidates) {
+        if (item[key] && typeof item[key] === 'string') {
+            item.proofUrl = item[key];
+            return;
+        }
+    }
+}
+
+// --- SHARED HELPER: GET SORTED HISTORY ---
 function getGalleryList() {
     if (!galleryData) return [];
 
-    // 1. Base Filter (Approved or Rejected + Has Image)
+    // Filter History Items (Approve/Reject)
     let items = galleryData.filter(i => {
         const s = (i.status || "").toLowerCase();
         return (s.includes('app') || s.includes('rej')) && i.proofUrl;
     });
 
-    // 2. Apply Filters
+    // Apply Filters
     if (activeStickerFilter === "DENIED") {
-        // Show ONLY Rejected items
         items = items.filter(item => (item.status || "").toLowerCase().includes('rej'));
     } 
     else if (activeStickerFilter !== "ALL" && activeStickerFilter !== "PENDING") {
-        // Show Specific Sticker
         items = items.filter(item => item.sticker === activeStickerFilter);
     }
 
-    // 3. Sort by Points (Desc), then Date (Newest)
+    // Sort by Points -> Date
     return items.sort((a, b) => {
         const pointsA = Number(a.points) || 0;
         const pointsB = Number(b.points) || 0;
@@ -49,34 +63,24 @@ function renderStickerFilters() {
 
     const stickers = new Set();
     galleryData.forEach(item => {
-        // Only collect stickers from Approved items usually, or just all unique ones
         if (item.sticker && item.sticker.length > 10) stickers.add(item.sticker);
     });
 
-    // 1. ALL
     let html = `
         <div class="filter-circle ${activeStickerFilter === 'ALL' ? 'active' : ''}" onclick="window.setGalleryFilter('ALL')">
             <span class="filter-all-text">ALL</span>
-        </div>`;
-
-    // 2. WAIT (Pending)
-    html += `
-        <div class="filter-circle ${activeStickerFilter === 'PENDING' ? 'active' : ''}" onclick="window.setGalleryFilter('PENDING')" style="${activeStickerFilter === 'PENDING' ? 'border-color:var(--neon-yellow); box-shadow:0 0 10px rgba(255,215,0,0.2);' : ''}">
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'PENDING' ? 'active' : ''}" onclick="window.setGalleryFilter('PENDING')" style="${activeStickerFilter === 'PENDING' ? 'border-color:var(--neon-yellow);' : ''}">
             <span class="filter-all-text" style="color:var(--neon-yellow); font-size:0.5rem;">WAIT</span>
-        </div>`;
-
-    // 3. DENY (Rejected) - NEW
-    html += `
-        <div class="filter-circle ${activeStickerFilter === 'DENIED' ? 'active' : ''}" onclick="window.setGalleryFilter('DENIED')" style="${activeStickerFilter === 'DENIED' ? 'border-color:var(--neon-red); box-shadow:0 0 10px rgba(255,0,60,0.2);' : ''}">
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'DENIED' ? 'active' : ''}" onclick="window.setGalleryFilter('DENIED')" style="${activeStickerFilter === 'DENIED' ? 'border-color:var(--neon-red);' : ''}">
             <span class="filter-all-text" style="color:var(--neon-red); font-size:0.5rem;">DENY</span>
         </div>`;
 
-    // 4. STICKERS
     stickers.forEach(url => {
-        // Don't show the Denied Sticker in the generic list if we have a dedicated button, 
-        // but usually stickers are rewards.
-        if(url === STICKER_DENIED) return; 
-
+        // Don't show the denied sticker in the list if we have a button for it
+        if(url === STICKER_DENIED) return;
+        
         const isActive = (activeStickerFilter === url) ? 'active' : '';
         html += `
             <div class="filter-circle ${isActive}" onclick="window.setGalleryFilter('${url}')">
@@ -93,29 +97,36 @@ window.setGalleryFilter = function(filterType) {
 };
 
 export function renderGallery() {
+    if (!galleryData) return;
+
+    // 1. RUN NORMALIZATION (Fixes missing images)
+    galleryData.forEach(normalizeGalleryItem);
+
     const pGrid = document.getElementById('pendingGrid');
     const hGrid = document.getElementById('historyGrid');
     const pSection = document.getElementById('pendingSection');
     
     renderStickerFilters();
 
-    // 1. PENDING VIEW
-    // Show Pending ONLY if "ALL" or "PENDING" is selected
+    // 2. PENDING VIEW
     const showPending = (activeStickerFilter === 'ALL' || activeStickerFilter === 'PENDING');
     const pItems = galleryData.filter(i => (i.status || "").toLowerCase() === 'pending' && i.proofUrl);
     
     if (pGrid) pGrid.innerHTML = pItems.slice(0, pendingLimit).map(createPendingCardHTML).join('');
-    if (pSection) pSection.style.display = (showPending && pItems.length > 0) ? 'block' : 'none';
     
-    // 2. HISTORY VIEW
-    // Show History if NOT "PENDING"
+    if (pSection) {
+        // Only show section if filter allows AND there are items
+        pSection.style.display = (showPending && pItems.length > 0) ? 'block' : 'none';
+    }
+    
+    // 3. HISTORY VIEW
     const showHistory = (activeStickerFilter !== 'PENDING');
-    const hItems = getGalleryList(); // Uses the new DENIED logic
+    const hItems = getGalleryList(); 
 
     if (hGrid) {
         hGrid.innerHTML = hItems.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
-        // Hide grid if empty (unless filter is active, but empty grid looks better than hidden div sometimes)
-        hGrid.style.display = showHistory ? 'grid' : 'none';
+        // Hide grid if filtered out or empty
+        hGrid.style.display = (showHistory && hItems.length > 0) ? 'grid' : 'none';
     }
     
     const loadBtn = document.getElementById('loadMoreBtn');
@@ -169,8 +180,8 @@ function createGalleryItemHTML(item, index) {
 
 export function openHistoryModal(index) {
     const historyItems = getGalleryList();
-
     if (!historyItems[index]) return;
+    
     setCurrentHistoryIndex(index);
     const item = historyItems[index];
 
@@ -286,11 +297,6 @@ export function openModal(url, status, text, isVideo) {
     document.getElementById('glassModal').classList.add('active');
 }
 
-export function loadMoreHistory() {
-    setHistoryLimit(historyLimit + 25);
-    renderGallery();
-}
-
 export function initModalSwipeDetection() {
     const modalEl = document.getElementById('glassModal');
     if (!modalEl) return;
@@ -311,7 +317,7 @@ export function initModalSwipeDetection() {
     }, { passive: true });
 }
 
-// FORCE EXPORT TO WINDOW
+// EXPORT TO WINDOW
 window.renderGallery = renderGallery;
 window.openHistoryModal = openHistoryModal;
 window.toggleHistoryView = toggleHistoryView;
