@@ -1,4 +1,4 @@
-// gallery.js - RESTORED SINGLE GRID (Data Plates & Redemption)
+// gallery.js - FINAL FIXED VERSION
 
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
@@ -25,8 +25,9 @@ function getGalleryList() {
 
     let items = galleryData.filter(i => {
         const s = (i.status || "").toLowerCase();
-        // Show Pending, Approved, and Rejected
-        return (s.includes('pending') || s.includes('app') || s.includes('rej')) && (item.proofUrl || item.media || item.file);
+        // FIXED: Changed 'item' to 'i' here
+        let hasImage = i.proofUrl || i.media || i.file;
+        return (s.includes('pending') || s.includes('app') || s.includes('rej')) && hasImage;
     });
 
     // Apply Filter
@@ -83,23 +84,29 @@ window.setGalleryFilter = function(filterType) {
 export function renderGallery() {
     if (!galleryData) return;
 
+    // Normalization loop
+    galleryData.forEach(item => {
+         if (!item.proofUrl) {
+            const c = ['media', 'file', 'evidence', 'url', 'image', 'src'];
+            for (let k of c) if (item[k]) item.proofUrl = item[k];
+        }
+    });
+
     const hGrid = document.getElementById('historyGrid');
-    const pSection = document.getElementById('pendingSection'); // Legacy check
+    const pSection = document.getElementById('pendingSection'); 
     
-    // Hide legacy pending section if it exists
-    if(pSection) pSection.classList.add('hidden');
+    if(pSection) pSection.classList.add('hidden'); // Ensure legacy section is gone
 
     renderStickerFilters();
 
     const showPending = (activeStickerFilter === 'ALL' || activeStickerFilter === 'PENDING');
     const items = getGalleryList(); 
 
-    // Apply strict PENDING filter here if selected
+    // Strict PENDING filter
     let displayItems = items;
     if (activeStickerFilter === 'PENDING') {
         displayItems = items.filter(i => (i.status || "").toLowerCase().includes('pending'));
     } else if (!showPending) {
-        // Hide pending if filter is NOT All/Pending
         displayItems = items.filter(i => !(i.status || "").toLowerCase().includes('pending'));
     }
 
@@ -153,7 +160,7 @@ function createGalleryItemHTML(item, index) {
 
 // --- REDEMPTION LOGIC ---
 window.atoneForTask = function(index) {
-    const items = getGalleryList();
+    const items = getGalleryList(); // Use the getter to ensure index alignment
     const task = items[index];
     if (!task) return;
 
@@ -168,7 +175,6 @@ window.atoneForTask = function(index) {
     const coinEl = document.getElementById('coins');
     if(coinEl) coinEl.innerText = gameStats.coins;
 
-    // Create Redemption Task
     const restoredTask = { text: task.text, category: 'redemption', timestamp: Date.now() };
     setCurrentTask(restoredTask);
     
@@ -178,7 +184,6 @@ window.atoneForTask = function(index) {
     
     window.closeModal(); 
     
-    // Switch to Active UI
     if(window.restorePendingUI) window.restorePendingUI();
     if(window.updateTaskUIState) window.updateTaskUIState(true);
     if(window.toggleTaskDetails) window.toggleTaskDetails(true);
@@ -220,7 +225,6 @@ export function openHistoryModal(index) {
 
     const overlay = document.getElementById('modalGlassOverlay');
     if (overlay) {
-        // Status Logic
         let statusImg = "";
         let statusText = "SYSTEM VERDICT";
         if (isPending) statusText = "AWAITING REVIEW";
@@ -230,7 +234,6 @@ export function openHistoryModal(index) {
             ? `<div style="font-size:3rem;">⏳</div>` 
             : `<img src="${statusImg}" style="width:100px; height:100px; object-fit:contain; margin-bottom:15px; opacity:0.8;">`;
 
-        // Footer Button (Redemption)
         let footerAction = `<button onclick="event.stopPropagation(); window.closeModal(event)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE FILE</button>`;
         if (isRejected) {
             footerAction = `<button onclick="event.stopPropagation(); window.atoneForTask(${index})" class="btn-dim" style="grid-column: span 2; border-color:var(--neon-red); color:var(--neon-red);">ATONE (-100 🪙)</button>`;
@@ -318,9 +321,7 @@ export function closeModal(e) {
     }
 }
 
-export function openModal(url, status, text, isVideo) {
-    // Legacy mapping for direct pending calls
-}
+export function openModal(url, status, text, isVideo) { } // Stub
 
 export function loadMoreHistory() {
     setHistoryLimit(historyLimit + 25);
