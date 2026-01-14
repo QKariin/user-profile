@@ -478,138 +478,154 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: TACTICAL DATA PLATES (5x3)
+   7. THE STONE VAULT (GAZE & MONOLITHS)
    ========================================= */
 
 #historySection {
-    padding: 20px;
+    background: #000;
+    display: flex;
+    flex-direction: row; /* Grid Left, Monoliths Right */
+}
+
+/* --- THE GAZE INTERACTION (Flashlight) --- */
+#gazeContainer {
+    flex-grow: 1;
     height: 100%;
     overflow-y: auto;
-}
-
-.section-header {
-    font-family: 'Cinzel', serif;
-    color: var(--gold);
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    letter-spacing: 3px;
-}
-
-/* --- THE GRID (5 COLUMNS STRICT) --- */
-.gallery-grid { 
-    display: grid; 
-    grid-template-columns: repeat(5, 1fr); /* Exactly 5 items per row */
-    gap: 8px; 
-    width: 100%; 
-    padding-bottom: 50px; 
-}
-
-/* On smaller screens, drop to 3 columns so it doesn't break */
-@media (max-width: 1200px) {
-    .gallery-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* --- THE DATA PLATE (CARD) --- */
-.gallery-item { 
-    position: relative; 
-    aspect-ratio: 3 / 4; /* Vertical Badge Shape */
-    background: #050505; 
+    padding: 20px;
+    position: relative;
     
-    /* TECH CUT: Top-Right Corner */
-    clip-path: polygon(
-        0 0, 
-        calc(100% - 15px) 0, 
-        100% 15px, 
-        100% 100%, 
-        0 100%
-    );
+    /* THE MASK: Everything is black until hovered */
+    /* We use a CSS variable --x and --y updated by JS */
+    -webkit-mask-image: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 40%, transparent 100%);
+    mask-image: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 40%, transparent 100%);
     
-    overflow: hidden; 
-    cursor: pointer; 
-    transition: all 0.2s ease;
-    
-    /* Default Border (Grey/Iron) */
-    box-shadow: inset 0 0 0 1px #333; 
+    /* Fallback for touch/no-js: slightly visible */
+    background: #020202;
 }
 
-.gallery-item:hover { 
-    transform: translateY(-3px); 
-    box-shadow: inset 0 0 0 1px #fff; /* Highlight on hover */
+/* --- THE STONE GRID --- */
+.stone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 4px; /* Tiny gaps like fitted stone */
+    padding-bottom: 50px;
+}
+
+/* --- THE ITEM (RECESSED TABLET) --- */
+.gallery-item {
+    aspect-ratio: 4 / 5;
+    background: #080808;
+    position: relative;
+    overflow: hidden;
+    cursor: crosshair; /* Target reticle cursor */
+    
+    /* PHYSICS: Deep Inset */
+    box-shadow: inset 0 0 30px #000;
+    border: none !important; /* No borders allowed */
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Sinking Effect on Hover */
+.gallery-item:hover {
+    transform: scale(0.96); /* Sinks into the wall */
+    box-shadow: inset 0 0 50px #000;
+}
+
+/* Image */
+.gi-thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.5; /* Dimmed by default */
+    filter: grayscale(100%) contrast(1.5); /* Stone-like */
+    transition: opacity 0.5s ease;
+}
+.gallery-item:hover .gi-thumb { opacity: 0.8; }
+
+/* --- VERDICT SEALS --- */
+
+/* APPROVED: Gold Leaf Shimmer */
+.item-tier-gold::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 40%, rgba(197, 160, 89, 0.2) 50%, transparent 60%);
+    background-size: 200% 200%;
+    mix-blend-mode: overlay;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.gallery-item:hover.item-tier-gold::after { opacity: 1; animation: shimmer 2s infinite; }
+
+/* DENIED: The Crack */
+.item-tier-denied::before {
+    content: ''; position: absolute; inset: 0;
+    background: transparent;
+    /* Jagged line drawn via gradient */
+    background-image: linear-gradient(135deg, transparent 48%, #000 49%, #000 51%, transparent 52%);
     z-index: 10;
+    opacity: 0.8;
+    pointer-events: none;
 }
-
-/* --- TIER BORDERS (Applied via JS) --- */
-.item-tier-gold { box-shadow: inset 0 0 0 2px var(--gold); }
-.item-tier-silver { box-shadow: inset 0 0 0 1px #ccc; }
-.item-tier-bronze { box-shadow: inset 0 0 0 1px #8B4513; }
-.item-tier-denied { box-shadow: inset 0 0 0 2px var(--neon-red); }
-.item-tier-pending { box-shadow: inset 0 0 0 1px var(--neon-yellow); }
-
-/* Image Styling */
-.gi-thumb { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    opacity: 0.6; /* Dimmed by default */
-    transition: all 0.3s ease; 
-}
-
-.gallery-item:hover .gi-thumb { 
-    opacity: 1; 
-    transform: scale(1.05); 
-}
-
-/* Denied Styling: Red Tint */
 .item-tier-denied .gi-thumb {
-    filter: grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(4) brightness(0.6);
+    filter: sepia(100%) hue-rotate(-50deg) saturate(5) brightness(0.4); /* Blood Red Tint */
 }
 
-/* --- OVERLAYS --- */
-.merit-tag {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 20px;
-    background: rgba(0,0,0,0.9);
-    display: flex; justify-content: center; align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-.tag-val { 
-    font-family: 'Rajdhani'; font-weight: 700; color: #fff; font-size: 0.8rem; 
-}
-.item-tier-gold .tag-val { color: var(--gold); }
-.item-tier-denied .tag-val { color: var(--neon-red); content: 'DENIED'; }
-
-.gi-reward-sticker {
-    position: absolute; top: 5px; left: 5px; width: 25px; height: 25px;
-    filter: drop-shadow(0 0 2px black);
+/* PENDING: Ghost */
+.item-tier-pending .gi-thumb { opacity: 0.2; }
+.item-tier-pending::after {
+    content: 'WAIT';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: 'Courier Prime', monospace;
+    color: var(--neon-yellow);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
 }
 
-/* Pending Overlay */
-.pending-overlay {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.5);
+/* --- THE SILENT UI (MONOLITHS) --- */
+.monolith-sidebar {
+    width: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #050505;
+    border-left: 1px solid #111;
+    padding: 20px 0;
+    z-index: 200;
 }
-.pending-icon { font-size: 1.5rem; text-shadow: 0 0 10px var(--neon-yellow); animation: pulse 2s infinite; }
 
-/* --- ATONE BUTTON (In Modal) --- */
-.btn-atone {
-    background: rgba(255, 0, 0, 0.1);
-    border: 1px solid var(--neon-red);
-    color: var(--neon-red);
-    padding: 15px;
+.monolith-bar {
+    flex: 1; /* Split height evenly */
     width: 100%;
-    font-family: 'Orbitron'; font-weight: 700;
-    margin-top: 10px; cursor: pointer;
-    transition: 0.2s;
-    text-shadow: 0 0 5px var(--neon-red);
+    margin: 2px 0;
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
 }
-.btn-atone:hover {
-    background: var(--neon-red);
-    color: #000;
+
+.monolith-bar:hover { background: #1a1a1a; }
+
+/* The Heartbeat Line */
+.mono-light {
+    position: absolute; top: 0; bottom: 0; right: 0; width: 2px;
+    background: #333;
+    transition: 0.3s;
+}
+
+/* Active State */
+.monolith-bar.active .mono-light {
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+@keyframes shimmer { 0% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+
+/* --- DOSSIER MODAL FONT OVERRIDE --- */
+/* Forces technical look inside the modal */
+.theater-text-box, .dossier-label, .tag-val {
+    font-family: 'Courier Prime', 'Courier New', monospace !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
