@@ -478,10 +478,10 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: THE MECHANICAL TRILOGY
+   7. HISTORY: THE STRUCTURAL TRILOGY
    ========================================= */
 
-/* --- GLOBAL LAYOUT --- */
+/* --- GLOBAL SECTION LAYOUT --- */
 .trilogy-section {
     height: 33.33vh; /* Exact 1/3 split */
     width: 100%;
@@ -490,9 +490,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* NO BACKGROUNDS - One continuous void */
-    background: transparent;
     border-bottom: 1px solid #111;
+    /* No background - floating in void */
+    background: transparent; 
 }
 
 .horizontal-scroll-track {
@@ -503,7 +503,7 @@ body {
     height: 100%;
     align-items: center;
     padding: 0 40px;
-    gap: 40px; /* Wider gaps for these large items */
+    gap: 40px;
     scrollbar-width: none; 
 }
 .horizontal-scroll-track::-webkit-scrollbar { display: none; }
@@ -513,196 +513,249 @@ body {
     top: 10px; left: 20px;
     z-index: 100;
     font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
+    letter-spacing: 4px;
     color: #444;
-    letter-spacing: 3px;
     pointer-events: none;
 }
 
 /* =========================================
-   TOP: THE NOIR MINIMALIST (Perfect > 145)
+   TOP: THE ELITE COLLAGE (Style 15)
+   "Asymmetrical, Parallax, Ghost Identity"
    ========================================= */
-.item-noir {
-    width: 200px; 
-    height: 200px;
-    flex-shrink: 0;
+
+/* The Container for a Group of 3 Images */
+.collage-cluster {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     position: relative;
-    background: #0D0D0D; /* Deep Charcoal */
-    border: 1px solid #666; /* Silver hairline */
-    
-    /* THE MAT BOARD EFFECT */
-    padding: 40px; /* Start wide */
-    transition: padding 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-    
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.item-noir img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    filter: grayscale(100%); /* Dead */
-    transition: all 0.8s ease;
-}
-
-/* Signature */
-.noir-sig {
-    position: absolute;
-    bottom: 8px; right: 12px;
-    font-family: 'La Belle Aurore', cursive; /* Handwritten font */
-    font-size: 0.7rem;
-    color: #666;
-    opacity: 0.6;
-}
-
-/* Interaction: Grow & Color */
-.item-noir:hover {
-    padding: 10px; /* Image grows */
-    border-color: #fff;
-}
-.item-noir:hover img {
-    filter: grayscale(0%) contrast(1.1);
-}
-
-/* =========================================
-   MIDDLE: THE INDUSTRIAL VAULT (Failed)
-   ========================================= */
-.item-vault {
-    width: 180px; height: 180px;
+    padding-left: 60px; /* Space for the Gold Line */
     flex-shrink: 0;
-    position: relative;
-    background: #000;
-    cursor: pointer;
-    
-    /* THE HEAVY FRAME */
-    border: 15px solid #222;
-    outline: 1px solid #000;
-    box-shadow: 
-        inset 2px 2px 5px rgba(255,255,255,0.1),
-        inset -2px -2px 5px rgba(0,0,0,0.8),
-        5px 10px 20px black;
 }
 
-/* The Image (Behind the door) */
-.vault-image {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    opacity: 0.4;
-    filter: brightness(0.4) contrast(1.2) blur(1px);
-    transition: 0.4s ease;
-}
-
-/* The Bolts (Corners) */
-.bolt {
-    position: absolute; width: 8px; height: 8px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #888, #222);
-    box-shadow: 1px 1px 3px black;
-    z-index: 20;
-}
-.b-tl { top: -10px; left: -10px; }
-.b-tr { top: -10px; right: -10px; }
-.b-bl { bottom: -10px; left: -10px; }
-.b-br { bottom: -10px; right: -10px; }
-
-/* The Locking Mechanism (The Bar) */
-.vault-lock {
+/* The Gold Vertical Line */
+.collage-line {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120%; height: 30px;
-    background: repeating-linear-gradient(
-        90deg, 
-        #333, #333 2px, #444 2px, #444 4px
-    ); /* Brushed texture */
-    border: 1px solid #000;
-    box-shadow: 0 5px 10px black;
-    transition: transform 0.5s cubic-bezier(0.5, -0.5, 0.2, 1.5);
+    left: 15px; /* 15px to the left of the anchor */
+    top: 10%; bottom: 10%;
+    width: 1px;
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+    opacity: 0.8;
+}
+
+/* The Ghost Number (Parallax Target) */
+.collage-ghost-num {
+    position: absolute;
+    left: -20px; bottom: -20px;
+    font-family: 'Cinzel', serif;
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--gold);
+    opacity: 0.1;
+    z-index: 0;
+    pointer-events: none;
+    transition: transform 0.1s linear; /* For JS Parallax */
+}
+
+/* 1. The Anchor (Tall Vertical) */
+.img-anchor {
+    width: 160px; height: 220px;
+    position: relative;
     z-index: 10;
-    display: flex; align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+.img-anchor:hover { transform: scale(1.02); z-index: 20; }
+
+/* 2. The Satellites (Stacked Landscape) */
+.collage-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
 }
 
-/* The Handle */
-.vault-handle {
-    width: 10px; height: 50px;
-    background: #666;
-    margin-left: 20px;
-    border-radius: 2px;
-    box-shadow: 2px 2px 5px black;
+.img-satellite {
+    width: 140px; height: 100px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+/* Shift offsets */
+.sat-top { transform: translateY(-15px); }
+.sat-bot { transform: translateY(15px); }
+
+.img-satellite:hover { transform: scale(1.05); z-index: 20; }
+
+/* Shared Image Style */
+.collage-img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: sepia(20%) contrast(1.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
 
-/* Interaction: Unlock */
-.item-vault:hover .vault-lock {
-    transform: translate(100%, -50%); /* Slide away */
-}
-.item-vault:hover .vault-image {
-    opacity: 1; filter: brightness(1) contrast(1);
-}
 
 /* =========================================
-   BOTTOM: THE APERTURE (Okay/Standard)
+   MIDDLE: THE NOIR VAULT (Style 1)
+   "Strict, Beveled, Light Sweep"
    ========================================= */
-.item-aperture {
+
+.item-noir {
     width: 160px; height: 160px;
     flex-shrink: 0;
     position: relative;
-    border-radius: 50%;
     background: #000;
-    overflow: hidden; /* Circular Mask */
     cursor: pointer;
-    border: 2px solid #222;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+
+    /* The Matte Black Bezel (45deg Slope) */
+    box-shadow: 
+        inset 10px 10px 20px #000, 
+        inset -10px -10px 20px #000,
+        0 0 0 10px #111; /* Outer thick frame */
 }
 
-.aperture-img {
+/* Inner Hairline */
+.item-noir::after {
+    content: ''; position: absolute; inset: 10px; /* Inside the bezel */
+    border: 1px solid rgba(255,255,255,0.3);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.noir-img {
     width: 100%; height: 100%;
     object-fit: cover;
-    transform: scale(1.1);
+    filter: grayscale(100%) contrast(1.2);
+    transition: filter 0.5s ease;
 }
 
-/* Lens Flare */
-.aperture-flare {
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 30%, rgba(100,100,255,0.1), transparent 60%);
-    pointer-events: none; z-index: 1;
-}
-
-/* The Blades (6 Blades created via CSS rotations) */
-.blade {
+/* The Metal Seal */
+.noir-seal {
     position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: #111;
-    border-right: 1px solid #444;
-    transform-origin: 50% 50%;
-    transition: transform 0.6s cubic-bezier(0.1, 0.7, 0.1, 1);
-    z-index: 5;
+    bottom: 12px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(to bottom, #ccc, #888); /* Brushed Silver */
+    color: #000;
+    font-family: 'Courier Prime', monospace;
+    font-size: 6px;
+    font-weight: 700;
+    padding: 2px 6px;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 5px black;
+    z-index: 10;
+}
+
+/* The Light Sweep Interaction */
+.item-noir::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+    transform: skewX(-25deg);
+    z-index: 6;
+    pointer-events: none;
+}
+
+.item-noir:hover .noir-img { filter: grayscale(0%) contrast(1); }
+.item-noir:hover::before { animation: sweep 0.6s linear; }
+
+@keyframes sweep {
+    0% { left: -100%; } 100% { left: 200%; }
+}
+
+
+/* =========================================
+   BOTTOM: THE REINFORCED CONTAINER (Style 16)
+   "Industrial, Rivets, Mechanical Lock"
+   ========================================= */
+
+.item-reinforced {
+    width: 180px; height: 180px;
+    flex-shrink: 0;
+    position: relative;
+    background: #080808;
+    cursor: pointer;
     
-    /* Create the pie slice shape */
-    clip-path: polygon(50% 50%, 100% 50%, 100% 0);
+    /* Hammered Iron Texture Border */
+    border: 12px solid #1a1a1a;
+    box-shadow: inset 0 0 10px #000, 5px 5px 15px black;
+    overflow: hidden;
 }
 
-/* Positioning the 6 blades */
-.b1 { transform: rotate(0deg); }
-.b2 { transform: rotate(60deg); }
-.b3 { transform: rotate(120deg); }
-.b4 { transform: rotate(180deg); }
-.b5 { transform: rotate(240deg); }
-.b6 { transform: rotate(300deg); }
-
-/* Interaction: Open Shutter */
-.item-aperture:hover .blade {
-    /* Spin them out of the way */
-    transform: rotate(var(--r)) scale(0);
+/* The 4 Rivets (Bolts) */
+.rivet {
+    position: absolute; width: 8px; height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #555, #111);
+    box-shadow: 1px 1px 2px black, inset 1px 1px 1px rgba(255,255,255,0.2);
+    z-index: 20;
 }
-.item-aperture:hover .b1 { --r: 45deg; }
-.item-aperture:hover .b2 { --r: 105deg; }
-.item-aperture:hover .b3 { --r: 165deg; }
-.item-aperture:hover .b4 { --r: 225deg; }
-.item-aperture:hover .b5 { --r: 285deg; }
-.item-aperture:hover .b6 { --r: 345deg; }
+.rv-tl { top: -8px; left: -8px; }
+.rv-tr { top: -8px; right: -8px; }
+.rv-bl { bottom: -8px; left: -8px; }
+.rv-br { bottom: -8px; right: -8px; }
 
-.item-aperture:hover { border-color: cyan; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+/* The Pulse LED */
+.status-led {
+    position: absolute; top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: #ff003c;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #ff003c;
+    z-index: 15;
+    animation: pulseRed 2s infinite;
+    transition: 0.3s;
+}
+
+/* The Image (Hidden behind bar) */
+.reinforced-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.4) contrast(1.2) sepia(50%);
+    transition: 0.5s ease;
+}
+
+/* The Locking Bar */
+.lock-bar {
+    position: absolute;
+    top: 50%; left: 0; width: 100%; height: 40px;
+    transform: translateY(-50%);
+    background: repeating-linear-gradient(90deg, #222, #222 2px, #333 2px, #333 4px);
+    border-top: 1px solid #111;
+    border-bottom: 1px solid #111;
+    box-shadow: 0 5px 15px black;
+    z-index: 10;
+    display: flex; align-items: center;
+    transition: transform 0.6s cubic-bezier(0.6, -0.28, 0.735, 0.045); /* Heavy start */
+}
+
+/* The Cog Handle */
+.lock-cog {
+    width: 24px; height: 24px;
+    background: radial-gradient(circle, #555, #111);
+    border: 2px solid #111;
+    border-radius: 50%;
+    margin-left: 10px;
+    position: relative;
+}
+.lock-cog::after {
+    content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #000;
+}
+
+/* Interaction: Unlock */
+.item-reinforced:hover .lock-bar {
+    transform: translate(100%, -50%); /* Slides completely out */
+}
+.item-reinforced:hover .reinforced-img {
+    filter: brightness(1) contrast(1) sepia(0%);
+}
+.item-reinforced:hover .status-led {
+    background: #fff; box-shadow: 0 0 8px #fff; animation: none;
+}
+
+@keyframes pulseRed { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
