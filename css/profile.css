@@ -478,113 +478,141 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: TEXTURAL HIERARCHY
+   7. HISTORY: THE TEXTURE VAULT
    ========================================= */
 
 #historySection {
-    padding: 0;
+    padding: 20px; /* Space around the grid */
     height: 100%;
     overflow-y: auto;
     background: #020202;
 }
 
+/* --- THE GRID (3 Columns to match reference vibe) --- */
 .gallery-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-    gap: 0; /* NO GAPS - creates the "Wall" effect */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px; /* Distinct separation like the reference */
     width: 100%; 
     padding-bottom: 50px; 
 }
 
-/* --- BASE ITEM --- */
+/* --- BASE CARD --- */
 .gallery-item { 
     position: relative; 
-    aspect-ratio: 1 / 1; 
+    aspect-ratio: 1 / 1; /* SQUARE */
     overflow: hidden; 
     cursor: pointer; 
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
+    background: #000;
 }
 
-/* Image default state */
+/* Image Base */
 .gi-thumb { 
-    width: 100%; height: 100%; object-fit: cover; 
+    width: 100%; height: 100%; 
+    object-fit: cover; 
     transition: all 0.5s ease; 
 }
 
+/* ---------------------------------------------------------
+   STYLE 1: NORMAL (The Shadow Cell)
+   Reference: Dark, recessed, mysterious.
+--------------------------------------------------------- */
+.style-normal {
+    /* Deep Inset Shadow */
+    box-shadow: inset 0 0 40px #000; 
+    border: 1px solid #222; /* Very faint edge */
+}
 
-/* --- TIER 1: THE SHADOW CELL (Standard Approved < 145) --- */
-/* Design 1: Recessed, Dark, Deep */
-.style-shadow {
-    background: #000;
-    /* The "Sunk into wall" effect */
-    box-shadow: inset 0 0 30px #000; 
-    z-index: 1;
+.style-normal .gi-thumb {
+    opacity: 0.5;
+    filter: grayscale(100%) contrast(1.2);
+    transform: scale(0.9); /* Pushed back */
 }
-.style-shadow .gi-thumb {
-    opacity: 0.6;
-    filter: grayscale(80%) contrast(1.2);
-    transform: scale(0.95); /* Physically smaller to look deeper */
-}
-.style-shadow:hover .gi-thumb {
-    opacity: 1;
+
+.style-normal:hover .gi-thumb {
+    opacity: 0.8;
     transform: scale(1);
-    filter: grayscale(0%);
-    box-shadow: inset 0 0 0 1px #333;
 }
 
-
-/* --- TIER 2: THE HUD GRID (Elite > 145) --- */
-/* Design 11: Glowing, Tech, Gold, "On Top" */
-.style-hud {
+/* ---------------------------------------------------------
+   STYLE 11: GOLD ELITE (> 145 Pts)
+   Reference: "045", Gold Texture, Big Typography.
+--------------------------------------------------------- */
+.style-gold {
+    border: 2px solid var(--gold);
+    background: radial-gradient(circle, rgba(197, 160, 89, 0.2) 0%, black 100%);
     z-index: 10;
-    box-shadow: 0 0 20px rgba(197, 160, 89, 0.1); /* Glow */
-    border: 1px solid rgba(197, 160, 89, 0.5); /* Thin Gold Line */
 }
-/* The "Tech Grid" Overlay */
-.style-hud::after {
-    content: ''; position: absolute; inset: 0;
-    background-image: 
-        linear-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(197, 160, 89, 0.1) 1px, transparent 1px);
-    background-size: 33% 33%; /* Creates a 3x3 grid over image */
-    pointer-events: none;
+
+.style-gold .gi-thumb {
+    opacity: 0.4; /* Fade image so number pops */
+    filter: sepia(100%) hue-rotate(5deg) contrast(1.2);
+}
+
+/* The Massive Number Overlay (Like "045" in picture) */
+.gold-number-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif; /* Thick tech font */
+    font-weight: 700;
+    font-size: 3.5rem; /* HUGE */
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    mix-blend-mode: overlay; /* Blends with image */
     z-index: 20;
-}
-.style-hud .gi-thumb {
-    opacity: 1;
-    filter: contrast(1.1) brightness(1.1);
-}
-.style-hud:hover {
-    box-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
-    border-color: var(--gold);
+    letter-spacing: -2px;
 }
 
+.style-gold:hover {
+    box-shadow: 0 0 30px rgba(197, 160, 89, 0.3);
+}
 
-/* --- TIER 3: THE SEALED FILE (Denied) --- */
-/* Design 12: Heavy, Scroll-like, Closed */
-.style-sealed {
+/* ---------------------------------------------------------
+   STYLE 12: FAIL (The Sealed Scroll)
+   Reference: Heavy top/bottom bars, closed off.
+--------------------------------------------------------- */
+.style-fail {
+    /* The "Scroll" Handles */
+    border-top: 8px solid #1a1a1a;
+    border-bottom: 8px solid #1a1a1a;
     background: #050505;
-    border-top: 6px solid #1a1a1a;   /* The "Scroll" handles */
-    border-bottom: 6px solid #1a1a1a;
 }
-.style-sealed::before {
-    content: ''; position: absolute; inset: 0;
-    background: rgba(0, 0, 0, 0.8); /* Dark tint */
-    z-index: 5;
+
+.style-fail .gi-thumb {
+    opacity: 0.2; /* Almost invisible */
+    filter: blur(2px) grayscale(100%);
 }
-.style-sealed .gi-thumb {
-    filter: grayscale(100%) blur(2px); /* Obscured */
-    opacity: 0.3;
+
+/* The "Void" Stamp */
+.fail-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
 }
-.style-sealed:hover::before {
-    background: rgba(20, 0, 0, 0.6); /* Red tint on hover */
+.fail-icon {
+    font-size: 2rem;
+    opacity: 0.5;
+    filter: grayscale(100%);
 }
-.style-sealed:hover {
+
+.style-fail:hover {
     border-color: var(--neon-red);
 }
 
-/* Remove filter bar (optional if you want cleaner look) */
-#stickerFilterBar { display: none; }
+/* --- PENDING (Ghost) --- */
+.style-pending {
+    border: 1px dashed #444;
+}
+.style-pending .gi-thumb { opacity: 0.3; }
+.pending-overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+
+/* Hide other overlays */
+.merit-tag, .gi-status-sticker, .gi-reward-sticker { display: none !important; }
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
 .glass-modal.active { display: flex; animation: fadeIn 0.3s; }
