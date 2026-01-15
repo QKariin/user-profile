@@ -526,6 +526,30 @@ body {
     pointer-events: none;
 }
 
+
+/* =========================================
+   1. FIX FOR MIDDLE & BOTTOM (The "Cage")
+   ========================================= */
+.item-placeholder-slot {
+    width: 140px !important;    /* FORCE SQUARE WIDTH */
+    height: 140px !important;   /* FORCE SQUARE HEIGHT */
+    flex-shrink: 0;             /* Prevent squashing */
+    margin-right: 15px;         
+    border: 1px solid rgba(50, 50, 50, 0.5);
+    background: rgba(0,0,0,0.5);
+    overflow: hidden !important; /* CUT OFF EXCESS IMAGE */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.item-placeholder-slot img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Fits image nicely inside the box */
+    display: block;
+}
+
 /* =========================================
    TOP SECTION: SQUARE GOLDEN TRIPTYCH
    ========================================= */
@@ -611,7 +635,7 @@ body {
 
 /* 4. IMAGES */
 .altar-img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
+    width: 100%; height: 100%; object-fit: cover; display: block; filter: none !important
 }
 
 /* 5. REFLECTION (Adjusted for Squares) */
