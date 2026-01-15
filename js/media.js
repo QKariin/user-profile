@@ -88,6 +88,7 @@ export function getOptimizedUrl(url, width = 400) {
 
 export async function getSignedUrl(url) {
   if (!url) return "";
+  console.log("Getting signed URL for:", url);
 
   // Only sign Bytescale URLs
   if (isBytescaleUrl(url)) {

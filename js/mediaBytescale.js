@@ -153,6 +153,7 @@ observer.observe(document.body, {
 
 export async function signUpcdnUrl(url) {
   if (!url || !url.startsWith("https://upcdn.io/")) return url;
+  console.log("Signing Upcdn URL:", url);
 
   //const parts = url.split("/raw/");
   const parts = url.split(/\/raw\/|\/thumbnail\//);
