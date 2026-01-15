@@ -1,9 +1,9 @@
-// gallery.js - TRILOGY LAYOUT FIXED
-
 import { 
-    galleryData, currentHistoryIndex, setCurrentHistoryIndex, setHistoryLimit
+    galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
+    setCurrentHistoryIndex, setHistoryLimit, setTouchStartX,
+    gameStats, setGameStats, setCurrentTask, setPendingTaskState, setIgnoreBackendUpdates
 } from './state.js';
-import { getOptimizedUrl } from './utils.js';
+import { getOptimizedUrl, cleanHTML, triggerSound } from './utils.js';
 
 // STICKERS
 const STICKER_APPROVE = "https://static.wixstatic.com/media/ce3e5b_a19d81b7f45c4a31a4aeaf03a41b999f~mv2.png";
@@ -15,33 +15,29 @@ function getPoints(item) {
     return Number(val);
 }
 
-// --- HELPER: SORTED LIST ---
+// --- HELPER: SORTED ---
 function getSortedGallery() {
     if (!galleryData) return [];
-    // Sort by Date (Newest First)
     return [...galleryData].sort((a, b) => new Date(b._createdDate) - new Date(a._createdDate));
 }
 
-// --- MAIN RENDERER (TRILOGY SPLIT) ---
+// --- MAIN RENDERER ---
 export function renderGallery() {
     if (!galleryData) return;
 
-    // 1. Get the 3 Containers
-    const gridPerfect = document.getElementById('gridPerfect');
-    const gridFailed = document.getElementById('gridFailed');
-    const gridOkay = document.getElementById('gridOkay');
+    // Get Containers
+    const gridPerfect = document.getElementById('gridPerfect'); // Top (Scrolls)
+    const gridFailed = document.getElementById('gridFailed');   // Bottom (Shadows)
+    const gridOkay = document.getElementById('gridOkay');       // Middle (Aperture)
 
-    // Safety: If these don't exist, the HTML is wrong, so we stop to prevent crash
     if (!gridPerfect || !gridFailed || !gridOkay) return;
 
-    // 2. Clear Previous Content
     gridPerfect.innerHTML = "";
     gridFailed.innerHTML = "";
     gridOkay.innerHTML = "";
 
     const sortedData = getSortedGallery();
-    
-    // 3. Distribute Items
+
     sortedData.forEach((item, index) => {
         let url = item.proofUrl || item.media || item.file;
         if (!url) return;
@@ -51,44 +47,45 @@ export function renderGallery() {
         let status = (item.status || "").toLowerCase();
         let isRejected = status.includes('rej') || status.includes('fail');
         let isPending = status.includes('pending');
-        
-        // Save global index for modal
-        item.globalIndex = index; 
 
-        // --- ZONE 1: FAILED (BOTTOM) ---
+        let html = "";
+        let targetGrid = null;
+
+        // 1. FAILED = BOTTOM (SHADOW CELL)
         if (isRejected) {
-            gridFailed.innerHTML += `
-                <div class="item-vault" onclick="window.openHistoryModal(${index})">
-                    <div class="vault-bolt vb-tl"></div><div class="vault-bolt vb-tr"></div>
-                    <div class="vault-bolt vb-bl"></div><div class="vault-bolt vb-br"></div>
-                    <div class="vault-led"></div>
-                    <div class="vault-bar"><div class="vault-cog"></div></div>
-                    <img src="${thumb}" class="vault-img">
+            targetGrid = gridFailed;
+            html = `
+                <div class="item-shadow" onclick="window.openHistoryModal(${index})">
+                    <div class="shadow-stamp">VOID</div>
+                    <img src="${thumb}" class="shadow-img">
                 </div>`;
-        } 
-        // --- ZONE 2: ELITE (TOP) -> Points > 145 ---
+        }
+        // 2. PERFECT = TOP (HANGING SCROLL) -> Points > 145
         else if (pts > 145) {
-            gridPerfect.innerHTML += `
+            targetGrid = gridPerfect;
+            html = `
                 <div class="item-scroll" onclick="window.openHistoryModal(${index})">
                     <div class="roller-top"></div>
                     <div class="scroll-paper"><img src="${thumb}"></div>
                     <div class="roller-bot"></div>
                 </div>`;
-        } 
-        // --- ZONE 3: STANDARD/PENDING (MIDDLE) ---
+        }
+        // 3. OKAY / PENDING = MIDDLE (APERTURE)
         else {
-            const pendingOverlay = isPending ? 
-                `<div style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; color:cyan; font-family:'Orbitron'; font-size:0.6rem; background:rgba(0,20,30,0.6);">ANALYZING</div>` 
-                : ``;
-
-            gridOkay.innerHTML += `
-                <div class="item-blueprint" onclick="window.openHistoryModal(${index})">
-                    <img src="${thumb}">
-                    <div class="bp-corner bl-tl"></div><div class="bp-corner bl-tr"></div>
-                    <div class="bp-corner bl-bl"></div><div class="bp-corner bl-br"></div>
-                    ${pendingOverlay}
+            targetGrid = gridOkay;
+            html = `
+                <div class="item-aperture" onclick="window.openHistoryModal(${index})">
+                    <div class="shutter-mech">
+                        <div class="blade b1"></div><div class="blade b2"></div>
+                        <div class="blade b3"></div><div class="blade b4"></div>
+                        <div class="blade b5"></div><div class="blade b6"></div>
+                    </div>
+                    <img src="${thumb}" class="aperture-img">
+                    ${isPending ? '<div style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; color:cyan; font-family:Orbitron; font-size:0.6rem; pointer-events:none;">WAIT</div>' : ''}
                 </div>`;
         }
+
+        if (targetGrid) targetGrid.innerHTML += html;
     });
 }
 
