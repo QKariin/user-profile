@@ -1,5 +1,5 @@
 // media.js
-import { getThumbnailBytescale, isBytescaleUrl } from "./mediaBytescale.js";
+import { getThumbnailBytescale, isBytescaleUrl, signUpcdnUrl } from "./mediaBytescale.js";
 
 export function fileType(file) {
   if (!file) return "unknown";
