@@ -1,4 +1,4 @@
-// gallery.js - RESTORED PROFILE CONNECTION + IMAGE FIX
+// gallery.js - FULL RESTORATION + IMAGE FIX
 
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
@@ -20,30 +20,34 @@ function getPoints(item) {
     return Number(val);
 }
 
-// --- HELPER: NORMALIZE DATA (The URL Hunter) ---
+// --- HELPER: NORMALIZE DATA (The Fix) ---
 function normalizeGalleryItem(item) {
-    if (item.proofUrl && typeof item.proofUrl === 'string' && item.proofUrl.length > 5) return item;
+    // Search for photos in any possible field
+    if (item.proofUrl && typeof item.proofUrl === 'string' && item.proofUrl.length > 5) return;
 
     const candidates = ['media', 'file', 'evidence', 'url', 'image', 'src', 'attachment', 'photo'];
     for (let key of candidates) {
         if (item[key] && typeof item[key] === 'string' && item[key].length > 5) {
             item.proofUrl = item[key];
-            break;
+            return;
         }
     }
-    return item;
 }
 
 // --- HELPER: GET SORTED LIST ---
 function getGalleryList() {
     if (!galleryData || !Array.isArray(galleryData)) return [];
 
-    let items = galleryData.map(normalizeGalleryItem).filter(i => {
+    // Apply normalization to all items first
+    galleryData.forEach(normalizeGalleryItem);
+
+    let items = galleryData.filter(i => {
         const s = (i.status || "").toLowerCase();
-        const hasUrl = i.proofUrl && i.proofUrl.length > 5;
-        return hasUrl && (s.includes('pending') || s.includes('app') || s.includes('rej') || s === "");
+        // Return items that have a photo and a valid status
+        return (s.includes('pending') || s.includes('app') || s.includes('rej') || s === "") && i.proofUrl;
     });
 
+    // Apply Filter logic
     if (activeStickerFilter === "DENIED") {
         items = items.filter(item => (item.status || "").toLowerCase().includes('rej'));
     } 
@@ -98,6 +102,7 @@ export function renderGallery() {
     if (!hGrid) return;
 
     renderStickerFilters();
+
     const items = getGalleryList(); 
 
     if (items.length > 0) {
@@ -138,7 +143,9 @@ function createGalleryItemHTML(item, index) {
                 ? `<video src="${thumbUrl}" class="gi-thumb" muted loop></video>` 
                 : `<img src="${thumbUrl}" class="gi-thumb" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}'">`
             }
-            ${isPending ? `<div class="pending-overlay"><div class="pending-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div></div>` : ''}
+
+            ${isPending ? `<div class="pending-overlay"><div class="pending-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div></div>` : ''}
+            
             <div class="merit-tag">
                 <div class="tag-label">MERIT</div>
                 <div class="tag-val">${barText}</div>
@@ -178,7 +185,8 @@ window.atoneForTask = function(index) {
     window.parent.postMessage({ 
         type: "PURCHASE_ITEM", 
         itemName: "Redemption",
-        cost: 100
+        cost: 100,
+        messageToDom: "Redemption processed." 
     }, "*");
     
     window.parent.postMessage({ 
@@ -222,7 +230,7 @@ export function openHistoryModal(index) {
         }
 
         const statusDisplay = isPending 
-            ? `<div style="font-size:3rem;"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="cyan" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>` 
+            ? `<div style="font-size:3rem;"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>` 
             : `<img src="${statusImg}" style="width:100px; height:100px; object-fit:contain; margin-bottom:15px; opacity:0.8;">`;
 
         let footerAction = `<button onclick="event.stopPropagation(); window.closeModal(event)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE FILE</button>`;
@@ -242,20 +250,23 @@ export function openHistoryModal(index) {
                         <div class="dossier-block">
                             <div class="dossier-label">MERIT VALUE</div>
                             <div class="m-points-lg" style="color:${isRejected ? 'red' : (isPending ? 'cyan' : 'gold')}">
-                                ${isPending ? "CALC" : "+" + pts}
+                                ${isPending ? "PROCESS" : "+" + pts}
                             </div>
                         </div>
                     </div>
+
                     <div id="modalFeedbackView" class="sub-view hidden">
                         <div class="dossier-label">OFFICER NOTES</div>
                         <div class="theater-text-box">${(item.adminComment || "No notes.").replace(/\n/g, '<br>')}</div>
                     </div>
+                    
                     <div id="modalTaskView" class="sub-view hidden">
                          <div class="dossier-label">DIRECTIVE</div>
                          <div class="theater-text-box">${(item.text || "").replace(/\n/g, '<br>')}</div>
                     </div>
                 </div>
             </div>
+
             <div class="modal-footer-menu">
                 <button onclick="event.stopPropagation(); window.toggleHistoryView('feedback')" class="history-action-btn">NOTES</button>
                 <button onclick="event.stopPropagation(); window.toggleHistoryView('task')" class="history-action-btn">ORDER</button>
@@ -270,6 +281,7 @@ export function openHistoryModal(index) {
     document.getElementById('glassModal').classList.add('active');
 }
 
+// --- VIEW HELPERS ---
 export function toggleHistoryView(view) {
     const modal = document.getElementById('glassModal');
     const overlay = document.getElementById('modalGlassOverlay');
@@ -286,7 +298,9 @@ export function toggleHistoryView(view) {
     } else {
         modal.classList.remove('proof-mode-active');
         overlay.classList.remove('clean');
-        let targetId = view === 'feedback' ? 'modalFeedbackView' : (view === 'task' ? 'modalTaskView' : 'modalInfoView');
+        let targetId = 'modalInfoView';
+        if (view === 'feedback') targetId = 'modalFeedbackView';
+        if (view === 'task') targetId = 'modalTaskView';
         const target = document.getElementById(targetId);
         if(target) target.classList.remove('hidden');
     }
@@ -325,7 +339,7 @@ export function initModalSwipeDetection() {
     }, { passive: true });
 }
 
-// FORCE WINDOW EXPORTS
+// FORCE EXPORT
 window.renderGallery = renderGallery;
 window.openHistoryModal = openHistoryModal;
 window.toggleHistoryView = toggleHistoryView;
