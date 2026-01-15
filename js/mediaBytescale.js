@@ -102,17 +102,24 @@ export async function signUpcdnUrl(url) {
 
   const query = extractQueryString(url);
 
+  const isThumbnail = url.includes("/thumbnail/");
+
   try {
     const result = await getPrivateFile(filePath);
-
-    // Backend returns a STRING
     const signed = typeof result === "string" ? result : url;
 
-    // If backend already includes query params, do not append
-    if (signed.includes("?")) return signed;
+    let finalUrl = signed;
+
+    // If original was thumbnail → convert signed raw → thumbnail
+    if (isThumbnail) {
+      finalUrl = finalUrl.replace("/raw/", "/thumbnail/");
+    }
+
+    // If backend already includes query params, return as-is
+    if (finalUrl.includes("?")) return finalUrl;
 
     // Otherwise re-append original transforms
-    return query ? `${signed}${query}` : signed;
+    return query ? `${finalUrl}${query}` : finalUrl;
 
   } catch (err) {
     console.error("Failed to sign Upcdn URL:", url, err);
