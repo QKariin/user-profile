@@ -1,4 +1,4 @@
-// gallery.js - TRILOGY LAYOUT (MATCHES YOUR HTML)
+// gallery.js - FINAL SINGLE GRID RESTORATION
 
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
@@ -10,105 +10,219 @@ import { getOptimizedUrl, cleanHTML, triggerSound } from './utils.js';
 // STICKERS
 const STICKER_APPROVE = "https://static.wixstatic.com/media/ce3e5b_a19d81b7f45c4a31a4aeaf03a41b999f~mv2.png";
 const STICKER_DENIED = "https://static.wixstatic.com/media/ce3e5b_63a0c8320e29416896d071d5b46541d7~mv2.png";
+const PLACEHOLDER_IMG = "https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce465fa89a36d70a68f355~mv2.png";
+
+let activeStickerFilter = "ALL"; 
 
 // --- HELPER: POINTS ---
 function getPoints(item) {
+    // Robust check for any value field
     let val = item.points || item.score || item.value || item.amount || item.reward || 0;
     return Number(val);
 }
 
-// --- HELPER: SORTED LIST ---
-function getSortedGallery() {
-    if (!galleryData) return [];
-    // Sort by Date (Newest First)
-    return [...galleryData].sort((a, b) => new Date(b._createdDate) - new Date(a._createdDate));
+// --- HELPER: NORMALIZE DATA (Fix missing image fields) ---
+function normalizeGalleryItem(item) {
+    if (item.proofUrl) return; 
+    const candidates = ['media', 'file', 'evidence', 'url', 'image', 'src'];
+    for (let key of candidates) {
+        if (item[key] && typeof item[key] === 'string') {
+            item.proofUrl = item[key];
+            return;
+        }
+    }
 }
 
-// --- MAIN RENDERER (TRILOGY SPLIT) ---
+// --- HELPER: GET SORTED LIST ---
+function getGalleryList() {
+    if (!galleryData || !Array.isArray(galleryData)) return [];
+
+    let items = galleryData.filter(i => {
+        // Ensure image exists
+        if (!i.proofUrl) normalizeGalleryItem(i);
+        return i.proofUrl; 
+    });
+
+    // Apply Filter
+    if (activeStickerFilter === "DENIED") {
+        items = items.filter(item => (item.status || "").toLowerCase().includes('rej'));
+    } 
+    else if (activeStickerFilter === "PENDING") {
+        items = items.filter(item => (item.status || "").toLowerCase().includes('pending'));
+    }
+    else if (activeStickerFilter !== "ALL") {
+        items = items.filter(item => item.sticker === activeStickerFilter);
+    }
+
+    // Sort by Date (Newest First) -> This puts Pending at top naturally
+    return items.sort((a, b) => new Date(b._createdDate) - new Date(a._createdDate));
+}
+
+// --- RENDERERS ---
+
+function renderStickerFilters() {
+    const filterBar = document.getElementById('stickerFilterBar');
+    if (!filterBar || !galleryData) return;
+
+    const stickers = new Set();
+    galleryData.forEach(item => {
+        if (item.sticker && item.sticker.length > 10) stickers.add(item.sticker);
+    });
+
+    let html = `
+        <div class="filter-circle ${activeStickerFilter === 'ALL' ? 'active' : ''}" onclick="window.setGalleryFilter('ALL')">
+            <span class="filter-all-text">ALL</span>
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'PENDING' ? 'active' : ''}" onclick="window.setGalleryFilter('PENDING')" style="${activeStickerFilter === 'PENDING' ? 'border-color:var(--neon-yellow);' : ''}">
+            <span class="filter-all-text" style="color:var(--neon-yellow); font-size:0.5rem;">WAIT</span>
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'DENIED' ? 'active' : ''}" onclick="window.setGalleryFilter('DENIED')" style="${activeStickerFilter === 'DENIED' ? 'border-color:var(--neon-red);' : ''}">
+            <span class="filter-all-text" style="color:var(--neon-red); font-size:0.5rem;">DENY</span>
+        </div>`;
+
+    stickers.forEach(url => {
+        if(url === STICKER_DENIED) return;
+        const isActive = (activeStickerFilter === url) ? 'active' : '';
+        html += `
+            <div class="filter-circle ${isActive}" onclick="window.setGalleryFilter('${url}')">
+                <img src="${url}">
+            </div>`;
+    });
+
+    filterBar.innerHTML = html;
+}
+
+window.setGalleryFilter = function(filterType) {
+    activeStickerFilter = filterType;
+    renderGallery(); 
+};
+
 export function renderGallery() {
     if (!galleryData) return;
 
-    // 1. Get the 3 Containers (Matches your HTML)
-    const gridPerfect = document.getElementById('gridPerfect');
-    const gridFailed = document.getElementById('gridFailed');
-    const gridOkay = document.getElementById('gridOkay');
+    // Run normalization
+    galleryData.forEach(normalizeGalleryItem);
 
-    // If these are missing, the HTML is wrong. Return to avoid crash.
-    if (!gridPerfect || !gridFailed || !gridOkay) return;
-
-    // 2. Clear Previous Content
-    gridPerfect.innerHTML = "";
-    gridFailed.innerHTML = "";
-    gridOkay.innerHTML = "";
-
-    const sortedData = getSortedGallery();
+    const hGrid = document.getElementById('historyGrid');
     
-    // 3. Distribute Items
-    sortedData.forEach((item, index) => {
-        // Fix missing URLs
-        let url = item.proofUrl || item.media || item.file;
-        if (!url) return;
-        
-        let thumb = getOptimizedUrl(url, 300);
-        let pts = getPoints(item);
-        let status = (item.status || "").toLowerCase();
-        let isRejected = status.includes('rej') || status.includes('fail');
-        let isPending = status.includes('pending') || status === "";
-        
-        // Save global index for modal
-        item.globalIndex = index; 
+    // Safety check
+    if (!hGrid) return;
 
-        // --- ZONE 1: FAILED (BOTTOM) ---
-        if (isRejected) {
-            gridFailed.innerHTML += `
-                <div class="item-vault" onclick="window.openHistoryModal(${index})">
-                    <div class="vault-bolt vb-tl"></div><div class="vault-bolt vb-tr"></div>
-                    <div class="vault-bolt vb-bl"></div><div class="vault-bolt vb-br"></div>
-                    <div class="vault-led"></div>
-                    <div class="vault-bar"><div class="vault-cog"></div></div>
-                    <img src="${thumb}" class="vault-img">
-                </div>`;
-        } 
-        // --- ZONE 2: ELITE (TOP) -> Points > 145 ---
-        else if (pts > 145) {
-            gridPerfect.innerHTML += `
-                <div class="item-scroll" onclick="window.openHistoryModal(${index})">
-                    <div class="roller-top"></div>
-                    <div class="scroll-paper"><img src="${thumb}"></div>
-                    <div class="roller-bot"></div>
-                </div>`;
-        } 
-        // --- ZONE 3: STANDARD/PENDING (MIDDLE) ---
-        else {
-            const pendingOverlay = isPending ? 
-                `<div style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; color:cyan; font-family:'Orbitron'; font-size:0.6rem; background:rgba(0,20,30,0.6);">ANALYZING</div>` 
-                : ``;
+    renderStickerFilters();
 
-            gridOkay.innerHTML += `
-                <div class="item-blueprint" onclick="window.openHistoryModal(${index})">
-                    <img src="${thumb}" class="aperture-img">
-                    <div class="bp-corner bl-tl"></div><div class="bp-corner bl-tr"></div>
-                    <div class="bp-corner bl-bl"></div><div class="bp-corner bl-br"></div>
-                    ${pendingOverlay}
-                </div>`;
-        }
-    });
+    const items = getGalleryList(); 
+
+    // Render Grid
+    if (items.length > 0) {
+        hGrid.innerHTML = items.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
+        hGrid.style.display = 'grid';
+    } else {
+        hGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#444; font-family:Cinzel;">NO RECORDS FOUND</div>';
+    }
+    
+    const loadBtn = document.getElementById('loadMoreBtn');
+    if (loadBtn) loadBtn.style.display = (items.length > historyLimit) ? 'block' : 'none';
 }
 
-// --- MODAL LOGIC ---
+function createGalleryItemHTML(item, index) {
+    let url = item.proofUrl || PLACEHOLDER_IMG;
+    let thumbUrl = getOptimizedUrl(url, 300);
+    const s = (item.status || "").toLowerCase();
+    
+    const isPending = s.includes('pending') || s === "";
+    const isRejected = s.includes('rej') || s.includes('fail');
+    const pts = getPoints(item);
+
+    // --- TIER LOGIC (CSS Classes) ---
+    let tierClass = "item-tier-silver"; // Default
+    if (isPending) tierClass = "item-tier-pending";
+    else if (isRejected) tierClass = "item-tier-denied";
+    else if (pts >= 100) tierClass = "item-tier-gold";
+    else if (pts < 10) tierClass = "item-tier-bronze";
+
+    // --- BOTTOM BAR TEXT ---
+    let barText = `+${pts}`;
+    if (isPending) barText = "WAIT";
+    if (isRejected) barText = "DENIED";
+
+    const isVideo = (url || "").match(/\.(mp4|webm|mov)($|\?)/i);
+
+    return `
+        <div class="gallery-item ${tierClass}" onclick='window.openHistoryModal(${index})'>
+            ${isVideo 
+                ? `<video src="${thumbUrl}" class="gi-thumb" muted loop></video>` 
+                : `<img src="${thumbUrl}" class="gi-thumb" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}'">`
+            }
+
+            ${isPending ? `<div class="pending-overlay"><div class="pending-icon">⏳</div></div>` : ''}
+            
+            <div class="merit-tag">
+                <div class="tag-label">MERIT</div>
+                <div class="tag-val">${barText}</div>
+            </div>
+        </div>`;
+}
+
+// --- REDEMPTION LOGIC ---
+window.atoneForTask = function(index) {
+    const items = getGalleryList(); // Use sorted list to get right item
+    const task = items[index];
+    if (!task) return;
+
+    if (gameStats.coins < 100) {
+        triggerSound('sfx-deny');
+        alert("Insufficient Capital. You need 100 coins to atone.");
+        return;
+    }
+
+    triggerSound('coinSound');
+    setGameStats({ ...gameStats, coins: gameStats.coins - 100 });
+    const coinEl = document.getElementById('coins');
+    if(coinEl) coinEl.innerText = gameStats.coins;
+
+    const restoredTask = { text: task.text, category: 'redemption', timestamp: Date.now() };
+    setCurrentTask(restoredTask);
+    
+    const endTimeVal = Date.now() + 86400000; 
+    const newPendingState = { task: restoredTask, endTime: endTimeVal, status: "PENDING" };
+    setPendingTaskState(newPendingState);
+    
+    window.closeModal(); 
+    
+    // Switch UI
+    if(window.restorePendingUI) window.restorePendingUI();
+    if(window.updateTaskUIState) window.updateTaskUIState(true);
+    if(window.toggleTaskDetails) window.toggleTaskDetails(true);
+
+    window.parent.postMessage({ 
+        type: "PURCHASE_ITEM", 
+        itemName: "Redemption",
+        cost: 100,
+        messageToDom: "Slave paid 100 coins to retry failed task." 
+    }, "*");
+    
+    window.parent.postMessage({ 
+        type: "savePendingState", 
+        pendingState: newPendingState, 
+        consumeQueue: false 
+    }, "*");
+};
+
+// --- MODAL (DOSSIER STYLE) ---
 export function openHistoryModal(index) {
-    const items = getSortedGallery();
+    const items = getGalleryList();
     const item = items[index];
     if (!item) return;
     
     setCurrentHistoryIndex(index);
 
-    const isVideo = (item.proofUrl || "").match(/\.(mp4|webm|mov)($|\?)/i);
+    let url = item.proofUrl || item.media || item.file;
+    const isVideo = (url || "").match(/\.(mp4|webm|mov)($|\?)/i);
     const mediaContainer = document.getElementById('modalMediaContainer');
     if (mediaContainer) {
         mediaContainer.innerHTML = isVideo 
-            ? `<video src="${item.proofUrl}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>`
-            : `<img src="${item.proofUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+            ? `<video src="${url}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>`
+            : `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
     }
 
     const overlay = document.getElementById('modalGlassOverlay');
@@ -180,51 +294,6 @@ export function openHistoryModal(index) {
     document.getElementById('glassModal').classList.add('active');
 }
 
-// --- REDEMPTION LOGIC ---
-window.atoneForTask = function(index) {
-    const items = getSortedGallery();
-    const task = items[index];
-    if (!task) return;
-
-    if (gameStats.coins < 100) {
-        triggerSound('sfx-deny');
-        alert("Insufficient Capital. You need 100 coins to atone.");
-        return;
-    }
-
-    triggerSound('coinSound');
-    setGameStats({ ...gameStats, coins: gameStats.coins - 100 });
-    const coinEl = document.getElementById('coins');
-    if(coinEl) coinEl.innerText = gameStats.coins;
-
-    const restoredTask = { text: task.text, category: 'redemption', timestamp: Date.now() };
-    setCurrentTask(restoredTask);
-    
-    const endTimeVal = Date.now() + 86400000; 
-    const newPendingState = { task: restoredTask, endTime: endTimeVal, status: "PENDING" };
-    setPendingTaskState(newPendingState);
-    
-    window.closeModal(); 
-    
-    if(window.restorePendingUI) window.restorePendingUI();
-    if(window.updateTaskUIState) window.updateTaskUIState(true);
-    if(window.toggleTaskDetails) window.toggleTaskDetails(true);
-
-    window.parent.postMessage({ 
-        type: "PURCHASE_ITEM", 
-        itemName: "Redemption",
-        cost: 100,
-        messageToDom: "Slave paid 100 coins to retry failed task." 
-    }, "*");
-    
-    window.parent.postMessage({ 
-        type: "savePendingState", 
-        pendingState: newPendingState, 
-        consumeQueue: false 
-    }, "*");
-};
-
-// --- VIEW HELPERS ---
 export function toggleHistoryView(view) {
     const modal = document.getElementById('glassModal');
     const overlay = document.getElementById('modalGlassOverlay');
@@ -263,14 +332,23 @@ export function closeModal(e) {
     }
 }
 
+// REQUIRED EXPORT
+export function loadMoreHistory() {
+    setHistoryLimit(historyLimit + 25);
+    renderGallery();
+}
+
 export function openModal() {}
-export function loadMoreHistory() { renderGallery(); }
 export function initModalSwipeDetection() {}
 
-// FORCE EXPORT
+// FORCE WINDOW EXPORTS
 window.renderGallery = renderGallery;
 window.openHistoryModal = openHistoryModal;
 window.toggleHistoryView = toggleHistoryView;
 window.closeModal = closeModal;
 window.atoneForTask = window.atoneForTask;
 window.loadMoreHistory = loadMoreHistory;
+window.setGalleryFilter = function(filterType) {
+    activeStickerFilter = filterType;
+    renderGallery(); 
+};
