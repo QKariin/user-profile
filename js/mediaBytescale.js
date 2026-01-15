@@ -57,14 +57,18 @@ export function isBytescaleUrl(url) {
 }
 
 export function isNotSigned(url) {
+  console.log("isNotSigned CHECK:", url);
+
   if (!isBytescaleUrl(url)) return false;
 
   const params = new URL(url).searchParams;
 
-  // Already signed → skip
-  if (params.has("sig")) return false;
+  if (params.has("sig")) {
+    console.log("Already signed → skip");
+    return false;
+  }
 
-  // Everything else → needs signing
+  console.log("Needs signing → true");
   return true;
 }
 
