@@ -107,7 +107,6 @@ function renderStickerFilters() {
 }
 
 // REPLACE your renderGallery function with this:
-
 export function renderGallery() {
     if (!galleryData) return;
 
@@ -126,7 +125,7 @@ export function renderGallery() {
 
     const allItems = getGalleryList(); 
 
-    // --- TOP ALTAR LOGIC ---
+    // --- 1. TOP 3 (THE ALTAR) ---
     let bestOf = [...allItems]
         .filter(item => {
             const s = (item.status || "").toLowerCase();
@@ -150,7 +149,6 @@ export function renderGallery() {
         slot1.card.onclick = null;
         slot1.img.style.filter = "grayscale(30%)"; 
     }
-
     // Left
     slot2.card.style.display = 'flex';
     if (bestOf[1]) {
@@ -162,7 +160,6 @@ export function renderGallery() {
         slot2.img.src = IMG_STATUE_SIDE;
         slot2.card.onclick = null;
     }
-
     // Right
     slot3.card.style.display = 'flex';
     if (bestOf[2]) {
@@ -175,7 +172,8 @@ export function renderGallery() {
         slot3.card.onclick = null;
     }
 
-    // --- MIDDLE (Archive) LOGIC ---
+
+    // --- 2. MIDDLE (ARCHIVE) ---
     const middleItems = allItems.filter(item => {
         if (bestOf.includes(item)) return false; 
         const s = (item.status || "").toLowerCase();
@@ -183,46 +181,50 @@ export function renderGallery() {
     });
 
     if (middleItems.length === 0) {
-        // RENDER 6 PLACEHOLDERS
+        // Empty State
         for(let i=0; i<6; i++) {
-            gridOkay.innerHTML += `
-                <div class="item-placeholder-slot">
-                    <img src="${IMG_MIDDLE_EMPTY}">
-                </div>`;
+            gridOkay.innerHTML += `<div class="item-placeholder-slot"><img src="${IMG_MIDDLE_EMPTY}"></div>`;
         }
     } else {
+        // Content State (Blueprint Layout)
         middleItems.forEach(item => {
             let thumb = getOptimizedUrl(item.proofUrl || item.media, 300);
             let realIndex = allItems.indexOf(item);
             let isPending = (item.status || "").toLowerCase().includes('pending');
+            
             let overlay = isPending ? `<div class="pending-overlay"><div class="pending-icon">⏳</div></div>` : ``;
 
+            // INJECTING BLUEPRINT CORNERS
             gridOkay.innerHTML += `
-                <div class="item-archive" onclick="window.openHistoryModal(${realIndex})">
-                    <img class="archive-img" src="${thumb}">
+                <div class="item-blueprint" onclick="window.openHistoryModal(${realIndex})">
+                    <img class="blueprint-img" src="${thumb}">
+                    <div class="bp-corner bl-tl"></div>
+                    <div class="bp-corner bl-tr"></div>
+                    <div class="bp-corner bl-bl"></div>
+                    <div class="bp-corner bl-br"></div>
                     ${overlay}
                 </div>`;
         });
     }
 
-    // --- BOTTOM (Heap) LOGIC ---
+    // --- 3. BOTTOM (HEAP) ---
     const failedItems = allItems.filter(item => {
         const s = (item.status || "").toLowerCase();
         return s.includes('rej') || s.includes('fail');
     });
 
     if (failedItems.length === 0) {
-        // RENDER 6 PLACEHOLDERS
+        // Empty State
         for(let i=0; i<6; i++) {
-            gridFailed.innerHTML += `
-                <div class="item-placeholder-slot">
-                    <img src="${IMG_BOTTOM_EMPTY}">
-                </div>`;
+            gridFailed.innerHTML += `<div class="item-placeholder-slot"><img src="${IMG_BOTTOM_EMPTY}"></div>`;
         }
     } else {
+        // Content State (Trash Layout)
         failedItems.forEach(item => {
             let thumb = getOptimizedUrl(item.proofUrl || item.media, 300);
             let realIndex = allItems.indexOf(item);
+            
+            // INJECTING TRASH STAMP
             gridFailed.innerHTML += `
                 <div class="item-trash" onclick="window.openHistoryModal(${realIndex})">
                     <img class="trash-img" src="${thumb}">
