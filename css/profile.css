@@ -16,7 +16,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 
 body {
-    background-color: var(--bg-void);
+    background: url('https://static.wixstatic.com/media/ce3e5b_c853f7c3a80746df915f15d186c31992~mv2.jpg') no-repeat center center fixed;
     background: radial-gradient(circle at 80% 20%, #111 0%, var(--bg-void) 80%);
     color: var(--text-white);
     font-family: 'Cinzel', serif; /* GLOBAL FONT CHANGE */
@@ -181,7 +181,7 @@ body {
 /* =========================================
    3. RIGHT STAGE
    ========================================= */
-.layout-right { flex-grow: 1; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.layout-right { flex-grow: 1; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; background: transparent; }
 .glass-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid #333; }
 .content-stage { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
 .view-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; }
@@ -527,107 +527,78 @@ body {
 }
 
 /* =========================================
-   TOP SECTION: COMPACT & CLEAN
+   2. TOP SECTION: THE ALTAR (Fixed 260px)
    ========================================= */
-
-/* 1. HANDCUFF THE HEIGHT (Fixes the "50% Screen" issue) */
 .section-altar.triptych-stage {
-    flex: 0 0 260px !important;    /* FORCE fixed size. Do not grow. */
-    height: 260px !important;      /* Strictly 260px tall */
-    min-height: 260px !important;  /* No shrinking */
+    flex: 0 0 260px !important;    /* LOCKED HEIGHT */
+    height: 260px !important;
+    min-height: 260px !important;
     
-    position: relative;
-    width: 100%;
-    background: radial-gradient(circle at 50% 40%, #1a1510 0%, #000 80%);
+    background: transparent !important; /* Show Marble */
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden !important;
+    overflow: visible !important; /* Allow glow to spill */
     perspective: 1000px;
     z-index: 10;
-    border-bottom: 1px solid #222; /* Clean separation from Middle Section */
+    border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+    position: relative;
 }
 
-/* 2. REMOVE THE POINTS (Clean Look) */
-.altar-plaque {
-    display: none !important;
-}
+/* REMOVE POINTS */
+.altar-plaque { display: none !important; }
 
-/* 3. RESIZE CARDS TO FIT NEW COMPACT HEIGHT */
-
-/* Center Idol */
-.center-idol {
-    width: 150px;   /* Narrower */
-    height: 200px;  /* Fits perfectly inside 260px container */
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%); /* Dead Center */
-    z-index: 20;
-    border-left: 1px solid #111;
-    border-right: 1px solid #111;
-}
-
-/* Side Offerings */
-.left-offering, .right-offering {
-    width: 120px;
-    height: 160px;
-    top: 50%;
-    z-index: 10;
-    filter: brightness(0.4) sepia(0.2);
-    opacity: 0.8;
-}
-
-.left-offering {
-    left: 50%;
-    transform: translate(-140%, -50%) scale(0.9);
-}
-
-.right-offering {
-    left: 50%;
-    transform: translate(40%, -50%) scale(0.9);
-}
-
-/* 4. ADJUST REFLECTION */
-.reflection-mask {
-    position: absolute;
-    top: 100%;
-    left: 0; 
-    width: 100%;
-    height: 40px; /* Short fade */
-    overflow: hidden;
-    transform: scaleY(-1);
-    opacity: 0.3; /* Subtle */
-    mask-image: linear-gradient(to top, transparent 0%, black 100%);
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
-    pointer-events: none;
-    margin-top: 4px;
-}
-
-/* 5. DECORATION */
-.altar-halo {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 350px; height: 350px; /* Smaller Halo */
-    background: radial-gradient(closest-side, rgba(197, 160, 89, 0.15), transparent);
-    z-index: 1; pointer-events: none;
-}
-
+/* --- THE GOLD EFFECT (Restored & Boosted) --- */
 .gold-bar {
-    width: 100%; height: 5px; 
-    background: linear-gradient(90deg, #5e4b25, #fddb92, #c5a059, #5e4b25);
+    width: 100%; height: 6px; 
+    /* Brighter, yellower gold */
+    background: linear-gradient(90deg, #8a6e3c, #ffd700, #fffdd0, #ffd700, #8a6e3c);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); /* Gold Glow */
     z-index: 10;
 }
 
-.inner-hairline {
-    position: absolute; inset: 5px; 
-    border: 1px solid rgba(255,255,255,0.3); 
-    pointer-events: none; z-index: 15;
+/* The Center Idol Glow */
+.center-idol {
+    width: 150px; height: 200px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    
+    /* The Golden Aura */
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.2), 0 0 10px rgba(0,0,0,1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.altar-card {
-    position: absolute; display: flex; flex-direction: column;
-    background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+/* Side Statues */
+.left-offering, .right-offering {
+    width: 120px; height: 160px;
+    top: 50%; z-index: 10;
+    /* Un-dim them slightly so placeholders are visible */
+    filter: brightness(0.8) sepia(0.2); 
+    opacity: 0.9;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8);
 }
-.altar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.left-offering { left: 50%; transform: translate(-140%, -50%) scale(0.9); }
+.right-offering { left: 50%; transform: translate(40%, -50%) scale(0.9); }
+
+/* --- MIDDLE & BOTTOM PLACEHOLDERS --- */
+.empty-placeholder {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    opacity: 0.8;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+}
+
+.section-archive, .section-heap {
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center the empty image */
+}
 /* =========================================
    MIDDLE: THE ARCHIVE (Recessed, Clean)
    Ref: Dark squares, thin borders
