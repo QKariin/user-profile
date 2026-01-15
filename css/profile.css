@@ -478,19 +478,19 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: THE MECHANICAL TRILOGY
+   7. HISTORY: THE TRILOGY
    ========================================= */
 
 /* --- GLOBAL SECTION LAYOUT --- */
 .trilogy-section {
-    height: 33.33vh; /* Exact 1/3 split */
+    height: 33.33vh;
     width: 100%;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #111;
 }
 
 .horizontal-scroll-track {
@@ -501,211 +501,158 @@ body {
     height: 100%;
     align-items: center;
     padding: 0 40px;
-    gap: 30px;
     scrollbar-width: none; 
 }
 .horizontal-scroll-track::-webkit-scrollbar { display: none; }
 
 .trilogy-label {
-    position: absolute;
-    top: 10px; left: 20px;
-    z-index: 100;
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 4px;
+    position: absolute; top: 10px; left: 20px; z-index: 100;
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 4px; pointer-events: none;
+}
+
+/* =========================================
+   TOP: THE ALTAR (Glowing, Floating, Gold)
+   ========================================= */
+.section-altar {
+    background: radial-gradient(circle at 50% 0%, #1a1510 0%, #000 70%);
+    z-index: 10;
+}
+.label-altar { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+
+/* The God Ray Light */
+.god-ray {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 100%;
+    background: linear-gradient(to bottom, rgba(197, 160, 89, 0.1), transparent);
+    filter: blur(40px);
     pointer-events: none;
 }
 
-/* =========================================
-   TOP: THE HANGING SCROLLS (Perfect > 145)
-   Ref: Image 2 - Vertical, Rollers, Swaying
-   ========================================= */
-.section-pergament {
-    background: radial-gradient(circle, #1a1510 0%, #050403 100%); /* Ancient Wall */
-}
-.label-pergament { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
-
-.item-scroll {
+.item-relic {
+    min-width: 160px; height: 220px; /* Tall Portrait */
+    margin-right: 40px;
     position: relative;
-    width: 140px; 
-    height: 200px;
-    flex-shrink: 0;
     cursor: pointer;
-    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.9));
-    transform-origin: top center;
-    animation: sway 6s ease-in-out infinite alternate;
+    /* Levitation Effect */
+    transform: translateY(-5px);
+    transition: all 0.4s ease;
 }
 
-/* The Paper */
-.scroll-paper {
-    width: 100%; height: 100%;
-    background: #dcd0b9; 
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 5px 0 10px rgba(0,0,0,0.3), inset -5px 0 10px rgba(0,0,0,0.3);
-}
-
-.scroll-paper img {
+.relic-img {
     width: 100%; height: 100%; object-fit: cover;
-    mix-blend-mode: multiply; /* Blends image into paper texture */
-    filter: sepia(0.3) contrast(1.1);
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.3), 0 20px 40px rgba(0,0,0,0.8);
 }
 
-/* The Rollers */
-.roller-top, .roller-bot {
-    position: absolute; left: -8%; width: 116%; height: 10px;
-    background: linear-gradient(to bottom, #8b5a2b, #3d2b1f); /* Wood */
-    border-radius: 5px;
-    z-index: 10;
-    box-shadow: 0 2px 4px black;
-    border: 1px solid #111;
+/* The Value Watermark (Behind/Over Image) */
+.relic-value {
+    position: absolute;
+    bottom: -10px; right: -10px;
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.1);
+    z-index: 2;
+    pointer-events: none;
 }
-/* Gold Caps */
-.roller-top::after, .roller-top::before, 
-.roller-bot::after, .roller-bot::before {
-    content: ''; position: absolute; top: 0; width: 6px; height: 100%;
-    background: linear-gradient(to right, #ffd700, #b8860b);
-    border-radius: 2px;
-}
-.roller-top::before { left: 0; } .roller-top::after { right: 0; }
-.roller-bot::before { left: 0; } .roller-bot::after { right: 0; }
 
-.roller-top { top: -6px; }
-.roller-bot { bottom: -6px; }
+.item-relic:hover { transform: translateY(-15px) scale(1.05); z-index: 20; }
+.item-relic:hover .relic-img { box-shadow: 0 0 40px rgba(197, 160, 89, 0.6); border-color: #fff; }
+.item-relic:hover .relic-value { color: var(--gold); opacity: 1; }
 
-@keyframes sway {
-    0% { transform: rotate(1.5deg); }
-    100% { transform: rotate(-1.5deg); }
-}
 
 /* =========================================
-   MIDDLE: THE APERTURE (Okay / Pending)
-   Ref: Image 3 - Circular, Blades, Tech
+   MIDDLE: THE ARCHIVE (Recessed, Clean)
+   Ref: Dark squares, thin borders
    ========================================= */
-.section-blueprint {
-    background: #080808;
-    background-image: radial-gradient(circle, #111 1px, transparent 1px);
-    background-size: 20px 20px;
+.section-archive {
+    background: #050505;
     border-top: 1px solid #222;
 }
-.label-blueprint { color: cyan; font-family:'Rajdhani'; }
+.label-archive { color: #888; font-family:'Rajdhani'; }
 
-.item-aperture {
-    width: 150px; height: 150px;
-    flex-shrink: 0;
+.item-archive {
+    min-width: 140px; height: 140px; /* Square */
+    margin-right: 15px;
     position: relative;
-    border-radius: 50%;
-    background: #000;
-    overflow: hidden;
     cursor: pointer;
-    border: 3px solid #222;
-    box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 20px #000;
-    transition: 0.3s;
+    background: #000;
+    /* Recessed Look */
+    box-shadow: inset 0 0 20px #000;
+    border: 1px solid #333;
+    overflow: hidden;
 }
 
-.aperture-img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transform: scale(1.2);
-    transition: 0.4s ease-out;
+.archive-img {
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 0.6; filter: grayscale(80%) contrast(1.1);
+    transform: scale(0.95);
+    transition: all 0.3s ease;
 }
 
-/* The Blades Container */
-.shutter-mech {
+.item-archive:hover .archive-img {
+    opacity: 1; filter: grayscale(0%); transform: scale(1);
+}
+.item-archive:hover { border-color: #fff; box-shadow: inset 0 0 0px #000; }
+
+/* Pending Overlay (Ghost) */
+.pending-ghost {
     position: absolute; inset: 0;
-    pointer-events: none;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    color: cyan; font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px;
 }
-
-/* The 6 Blades */
-.blade {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 100%; height: 100%;
-    background: #151515;
-    transform-origin: 0% 0%;
-    border-left: 1px solid #333;
-    /* Create triangular blade shape */
-    clip-path: polygon(0 0, 100% 0, 100% 50%);
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Arrange the 6 blades in a circle */
-.b1 { transform: rotate(0deg) skewX(30deg); }
-.b2 { transform: rotate(60deg) skewX(30deg); }
-.b3 { transform: rotate(120deg) skewX(30deg); }
-.b4 { transform: rotate(180deg) skewX(30deg); }
-.b5 { transform: rotate(240deg) skewX(30deg); }
-.b6 { transform: rotate(300deg) skewX(30deg); }
-
-/* Interaction: Open the Shutter */
-.item-aperture:hover .blade {
-    transform: rotate(var(--r)) skewX(30deg) translate(15px, -15px);
-    opacity: 0;
-}
-/* Recalculate rotations for hover state to slide them out */
-.item-aperture:hover .b1 { --r: 0deg; }
-.item-aperture:hover .b2 { --r: 60deg; }
-.item-aperture:hover .b3 { --r: 120deg; }
-.item-aperture:hover .b4 { --r: 180deg; }
-.item-aperture:hover .b5 { --r: 240deg; }
-.item-aperture:hover .b6 { --r: 300deg; }
-
-.item-aperture:hover { border-color: cyan; box-shadow: 0 0 20px cyan; }
-.item-aperture:hover .aperture-img { transform: scale(1); }
 
 
 /* =========================================
-   BOTTOM: THE SHADOW CELLS (Failed)
-   Ref: Image 1 - Dark, Recessed, No Borders
+   BOTTOM: THE HEAP (Overlapping Garbage)
    ========================================= */
-.section-vault {
+.section-heap {
     background: #020202;
     border-top: 1px solid #111;
 }
-.label-vault { color: #555; font-family:'Orbitron'; font-weight:900; }
+.label-heap { color: #444; font-family:'Orbitron'; font-weight:900; }
 
-.item-shadow {
-    width: 140px; height: 140px;
-    flex-shrink: 0;
+.heap-track {
+    padding-left: 60px; /* Offset for overlap */
+    overflow-y: visible; /* Allow pop-up */
+}
+
+.item-trash {
+    min-width: 120px; height: 160px; /* Portrait Cards */
+    margin-right: -60px; /* HEAVY NEGATIVE MARGIN -> OVERLAP */
     position: relative;
-    background: #000;
-    overflow: hidden;
     cursor: pointer;
-    
-    /* THE INSET LOOK */
-    box-shadow: inset 0 0 40px #000;
-    border: 1px solid #111;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom center;
+    filter: grayscale(100%) brightness(0.4);
+    border: 1px solid #333;
+    background: #111;
 }
 
-.shadow-img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    opacity: 0.3; /* Very dark */
-    filter: grayscale(100%) contrast(1.5);
-    transition: all 0.5s ease;
-    transform: scale(0.9); /* Pushed back */
-}
-
-/* Verdict Overlay */
-.shadow-stamp {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: #333; font-family: 'Black Ops One'; font-size: 1.5rem;
-    transform: rotate(-15deg);
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.item-shadow:hover .shadow-img {
-    opacity: 1; 
-    filter: grayscale(0%) contrast(1);
-    transform: scale(1); /* Comes forward */
-}
-.item-shadow:hover {
+.item-trash:hover {
+    margin-right: 10px; /* Spread out */
+    transform: translateY(-20px) scale(1.1) rotate(0deg) !important;
+    z-index: 100;
+    filter: grayscale(0%) brightness(1);
+    box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
     border-color: var(--neon-red);
-    box-shadow: inset 0 0 10px #000;
 }
+
+.trash-img { width: 100%; height: 100%; object-fit: cover; }
+
+.trash-stamp {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+    border: 3px solid var(--neon-red);
+    color: var(--neon-red);
+    font-family: 'Black Ops One'; font-size: 1rem;
+    padding: 5px; opacity: 0.8;
+}
+
+/* Random Rotations handled by JS or nth-child */
+.item-trash:nth-child(odd) { transform: rotate(3deg); }
+.item-trash:nth-child(even) { transform: rotate(-2deg); }
+.item-trash:nth-child(3n) { transform: rotate(1deg) translateY(5px); }
 
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
