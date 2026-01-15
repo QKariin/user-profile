@@ -479,10 +479,10 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: THE TRILOGY (FULL REPLACEMENT)
+   7. HISTORY: THE TRILOGY (FULL RESTORATION)
    ========================================= */
 
-/* --- SHARED CONTAINER STYLES --- */
+/* --- SHARED CONTAINER (SEAMLESS) --- */
 .trilogy-section {
     width: 100%;
     position: relative;
@@ -490,53 +490,33 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid rgba(197, 160, 89, 0.2);
-    background: transparent !important; /* CRITICAL: Show Marble */
+    border: none !important; 
+    background: transparent !important; 
 }
 
-/* SECTION LABELS */
 .trilogy-label {
-    position: absolute;
-    top: 10px; left: 20px;
-    z-index: 100;
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 4px;
-    pointer-events: none;
+    position: absolute; top: 10px; left: 20px; z-index: 100;
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 4px;
+    pointer-events: none; color: rgba(255,255,255,0.4);
 }
 
-/* SCROLL TRACKS (Middle & Bottom) */
 #gridPerfect, #gridFailed, #gridOkay {
-    display: flex; 
-    flex-direction: row;
-    overflow-x: auto; 
-    overflow-y: hidden;
-    height: 100%;
-    align-items: center; 
-    padding: 0 40px; 
-    gap: 20px;
-    scrollbar-width: none; 
+    display: flex; flex-direction: row; align-items: center;
+    overflow-x: auto; overflow-y: hidden; height: 100%;
+    padding: 0 40px; gap: 20px; scrollbar-width: none;
 }
 #gridPerfect::-webkit-scrollbar, #gridFailed::-webkit-scrollbar, #gridOkay::-webkit-scrollbar { display: none; }
 
-/* FIX: Remove gap for the Trash pile so they can overlap */
-#gridFailed { gap: 0 !important; padding-left: 60px; }
-
 
 /* =========================================
-   TOP: THE GOLDEN TRIPTYCH (SQUARE & FIXED)
+   TOP: THE GOLDEN TRIPTYCH (Square Altar)
    ========================================= */
 .section-altar.triptych-stage {
-    flex: 0 0 260px !important;    /* LOCKED HEIGHT */
-    height: 260px !important;
-    min-height: 260px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    position: relative !important;
-    background: transparent !important;
-    z-index: 10;
+    flex: 0 0 260px !important; height: 260px !important; min-height: 260px !important;
+    display: flex !important; justify-content: center !important; align-items: center !important;
+    position: relative !important; background: transparent !important; z-index: 10;
     overflow: visible !important;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.1) !important;
 }
 
 .altar-halo {
@@ -546,170 +526,142 @@ body {
     z-index: 0; pointer-events: none;
 }
 
-/* CARDS */
-.altar-card {
-    position: absolute;
-    background: #000;
-    display: flex; flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-}
+.altar-card { position: absolute; background: #000; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.altar-card::after { display: none !important; } 
+.altar-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: none !important; }
 
-/* REMOVE OVERLAY (CLEAN IMAGES) */
-.altar-card::after { display: none !important; content: none !important; }
-
-/* CENTER IDOL (Rank 1) - SQUARE */
 .center-idol {
-    width: 180px; height: 180px;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 20;
-    border: 1px solid rgba(255, 215, 0, 0.5);
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.25);
+    width: 180px; height: 180px; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 20; border: 1px solid rgba(255, 215, 0, 0.5); box-shadow: 0 0 40px rgba(255, 215, 0, 0.25);
 }
-
-/* SIDES (Rank 2 & 3) - SQUARE */
 .left-offering, .right-offering {
-    width: 130px; height: 130px;
-    top: 50%; z-index: 10;
-    opacity: 0.9;
+    width: 130px; height: 130px; top: 50%; z-index: 10; opacity: 0.9;
 }
 .left-offering { left: 50%; transform: translate(-140%, -50%); }
 .right-offering { left: 50%; transform: translate(40%, -50%); }
 
-/* IMAGES & REFLECTION */
-.altar-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: none !important; }
-
 .reflection-mask {
-    position: absolute; top: 100%; left: 0; 
-    width: 100%; height: 60px; 
-    overflow: hidden !important; 
-    transform: scaleY(-1); opacity: 0.4;
+    position: absolute; top: 100%; left: 0; width: 100%; height: 60px; 
+    overflow: hidden !important; transform: scaleY(-1); opacity: 0.4;
     mask-image: linear-gradient(to top, transparent 0%, black 100%);
     -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
     pointer-events: none; margin-top: 5px; z-index: 0;
 }
 .reflect-img { width: 100%; height: 180px; object-fit: cover; }
 
-/* GOLD BARS */
 .gold-bar {
     width: 100%; height: 6px; 
     background: linear-gradient(90deg, #8a6e3c, #ffd700, #fffdd0, #ffd700, #8a6e3c);
-    z-index: 30; position: relative;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    z-index: 30; position: relative; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
 }
-.inner-hairline {
-    position: absolute; inset: 6px; 
-    border: 1px solid rgba(255,255,255,0.4); 
-    pointer-events: none; z-index: 26;
-}
+.inner-hairline { position: absolute; inset: 6px; border: 1px solid rgba(255,255,255,0.4); pointer-events: none; z-index: 26; }
 
 
 /* =========================================
-   MIDDLE SECTION: THE ARCHIVE (9:16 Portrait)
+   MIDDLE: THE ARCHIVE (RESTORED BLUEPRINT LAYOUT)
    ========================================= */
+.section-archive { flex: 1; position: relative; }
 
-/* The Container */
-.section-archive {
-    flex: 1; /* Fills available space naturally */
-    position: relative;
-    /* No borders, no background */
-}
-
-/* The Card (Portrait 9:16) */
-.item-archive {
-    min-width: 120px;       /* Width */
-    height: 210px;          /* Height (~9:16 ratio) */
-    margin-right: 15px;     /* Spacing */
-    position: relative;
-    cursor: pointer;
-    
-    /* Transparent / Glass base */
-    background: rgba(0, 0, 0, 0.2); 
+/* The Container (9:16 Portrait) */
+.item-blueprint {
+    min-width: 120px; height: 210px;
+    margin-right: 15px; position: relative; cursor: pointer;
+    background: rgba(0, 0, 0, 0.3); 
     border: 1px solid rgba(255, 255, 255, 0.1); 
     overflow: hidden;
 }
 
-/* The Image (Grey Overlay Effect) */
-.archive-img {
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover;
-    
-    /* THE GREY OVERLAY LOOK */
-    opacity: 0.5;           /* Dimmed */
-    filter: grayscale(100%); /* Black & White */
-    transition: all 0.4s ease;
+/* Image Layer */
+.blueprint-img {
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 0.5; filter: grayscale(100%); transition: all 0.4s ease;
+    z-index: 1;
 }
+.item-blueprint:hover .blueprint-img { opacity: 1; filter: grayscale(0%); transform: scale(1.05); }
 
-/* Hover: Bring back color */
-.item-archive:hover .archive-img {
-    opacity: 1;
-    filter: grayscale(0%);
-    transform: scale(1.05);
+/* LAYOUT: The Technical Corners (Restored) */
+.bp-corner {
+    position: absolute; width: 10px; height: 10px;
+    border-color: rgba(255, 255, 255, 0.5); border-style: solid;
+    z-index: 10; pointer-events: none; transition: all 0.3s ease;
 }
+.bl-tl { top: 5px; left: 5px; border-width: 2px 0 0 2px; }
+.bl-tr { top: 5px; right: 5px; border-width: 2px 2px 0 0; }
+.bl-bl { bottom: 5px; left: 5px; border-width: 0 0 2px 2px; }
+.bl-br { bottom: 5px; right: 5px; border-width: 0 2px 2px 0; }
 
-/* --- STICKERS & OVERLAYS --- */
+.item-blueprint:hover .bp-corner { border-color: var(--gold); width: 15px; height: 15px; }
 
-/* 1. PENDING (Sandglass/Wait) */
+/* LAYOUT: Stickers */
 .pending-overlay {
-    position: absolute; 
-    inset: 0;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    background: rgba(0,0,0,0.6); /* Darker dim for pending */
-    z-index: 5;
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6); z-index: 20;
 }
-.pending-icon {
-    font-size: 2rem;
-    filter: drop-shadow(0 0 5px cyan);
-    animation: pulse 2s infinite;
-}
+.pending-icon { font-size: 2rem; animation: pulse 2s infinite; }
 
-/* 2. APPROVED (Automatic Sticker via CSS) */
-/* This adds a subtle "stamped" look to non-pending items */
-.item-archive:not(:has(.pending-overlay))::after {
-    content: 'LOGGED'; /* Or 'APPROVED' */
-    position: absolute;
-    bottom: 10px; right: 10px;
-    font-family: 'Black Ops One', cursive; /* Stencil font */
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 2px 5px;
-    transform: rotate(-10deg);
-    pointer-events: none;
-    z-index: 4;
+/* Approved Watermark */
+.item-blueprint:not(:has(.pending-overlay))::after {
+    content: 'LOGGED'; position: absolute; bottom: 15px; right: 10px;
+    font-family: 'Black Ops One', cursive; font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2px 5px; transform: rotate(-10deg); pointer-events: none; z-index: 15;
 }
-
-.item-archive:hover::after {
-    color: var(--gold);
-    border-color: var(--gold);
-    opacity: 1;
-}
+.item-blueprint:hover::after { color: var(--gold); border-color: var(--gold); opacity: 1; }
 
 
 /* =========================================
-   FIX FOR PLACEHOLDERS (The "Cage")
+   BOTTOM: THE HEAP (RESTORED TRASH LAYOUT)
+   ========================================= */
+.section-heap { flex: 1; position: relative; }
+#gridFailed { gap: 0 !important; padding-left: 60px; }
+
+/* The Container (Overlapping) */
+.item-trash {
+    min-width: 120px; height: 160px;
+    margin-right: -50px !important; /* Stacked */
+    position: relative; cursor: pointer;
+    transition: all 0.3s ease; transform-origin: bottom center;
+    border: 1px solid #333; background: #050505;
+}
+
+/* Image Layer */
+.trash-img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: grayscale(100%) brightness(0.5); opacity: 0.7;
+}
+
+/* LAYOUT: The Stamp (Restored) */
+.trash-stamp {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+    border: 3px solid var(--neon-red); color: var(--neon-red);
+    font-family: 'Black Ops One'; font-size: 1rem; padding: 5px; 
+    opacity: 0.8; z-index: 10; text-shadow: 0 0 10px black;
+}
+
+/* Hover Effects */
+.item-trash:hover {
+    margin-right: 15px !important; transform: translateY(-30px) scale(1.1) rotate(0deg) !important;
+    z-index: 100; border-color: var(--neon-red);
+}
+.item-trash:hover .trash-img { filter: grayscale(0%); opacity: 1; }
+
+/* Rotations */
+.item-trash:nth-child(odd) { transform: rotate(3deg); }
+.item-trash:nth-child(even) { transform: rotate(-2deg); }
+
+
+/* =========================================
+   PLACEHOLDERS (Matching Sizes)
    ========================================= */
 .item-placeholder-slot {
-    width: 140px !important;    
-    height: 140px !important;   
-    flex-shrink: 0;             
-    margin-right: 15px;         
-    border: 1px solid rgba(50, 50, 50, 0.5);
-    background: rgba(0,0,0,0.5);
-    overflow: hidden !important; /* CUT OFF EXCESS IMAGE */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-shrink: 0; margin-right: 15px;
+    border: 1px solid rgba(50, 50, 50, 0.5); background: rgba(0,0,0,0.5);
+    overflow: hidden !important; display: flex; justify-content: center; align-items: center;
 }
-.item-placeholder-slot img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important; 
-    display: block;
-}
+.item-placeholder-slot img { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block; }
+
+#gridOkay .item-placeholder-slot { width: 120px !important; height: 210px !important; } /* Middle */
+#gridFailed .item-placeholder-slot { width: 120px !important; height: 160px !important; } /* Bottom */
 
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
