@@ -1,3 +1,4 @@
+
 /* =========================================
    1. VARIABLES & RESET
    ========================================= */
@@ -478,12 +479,12 @@ body {
 .si-btn:hover { border-color: #fff; color: #fff; }
 
 /* =========================================
-   7. HISTORY: THE TRILOGY (FIXED LAYOUT)
+   7. HISTORY: THE TRILOGY
    ========================================= */
 
 /* --- GLOBAL SECTION LAYOUT --- */
 .trilogy-section {
-    height: 33.33vh; /* Exact 1/3 split */
+    height: 33.33vh;
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -491,7 +492,6 @@ body {
     flex-direction: column;
     justify-content: center;
     border-bottom: 1px solid #111;
-    background: #000;
 }
 
 .horizontal-scroll-track {
@@ -502,131 +502,222 @@ body {
     height: 100%;
     align-items: center;
     padding: 0 40px;
-    gap: 20px;
     scrollbar-width: none; 
 }
 .horizontal-scroll-track::-webkit-scrollbar { display: none; }
 
 .trilogy-label {
-    position: absolute;
-    top: 10px; left: 20px;
-    z-index: 100;
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 4px;
-    pointer-events: none;
+    position: absolute; top: 10px; left: 20px; z-index: 100;
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 4px; pointer-events: none;
 }
 
 /* =========================================
-   TOP: HALL OF MERIT (Fixed Size Triptych)
+   TOP: THE GOLDEN TRIPTYCH (STATIC ALTAR)
    ========================================= */
-.section-pergament {
+.section-altar {
+    /* Dark Sanctuary Atmosphere */
     background: radial-gradient(circle at 50% 100%, #1a1510 0%, #000 80%);
-}
-.label-pergament { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
-
-.item-relic {
-    position: relative;
-    /* FORCE DIMENSIONS so it doesn't blow up */
-    width: 160px;  
-    height: 220px;
-    flex-shrink: 0; 
-    cursor: pointer;
-    border: 1px solid var(--gold);
-    box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
-    transition: transform 0.3s ease;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
 }
 
-.item-relic:hover { transform: scale(1.05); z-index: 10; }
-
-.relic-img {
-    width: 100%; height: 100%; object-fit: cover;
-}
-
-.relic-value {
-    position: absolute; bottom: 0; width: 100%;
-    background: rgba(0,0,0,0.8);
-    color: var(--gold);
+.label-altar { 
+    color: var(--gold); 
+    text-shadow: 0 0 20px var(--gold); 
+    top: 15px;
+    width: 100%;
     text-align: center;
-    font-family: 'Rajdhani', sans-serif;
+    left: 0;
+}
+
+/* The Stage */
+.triptych-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px; /* Space between frames */
+    height: 100%;
+    margin-top: 20px;
+}
+
+/* Base Card Style */
+.trip-card {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
+/* --- CENTER CARD (THE IDOL) --- */
+.trip-center {
+    width: 180px; 
+    height: 240px;
+    z-index: 20;
+    transform: translateY(-10px); /* Levitate slightly */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+/* Center Glow (The Halo) */
+.trip-center::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 150%; height: 150%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(197, 160, 89, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* --- SIDE CARDS (THE SAINTS) --- */
+.trip-side {
+    width: 140px; 
+    height: 190px;
+    z-index: 10;
+    opacity: 0.6;
+    filter: grayscale(80%) contrast(1.2);
+}
+
+.trip-side:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+/* --- THE FRAME (Double Construction) --- */
+
+/* 1. The Image Canvas */
+.trip-img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+    /* Heavy Gold Bars Top/Bottom */
+    border-top: 4px solid var(--gold);
+    border-bottom: 4px solid var(--gold);
+    
+    /* Reflection on the floor */
+    -webkit-box-reflect: below 5px linear-gradient(transparent, transparent 60%, rgba(0,0,0,0.3));
+}
+
+/* 2. The Inner Hairline (Etched Glass) */
+.trip-inner-frame {
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* --- THE PLAQUE (Points below) --- */
+.trip-plaque {
+    position: absolute;
+    bottom: -35px; /* Sit in the reflection area */
+    width: 100%;
+    text-align: center;
+    font-family: 'Cinzel', serif;
     font-weight: 700;
-    font-size: 1.2rem;
-    padding: 5px 0;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 2px 5px black;
+    opacity: 0.8;
 }
 
 /* =========================================
-   MIDDLE: PROCESSING (The Blueprints)
+   MIDDLE: THE ARCHIVE (Recessed, Clean)
+   Ref: Dark squares, thin borders
    ========================================= */
-.section-blueprint {
+.section-archive {
     background: #050505;
     border-top: 1px solid #222;
 }
-.label-blueprint { color: cyan; font-family:'Rajdhani'; }
+.label-archive { color: #888; font-family:'Rajdhani'; }
 
-.item-blueprint {
+.item-archive {
+    min-width: 140px; height: 140px; /* Square */
+    margin-right: 15px;
     position: relative;
-    /* FORCE DIMENSIONS */
-    width: 150px; 
-    height: 150px;
-    flex-shrink: 0;
     cursor: pointer;
+    background: #000;
+    /* Recessed Look */
+    box-shadow: inset 0 0 20px #000;
     border: 1px solid #333;
-    background: #111;
     overflow: hidden;
 }
 
-.item-blueprint img {
+.archive-img {
     width: 100%; height: 100%; object-fit: cover;
-    opacity: 0.7; transition: 0.3s;
+    opacity: 0.6; filter: grayscale(80%) contrast(1.1);
+    transform: scale(0.95);
+    transition: all 0.3s ease;
 }
 
-.item-blueprint:hover { border-color: cyan; }
-.item-blueprint:hover img { opacity: 1; }
+.item-archive:hover .archive-img {
+    opacity: 1; filter: grayscale(0%); transform: scale(1);
+}
+.item-archive:hover { border-color: #fff; box-shadow: inset 0 0 0px #000; }
+
+/* Pending Overlay (Ghost) */
+.pending-ghost {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    color: cyan; font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px;
+}
+
 
 /* =========================================
-   BOTTOM: CONTAINMENT (The Vaults)
+   BOTTOM: THE HEAP (Overlapping Garbage)
    ========================================= */
-.section-vault {
+.section-heap {
     background: #020202;
     border-top: 1px solid #111;
 }
-.label-vault { color: #555; font-family:'Orbitron'; font-weight:900; }
+.label-heap { color: #444; font-family:'Orbitron'; font-weight:900; }
 
-.item-vault {
-    position: relative; /* CRITICAL: Contains the 'VOID' text */
-    /* FORCE DIMENSIONS */
-    width: 140px; 
-    height: 140px;
-    flex-shrink: 0;
-    background: #080808;
-    border: 4px solid #1a1a1a;
-    box-shadow: inset 0 0 20px #000;
+.heap-track {
+    padding-left: 60px; /* Offset for overlap */
+    overflow-y: visible; /* Allow pop-up */
+}
+
+.item-trash {
+    min-width: 120px; height: 160px; /* Portrait Cards */
+    margin-right: -60px; /* HEAVY NEGATIVE MARGIN -> OVERLAP */
+    position: relative;
     cursor: pointer;
-    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom center;
+    filter: grayscale(100%) brightness(0.4);
+    border: 1px solid #333;
+    background: #111;
 }
 
-.vault-img {
-    width: 100%; height: 100%; object-fit: cover;
-    opacity: 0.2; 
-    filter: grayscale(100%);
-    transition: 0.3s;
+.item-trash:hover {
+    margin-right: 10px; /* Spread out */
+    transform: translateY(-20px) scale(1.1) rotate(0deg) !important;
+    z-index: 100;
+    filter: grayscale(0%) brightness(1);
+    box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
+    border-color: var(--neon-red);
 }
 
-.vault-stamp {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    font-family: 'Orbitron', sans-serif;
-    color: #333;
-    font-size: 1.5rem;
-    font-weight: 900;
-    pointer-events: none;
-    z-index: 10;
+.trash-img { width: 100%; height: 100%; object-fit: cover; }
+
+.trash-stamp {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+    border: 3px solid var(--neon-red);
+    color: var(--neon-red);
+    font-family: 'Black Ops One'; font-size: 1rem;
+    padding: 5px; opacity: 0.8;
 }
 
-.item-vault:hover { border-color: var(--neon-red); }
-.item-vault:hover .vault-img { opacity: 0.5; }
-.item-vault:hover .vault-stamp { color: var(--neon-red); }
+/* Random Rotations handled by JS or nth-child */
+.item-trash:nth-child(odd) { transform: rotate(3deg); }
+.item-trash:nth-child(even) { transform: rotate(-2deg); }
+.item-trash:nth-child(3n) { transform: rotate(1deg) translateY(5px); }
 
 /* MODALS */
 .glass-modal { display: none; position: absolute; inset: 0; z-index: 999; background: #000; flex-direction: column; overflow: hidden; }
