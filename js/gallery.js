@@ -33,7 +33,11 @@ export function renderGallery() {
     gridOkay.innerHTML = "";
 
     const sortedData = getSortedGallery();
+    
+    // Array to hold Elite items for the 3D Carousel calculation
+    let perfectItems = [];
 
+    // 1. DISTRIBUTE ITEMS
     sortedData.forEach((item, index) => {
         let url = item.proofUrl || item.media || item.file;
         if (!url) return;
@@ -44,9 +48,10 @@ export function renderGallery() {
         let isRejected = status.includes('rej') || status.includes('fail');
         let isPending = status.includes('pending');
 
+        // Store global index for the modal
         item.globalIndex = index; 
 
-        // 1. THE HEAP (FAILED) - BOTTOM
+        // A. THE HEAP (FAILED) - BOTTOM
         if (isRejected) {
             gridFailed.innerHTML += `
                 <div class="item-trash" onclick="window.openHistoryModal(${index})">
@@ -54,15 +59,12 @@ export function renderGallery() {
                     <div class="trash-stamp">DENIED</div>
                 </div>`;
         } 
-        // 2. THE ALTAR (ELITE) - TOP (> 145)
+        // B. COLLECT ELITES FOR 3D RENDER (TOP)
         else if (pts > 145) {
-            gridPerfect.innerHTML += `
-                <div class="item-relic" onclick="window.openHistoryModal(${index})">
-                    <img src="${thumb}" class="relic-img">
-                    <div class="relic-value">+${pts}</div>
-                </div>`;
+            // Push to array to calculate angles later
+            perfectItems.push({ ...item, thumb });
         } 
-        // 3. THE ARCHIVE (OKAY) - MIDDLE
+        // C. THE ARCHIVE (OKAY) - MIDDLE
         else {
             const pendingHTML = isPending ? 
                 `<div class="pending-ghost">⏳ ANALYZING</div>` : ``;
@@ -74,6 +76,24 @@ export function renderGallery() {
                 </div>`;
         }
     });
+
+    // 2. RENDER THE 3D CAROUSEL (HALL OF MERIT)
+    if (perfectItems.length > 0) {
+        const radius = 250; // Distance from center (Width of circle)
+        const angleStep = 360 / perfectItems.length; // Spread items evenly
+
+        perfectItems.forEach((pItem, i) => {
+            const angle = i * angleStep;
+            // The Math: Rotate around Y axis, then push out Z axis
+            const transformStyle = `transform: rotateY(${angle}deg) translateZ(${radius}px);`;
+            
+            gridPerfect.innerHTML += `
+                <div class="item-relic" style="${transformStyle}" onclick="window.openHistoryModal(${pItem.globalIndex})">
+                    <img src="${pItem.thumb}" class="relic-img">
+                    <div class="relic-badge">+${getPoints(pItem)}</div>
+                </div>`;
+        });
+    }
 }
 // --- MODAL LOGIC (DOSSIER STYLE) ---
 export function openHistoryModal(index) {
