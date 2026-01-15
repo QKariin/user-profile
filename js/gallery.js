@@ -1,4 +1,4 @@
-// gallery.js - NUCLEAR FIX (Force Render)
+// gallery.js - NUCLEAR IMAGE FINDER + SINGLE GRID
 
 import { 
     galleryData, pendingLimit, historyLimit, currentHistoryIndex, touchStartX, 
@@ -14,37 +14,45 @@ const PLACEHOLDER_IMG = "https://static.wixstatic.com/media/ce3e5b_1bd27ba758ce4
 
 let activeStickerFilter = "ALL"; 
 
-// --- HELPER: FIND THE IMAGE (NO MATTER WHAT) ---
-function getValidImage(item) {
-    // Check every possible field where Wix might hide the image
-    let candidates = [
-        item.proofUrl, item.media, item.file, item.image, item.src, item.url, item.attachment
-    ];
-    
-    for (let c of candidates) {
-        if (c && typeof c === 'string' && c.length > 5) return c;
-    }
-    
-    return PLACEHOLDER_IMG; // Fallback so we at least see a box
-}
-
 // --- HELPER: POINTS ---
 function getPoints(item) {
     let val = item.points || item.score || item.value || item.amount || item.reward || 0;
     return Number(val);
 }
 
+// --- HELPER: FIND IMAGE (BRUTE FORCE) ---
+function getValidImage(item) {
+    // Check every possible field Wix uses
+    const candidates = [
+        item.proofUrl, 
+        item.media, 
+        item.file, 
+        item.image, 
+        item.src, 
+        item.url, 
+        item.attachment
+    ];
+    
+    for (let c of candidates) {
+        if (c && typeof c === 'string' && c.length > 5) return c;
+    }
+    
+    return null; // No image found
+}
+
 // --- HELPER: GET SORTED LIST ---
 function getGalleryList() {
-    if (!galleryData || !Array.isArray(galleryData)) {
-        console.warn("Gallery Data is empty or invalid");
-        return [];
-    }
+    if (!galleryData || !Array.isArray(galleryData)) return [];
 
-    // 1. Show EVERYTHING. Do not filter out items just because fields are missing.
-    let items = [...galleryData];
+    let items = galleryData.filter(i => {
+        const s = (i.status || "").toLowerCase();
+        const hasImage = getValidImage(i) !== null; // Use the brute force checker
+        
+        // Show Pending, Approved, and Rejected if they have an image
+        return (s.includes('pending') || s.includes('app') || s.includes('rej')) && hasImage;
+    });
 
-    // 2. Apply UI Filters
+    // Apply Filter
     if (activeStickerFilter === "DENIED") {
         items = items.filter(item => (item.status || "").toLowerCase().includes('rej'));
     } 
@@ -55,44 +63,77 @@ function getGalleryList() {
         items = items.filter(item => item.sticker === activeStickerFilter);
     }
 
-    // 3. Sort by Date (Newest First)
+    // Sort by Date (Newest First)
     return items.sort((a, b) => new Date(b._createdDate) - new Date(a._createdDate));
 }
 
-// --- MAIN RENDERER ---
+// --- RENDERERS ---
+
+function renderStickerFilters() {
+    const filterBar = document.getElementById('stickerFilterBar');
+    if (!filterBar || !galleryData) return;
+
+    const stickers = new Set();
+    galleryData.forEach(item => {
+        if (item.sticker && item.sticker.length > 10) stickers.add(item.sticker);
+    });
+
+    let html = `
+        <div class="filter-circle ${activeStickerFilter === 'ALL' ? 'active' : ''}" onclick="window.setGalleryFilter('ALL')">
+            <span class="filter-all-text">ALL</span>
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'PENDING' ? 'active' : ''}" onclick="window.setGalleryFilter('PENDING')" style="${activeStickerFilter === 'PENDING' ? 'border-color:var(--neon-yellow);' : ''}">
+            <span class="filter-all-text" style="color:var(--neon-yellow); font-size:0.5rem;">WAIT</span>
+        </div>
+        <div class="filter-circle ${activeStickerFilter === 'DENIED' ? 'active' : ''}" onclick="window.setGalleryFilter('DENIED')" style="${activeStickerFilter === 'DENIED' ? 'border-color:var(--neon-red);' : ''}">
+            <span class="filter-all-text" style="color:var(--neon-red); font-size:0.5rem;">DENY</span>
+        </div>`;
+
+    stickers.forEach(url => {
+        if(url === STICKER_DENIED) return;
+        const isActive = (activeStickerFilter === url) ? 'active' : '';
+        html += `
+            <div class="filter-circle ${isActive}" onclick="window.setGalleryFilter('${url}')">
+                <img src="${url}">
+            </div>`;
+    });
+
+    filterBar.innerHTML = html;
+}
+
+window.setGalleryFilter = function(filterType) {
+    activeStickerFilter = filterType;
+    renderGallery(); 
+};
+
 export function renderGallery() {
+    if (!galleryData) return;
+
     const hGrid = document.getElementById('historyGrid');
+    
+    // Safety check
     if (!hGrid) return;
 
     renderStickerFilters();
 
     const items = getGalleryList(); 
-
-    if (items.length === 0) {
-        hGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">NO RECORDS FOUND</div>';
-        return;
-    }
-
-    // Render Grid
-    hGrid.innerHTML = items.slice(0, historyLimit).map((item, index) => {
-        try {
-            return createGalleryItemHTML(item, index);
-        } catch (e) {
-            console.error("Error rendering item:", e);
-            return ""; // Skip bad item
-        }
-    }).join('');
     
-    // Force CSS visibility
-    hGrid.style.display = 'grid';
+    if (items.length > 0) {
+        hGrid.innerHTML = items.slice(0, historyLimit).map((item, index) => createGalleryItemHTML(item, index)).join('');
+        hGrid.style.display = 'grid';
+    } else {
+        hGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#444; font-family:Cinzel;">NO RECORDS FOUND</div>';
+    }
     
     const loadBtn = document.getElementById('loadMoreBtn');
     if (loadBtn) loadBtn.style.display = (items.length > historyLimit) ? 'block' : 'none';
 }
 
 function createGalleryItemHTML(item, index) {
-    let rawUrl = getValidImage(item);
+    // USE THE BRUTE FORCE FINDER
+    let rawUrl = getValidImage(item) || PLACEHOLDER_IMG;
     let thumbUrl = getOptimizedUrl(rawUrl, 300);
+    
     const s = (item.status || "").toLowerCase();
     
     const isPending = s.includes('pending') || s === "";
@@ -129,116 +170,7 @@ function createGalleryItemHTML(item, index) {
         </div>`;
 }
 
-// --- FILTER BUTTONS ---
-function renderStickerFilters() {
-    const filterBar = document.getElementById('stickerFilterBar');
-    if (!filterBar || !galleryData) return;
-
-    const stickers = new Set();
-    galleryData.forEach(item => {
-        if (item.sticker && item.sticker.length > 10) stickers.add(item.sticker);
-    });
-
-    let html = `
-        <div class="filter-circle ${activeStickerFilter === 'ALL' ? 'active' : ''}" onclick="window.setGalleryFilter('ALL')">
-            <span class="filter-all-text">ALL</span>
-        </div>
-        <div class="filter-circle ${activeStickerFilter === 'PENDING' ? 'active' : ''}" onclick="window.setGalleryFilter('PENDING')" style="${activeStickerFilter === 'PENDING' ? 'border-color:var(--neon-yellow);' : ''}">
-            <span class="filter-all-text" style="color:var(--neon-yellow); font-size:0.5rem;">WAIT</span>
-        </div>
-        <div class="filter-circle ${activeStickerFilter === 'DENIED' ? 'active' : ''}" onclick="window.setGalleryFilter('DENIED')" style="${activeStickerFilter === 'DENIED' ? 'border-color:var(--neon-red);' : ''}">
-            <span class="filter-all-text" style="color:var(--neon-red); font-size:0.5rem;">DENY</span>
-        </div>`;
-
-    stickers.forEach(url => {
-        if(url === STICKER_DENIED) return;
-        const isActive = (activeStickerFilter === url) ? 'active' : '';
-        html += `
-            <div class="filter-circle ${isActive}" onclick="window.setGalleryFilter('${url}')">
-                <img src="${url}">
-            </div>`;
-    });
-
-    filterBar.innerHTML = html;
-}
-
-// --- MODAL ---
-export function openHistoryModal(index) {
-    const items = getGalleryList();
-    const item = items[index];
-    if (!item) return;
-    
-    setCurrentHistoryIndex(index);
-    let url = getValidImage(item);
-    const pts = getPoints(item);
-    
-    const isVideo = url.match(/\.(mp4|webm|mov)($|\?)/i);
-    const mediaContainer = document.getElementById('modalMediaContainer');
-    if (mediaContainer) {
-        mediaContainer.innerHTML = isVideo 
-            ? `<video src="${url}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>`
-            : `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
-    }
-
-    const overlay = document.getElementById('modalGlassOverlay');
-    if (overlay) {
-        const s = (item.status || "").toLowerCase();
-        const isRejected = s.includes('rej') || s.includes('fail');
-        const isPending = s.includes('pending');
-
-        let statusImg = "";
-        let statusText = "SYSTEM VERDICT";
-        if (isPending) statusText = "AWAITING REVIEW";
-        else statusImg = s.includes('app') ? STICKER_APPROVE : (isRejected ? STICKER_DENIED : "");
-
-        const statusDisplay = isPending 
-            ? `<div style="font-size:3rem;">⏳</div>` 
-            : `<img src="${statusImg}" style="width:100px; height:100px; object-fit:contain; margin-bottom:15px; opacity:0.8;">`;
-
-        let footerAction = `<button onclick="event.stopPropagation(); window.closeModal(event)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE FILE</button>`;
-        if (isRejected) {
-            footerAction = `<button onclick="event.stopPropagation(); window.atoneForTask(${index})" class="btn-skip-small" style="grid-column: span 2; border-color:var(--neon-red); color:var(--neon-red); width:100%;">ATONE (-100 🪙)</button>`;
-        }
-
-        overlay.innerHTML = `
-            <div id="modalCloseX" onclick="window.closeModal(event)" style="position:absolute; top:20px; right:20px; font-size:2.5rem; cursor:pointer; color:white; z-index:110;">×</div>
-            <div class="theater-content dossier-layout">
-                <div class="dossier-sidebar">
-                    <div id="modalInfoView" class="sub-view">
-                        <div class="dossier-block">
-                            <div class="dossier-label">${statusText}</div>
-                            ${statusDisplay}
-                        </div>
-                        <div class="dossier-block">
-                            <div class="dossier-label">MERIT VALUE</div>
-                            <div class="m-points-lg" style="color:${isRejected ? 'red' : (isPending ? 'cyan' : 'gold')}">
-                                ${isPending ? "CALCULATING" : "+" + pts}
-                            </div>
-                        </div>
-                    </div>
-                    <div id="modalFeedbackView" class="sub-view hidden">
-                        <div class="dossier-label">OFFICER NOTES</div>
-                        <div class="theater-text-box">${(item.adminComment || "No notes.").replace(/\n/g, '<br>')}</div>
-                    </div>
-                    <div id="modalTaskView" class="sub-view hidden">
-                         <div class="dossier-label">DIRECTIVE</div>
-                         <div class="theater-text-box">${(item.text || "").replace(/\n/g, '<br>')}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer-menu">
-                <button onclick="event.stopPropagation(); window.toggleHistoryView('feedback')" class="history-action-btn">NOTES</button>
-                <button onclick="event.stopPropagation(); window.toggleHistoryView('task')" class="history-action-btn">ORDER</button>
-                <button onclick="event.stopPropagation(); window.toggleHistoryView('proof')" class="history-action-btn">EVIDENCE</button>
-                <button onclick="event.stopPropagation(); window.toggleHistoryView('info')" class="history-action-btn">DATA</button>
-                ${footerAction}
-            </div>
-        `;
-    }
-    toggleHistoryView('info');
-    document.getElementById('glassModal').classList.add('active');
-}
-
+// --- REDEMPTION LOGIC ---
 window.atoneForTask = function(index) {
     const items = getGalleryList();
     const task = items[index];
@@ -263,39 +195,175 @@ window.atoneForTask = function(index) {
     setPendingTaskState(newPendingState);
     
     window.closeModal(); 
+    
     if(window.restorePendingUI) window.restorePendingUI();
     if(window.updateTaskUIState) window.updateTaskUIState(true);
     if(window.toggleTaskDetails) window.toggleTaskDetails(true);
 
-    window.parent.postMessage({ type: "PURCHASE_ITEM", itemName: "Redemption", cost: 100, messageToDom: "Slave paid 100 coins to retry failed task." }, "*");
-    window.parent.postMessage({ type: "savePendingState", pendingState: newPendingState, consumeQueue: false }, "*");
+    window.parent.postMessage({ 
+        type: "PURCHASE_ITEM", 
+        itemName: "Redemption",
+        cost: 100,
+        messageToDom: "Slave paid 100 coins to retry failed task." 
+    }, "*");
+    
+    window.parent.postMessage({ 
+        type: "savePendingState", 
+        pendingState: newPendingState, 
+        consumeQueue: false 
+    }, "*");
 };
 
-export function toggleHistoryView(view) {
-    const views = ['modalInfoView', 'modalFeedbackView', 'modalTaskView'];
-    views.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-    const target = document.getElementById(view === 'feedback' ? 'modalFeedbackView' : (view === 'task' ? 'modalTaskView' : 'modalInfoView'));
-    if(target) target.classList.remove('hidden');
+// --- MODAL ---
+export function openHistoryModal(index) {
+    const items = getGalleryList();
+    if (!items[index]) return;
     
+    setCurrentHistoryIndex(index);
+    const item = items[index];
+    const s = (item.status || "").toLowerCase();
+    const isRejected = s.includes('rej') || s.includes('fail');
+    const isPending = s.includes('pending') || s === "";
+    const pts = getPoints(item);
+
+    let url = getValidImage(item);
+    const isVideo = (url || "").match(/\.(mp4|webm|mov)($|\?)/i);
+    const mediaContainer = document.getElementById('modalMediaContainer');
+    if (mediaContainer) {
+        mediaContainer.innerHTML = isVideo 
+            ? `<video src="${url}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>`
+            : `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
+    }
+
+    const overlay = document.getElementById('modalGlassOverlay');
+    if (overlay) {
+        let statusImg = "";
+        let statusText = "SYSTEM VERDICT";
+        
+        if (isPending) {
+            statusText = "AWAITING REVIEW";
+        } else {
+            statusImg = s.includes('app') ? STICKER_APPROVE : (isRejected ? STICKER_DENIED : "");
+        }
+
+        const statusDisplay = isPending 
+            ? `<div style="font-size:3rem;">⏳</div>` 
+            : `<img src="${statusImg}" style="width:100px; height:100px; object-fit:contain; margin-bottom:15px; opacity:0.8;">`;
+
+        let footerAction = `<button onclick="event.stopPropagation(); window.closeModal(event)" class="history-action-btn btn-close-red" style="grid-column: span 2;">CLOSE FILE</button>`;
+        if (isRejected) {
+            footerAction = `<button onclick="event.stopPropagation(); window.atoneForTask(${index})" class="btn-dim" style="grid-column: span 2; border-color:var(--neon-red); color:var(--neon-red); width:100%;">ATONE (-100 🪙)</button>`;
+        }
+
+        overlay.innerHTML = `
+            <div id="modalCloseX" onclick="window.closeModal(event)" style="position:absolute; top:20px; right:20px; font-size:2.5rem; cursor:pointer; color:white; z-index:110;">×</div>
+            
+            <div class="theater-content dossier-layout">
+                <div class="dossier-sidebar">
+                    <div id="modalInfoView" class="sub-view">
+                        <div class="dossier-block">
+                            <div class="dossier-label">${statusText}</div>
+                            ${statusDisplay}
+                        </div>
+                        <div class="dossier-block">
+                            <div class="dossier-label">MERIT VALUE</div>
+                            <div class="m-points-lg" style="color:${isRejected ? 'red' : (isPending ? 'cyan' : 'gold')}">
+                                ${isPending ? "CALCULATING" : "+" + pts}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="modalFeedbackView" class="sub-view hidden">
+                        <div class="dossier-label">OFFICER NOTES</div>
+                        <div class="theater-text-box">${(item.adminComment || "No notes.").replace(/\n/g, '<br>')}</div>
+                    </div>
+                    
+                    <div id="modalTaskView" class="sub-view hidden">
+                         <div class="dossier-label">DIRECTIVE</div>
+                         <div class="theater-text-box">${(item.text || "").replace(/\n/g, '<br>')}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-menu">
+                <button onclick="event.stopPropagation(); window.toggleHistoryView('feedback')" class="history-action-btn">NOTES</button>
+                <button onclick="event.stopPropagation(); window.toggleHistoryView('task')" class="history-action-btn">ORDER</button>
+                <button onclick="event.stopPropagation(); window.toggleHistoryView('proof')" class="history-action-btn">EVIDENCE</button>
+                <button onclick="event.stopPropagation(); window.toggleHistoryView('info')" class="history-action-btn">DATA</button>
+                ${footerAction}
+            </div>
+        `;
+    }
+
+    toggleHistoryView('info');
+    document.getElementById('glassModal').classList.add('active');
+}
+
+export function toggleHistoryView(view) {
     const modal = document.getElementById('glassModal');
-    if (view === 'proof') modal.classList.add('proof-mode-active');
-    else modal.classList.remove('proof-mode-active');
+    const overlay = document.getElementById('modalGlassOverlay');
+    if (!modal || !overlay) return;
+
+    const views = ['modalInfoView', 'modalFeedbackView', 'modalTaskView'];
+    views.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('hidden');
+    });
+
+    if (view === 'proof') {
+        modal.classList.add('proof-mode-active');
+        overlay.classList.add('clean');
+    } else {
+        modal.classList.remove('proof-mode-active');
+        overlay.classList.remove('clean');
+        let targetId = 'modalInfoView';
+        if (view === 'feedback') targetId = 'modalFeedbackView';
+        if (view === 'task') targetId = 'modalTaskView';
+        const target = document.getElementById(targetId);
+        if(target) target.classList.remove('hidden');
+    }
 }
 
 export function closeModal(e) {
-    document.getElementById('glassModal').classList.remove('active');
-    document.getElementById('modalMediaContainer').innerHTML = "";
+    if (e && (e.target.id === 'modalCloseX' || e.target.classList.contains('btn-close-red'))) {
+        document.getElementById('glassModal').classList.remove('active');
+        document.getElementById('modalMediaContainer').innerHTML = "";
+        return;
+    }
+    const overlay = document.getElementById('modalGlassOverlay');
+    if (overlay && overlay.classList.contains('clean')) {
+        toggleHistoryView('info'); 
+        return;
+    }
 }
 
+export function openModal() {}
 export function loadMoreHistory() {
     setHistoryLimit(historyLimit + 25);
     renderGallery();
 }
 
-export function openModal() {}
-export function initModalSwipeDetection() {}
+export function initModalSwipeDetection() {
+    const modalEl = document.getElementById('glassModal');
+    if (!modalEl) return;
+    modalEl.addEventListener('touchstart', e => setTouchStartX(e.changedTouches[0].screenX), { passive: true });
+    modalEl.addEventListener('touchend', e => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 80) {
+            let historyItems = getGalleryList();
+            let nextIndex = currentHistoryIndex;
+            if (diff > 0) nextIndex++; 
+            else nextIndex--; 
+            
+            if (nextIndex >= 0 && nextIndex < historyItems.length) {
+                openHistoryModal(nextIndex);
+            }
+        }
+    }, { passive: true });
+}
 
-// FORCE EXPORTS
+// FORCE EXPORT
 window.renderGallery = renderGallery;
 window.openHistoryModal = openHistoryModal;
 window.toggleHistoryView = toggleHistoryView;
