@@ -247,37 +247,59 @@
         </div>
 
     <!-- 3. EVIDENCE LOG (THE TRILOGY) -->
-          <div id="historySection" class="view-wrapper hidden" style="padding: 0; overflow: hidden; height: 100%; display: flex; flex-direction: column; background: #020202;">
-              
-              <!-- TOP: THE ALTAR (Relics) -->
-             <!-- TOP: THE 3D ALTAR (PERFECT > 145) -->
-              <div class="trilogy-section section-altar">
-                  <div class="trilogy-label label-altar">HALL OF MERIT</div>
-                  
-                  <!-- 3D Scene Container -->
-                  <div class="altar-scene">
-                      <div id="gridPerfect" class="altar-carousel">
-                          <!-- Items injected by JS -->
-                      </div>
+         <div id="historySection" class="view-wrapper hidden" style="height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #020202;">
+
+          <!-- 1. TOP: THE ALTAR (Static Triptych) -->
+          <div class="trilogy-section section-altar triptych-stage">
+              <!-- Background Light -->
+              <div class="altar-halo"></div>
+      
+              <!-- LEFT OFFERING (Rank #2) -->
+              <div class="altar-card side-card left-offering" id="altarSlot2" style="display:none;">
+                  <div class="gold-bar bar-top"></div>
+                  <div class="inner-hairline"></div>
+                  <img src="" class="altar-img" id="imgSlot2">
+                  <div class="gold-bar bar-bottom"></div>
+                  <div class="altar-plaque" id="scoreSlot2"></div>
+              </div>
+      
+              <!-- RIGHT OFFERING (Rank #3) -->
+              <div class="altar-card side-card right-offering" id="altarSlot3" style="display:none;">
+                  <div class="gold-bar bar-top"></div>
+                  <div class="inner-hairline"></div>
+                  <img src="" class="altar-img" id="imgSlot3">
+                  <div class="gold-bar bar-bottom"></div>
+                  <div class="altar-plaque" id="scoreSlot3"></div>
+              </div>
+      
+              <!-- CENTER IDOL (Rank #1) -->
+              <div class="altar-card center-idol" id="altarSlot1" style="display:none;">
+                  <div class="gold-bar bar-top"></div>
+                  <div class="inner-hairline"></div>
+                  <img src="" class="altar-img" id="imgSlot1">
+                  <div class="gold-bar bar-bottom"></div>
+                  <!-- Reflection -->
+                  <div class="reflection-mask">
+                      <img src="" class="reflect-img" id="reflectSlot1">
                   </div>
-                  
-                  <!-- Floor Reflection Gradient -->
-                  <div class="altar-floor"></div>
+                  <!-- Score -->
+                  <div class="altar-plaque main-plaque" id="scoreSlot1"></div>
               </div>
-          
-              <!-- MIDDLE: THE ARCHIVE (Reference Image Style) -->
-              <div class="trilogy-section section-archive">
-                  <div class="trilogy-label label-archive">PROCESSING</div>
-                  <div id="gridOkay" class="horizontal-scroll-track archive-track"></div>
-              </div>
-          
-              <!-- BOTTOM: THE HEAP (Failed Pile) -->
-              <div class="trilogy-section section-heap">
-                  <div class="trilogy-label label-heap">CONTAINMENT</div>
-                  <div id="gridFailed" class="horizontal-scroll-track heap-track"></div>
-              </div>
-          
           </div>
+
+    <!-- 2. MIDDLE: THE ARCHIVE -->
+    <div class="trilogy-section section-archive">
+        <div class="trilogy-label label-archive">PROCESSING</div>
+        <div id="gridOkay" class="horizontal-scroll-track archive-track" style="display:flex; overflow-x:auto; height:100%; align-items:center; padding:0 20px;"></div>
+    </div>
+
+    <!-- 3. BOTTOM: THE HEAP -->
+    <div class="trilogy-section section-heap">
+        <div class="trilogy-label label-heap">CONTAINMENT</div>
+        <div id="gridFailed" class="horizontal-scroll-track heap-track" style="display:flex; overflow-x:auto; height:100%; align-items:center; padding:0 20px;"></div>
+    </div>
+
+</div>
 
         <!-- 4. QUEEN KARIN NEWS (RESTORED) -->
         <div id="viewNews" class="view-wrapper hidden" style="padding: 20px; overflow-y: auto;">
