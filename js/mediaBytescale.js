@@ -158,6 +158,7 @@ export async function signUpcdnUrl(url) {
   //const parts = url.split("/raw/");
   const parts = url.split(/\/raw\/|\/thumbnail\//);
   if (parts.length !== 2) return url;
+  console.log("Extracted file path:", parts[1]);
 
   const filePath = "/" + parts[1];
 
