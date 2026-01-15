@@ -527,56 +527,151 @@ body {
 }
 
 /* =========================================
-   TOP: THE ALTAR (Glowing, Floating, Gold)
+   TOP SECTION ONLY: THE GOLDEN TRIPTYCH
    ========================================= */
-.section-altar {
-    background: radial-gradient(circle at 50% 0%, #1a1510 0%, #000 70%);
+
+/* The Stage - Forces "Static" Mode (No Scroll) */
+.section-altar.triptych-stage {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Fills strictly the top container */
+    background: radial-gradient(circle at 50% 40%, #1a1510 0%, #000 80%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden !important; /* CRITICAL: Kills the old scroll */
+    perspective: 1000px; /* Creates 3D depth for the sides */
     z-index: 10;
 }
-.label-altar { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
 
-/* The God Ray Light */
-.god-ray {
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 60%; height: 100%;
-    background: linear-gradient(to bottom, rgba(197, 160, 89, 0.1), transparent);
-    filter: blur(40px);
-    pointer-events: none;
-}
-
-.item-relic {
-    min-width: 160px; height: 220px; /* Tall Portrait */
-    margin-right: 40px;
-    position: relative;
-    cursor: pointer;
-    /* Levitation Effect */
-    transform: translateY(-5px);
-    transition: all 0.4s ease;
-}
-
-.relic-img {
-    width: 100%; height: 100%; object-fit: cover;
-    border: 1px solid var(--gold);
-    box-shadow: 0 0 20px rgba(197, 160, 89, 0.3), 0 20px 40px rgba(0,0,0,0.8);
-}
-
-/* The Value Watermark (Behind/Over Image) */
-.relic-value {
+/* The Halo (Glowing Background) */
+.altar-halo {
     position: absolute;
-    bottom: -10px; right: -10px;
-    font-family: 'Cinzel', serif;
-    font-size: 3rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.1);
-    z-index: 2;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%; 
+    height: 150%; /* Tall glow */
+    background: radial-gradient(closest-side, rgba(197, 160, 89, 0.2), transparent);
+    z-index: 1;
     pointer-events: none;
 }
 
-.item-relic:hover { transform: translateY(-15px) scale(1.05); z-index: 20; }
-.item-relic:hover .relic-img { box-shadow: 0 0 40px rgba(197, 160, 89, 0.6); border-color: #fff; }
-.item-relic:hover .relic-value { color: var(--gold); opacity: 1; }
+/* --- THE CARDS (Shared Styles) --- */
+.altar-card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
 
+/* Image Fit */
+.altar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
+/* --- THE DECORATION (Frame & Gold) --- */
+.gold-bar {
+    width: 100%;
+    height: 6px; /* Heavy Top/Bottom Bar */
+    background: linear-gradient(90deg, #5e4b25, #fddb92, #c5a059, #5e4b25);
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.inner-hairline {
+    position: absolute;
+    top: 10px; bottom: 10px; left: 10px; right: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    z-index: 15;
+    pointer-events: none;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+}
+
+/* --- POSITIONS & HIERARCHY --- */
+
+/* 1. CENTER IDOL (Rank 1) */
+.center-idol {
+    width: 180px;  /* Adjust width to fit your screen */
+    height: 240px; /* Adjust height to fit your screen */
+    z-index: 20;   /* On Top */
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -55%); /* Centered, slightly up */
+    border-left: 1px solid #222;
+    border-right: 1px solid #222;
+}
+
+/* 2. LEFT OFFERING (Rank 2) */
+.left-offering {
+    width: 140px;
+    height: 190px;
+    z-index: 10;   /* Behind Center */
+    top: 50%;
+    left: 50%;
+    transform: translate(-130%, -50%) scale(0.9); /* Left & Small */
+    filter: brightness(0.5) sepia(0.3); /* Dimmed */
+    opacity: 0.8;
+}
+
+/* 3. RIGHT OFFERING (Rank 3) */
+.right-offering {
+    width: 140px;
+    height: 190px;
+    z-index: 10;   /* Behind Center */
+    top: 50%;
+    left: 50%;
+    transform: translate(30%, -50%) scale(0.9); /* Right & Small */
+    filter: brightness(0.5) sepia(0.3); /* Dimmed */
+    opacity: 0.8;
+}
+
+/* --- REFLECTION (Under Center Only) --- */
+.reflection-mask {
+    position: absolute;
+    top: 100%; /* Directly below */
+    left: 0; 
+    width: 100%;
+    height: 60px; /* Fade out height */
+    overflow: hidden;
+    transform: scaleY(-1); /* Flip Vertical */
+    opacity: 0.5;
+    mask-image: linear-gradient(to top, transparent 0%, black 100%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
+    pointer-events: none;
+    margin-top: 6px; /* Gap for gold bar */
+}
+
+/* --- TEXT PLAQUES --- */
+.altar-plaque {
+    position: absolute;
+    bottom: -35px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Side Text */
+.side-card .altar-plaque {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Center Text */
+.main-plaque {
+    bottom: -55px; /* Push lower below reflection */
+    font-size: 1.5rem;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(197, 160, 89, 0.5);
+    z-index: 30;
+}
 /* =========================================
    MIDDLE: THE ARCHIVE (Recessed, Clean)
    Ref: Dark squares, thin borders
