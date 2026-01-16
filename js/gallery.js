@@ -243,7 +243,7 @@ export async function renderGallery() {
                     <img class="trash-img" src="${thumb}">
                     <div class="trash-stamp">DENIED</div>
                 </div>`;
-        });
+        };
     }
 }
 
