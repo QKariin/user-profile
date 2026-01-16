@@ -444,29 +444,41 @@ export function toggleHistoryView(view) {
     }
 }
 
-// REPLACE YOUR EXISTING closeModal FUNCTION WITH THIS
 export function closeModal(e) {
-    // 1. If called directly (window.closeModal()) -> CLOSE
+    const modal = document.getElementById('glassModal');
+
+    // 1. If called manually (clicked DISMISS button), force close immediately.
     if (!e) {
-        forceClose();
+        if(modal) modal.classList.remove('active');
+        document.getElementById('modalMediaContainer').innerHTML = "";
         return;
     }
 
-    // 2. Define what things should close the window
+    // --- NEW FEATURE STARTS HERE ---
+    // 2. If we are in INSPECT MODE, a click should just bring the menu back.
+    if (modal && modal.classList.contains('inspect-mode')) {
+        modal.classList.remove('inspect-mode');
+        return; // STOP HERE! Do not close the window.
+    }
+    // --- NEW FEATURE ENDS HERE ---
+
+    // 3. Normal Background Click Logic (Close the Modal)
     const target = e.target;
+    
+    // List of things that act as "Background"
     const idsToClose = ['glassModal', 'modalGlassOverlay', 'modalMediaContainer', 'modalCloseX'];
     const classesToClose = ['btn-close-red', 'btn-glass-red'];
 
-    // 3. Check if we clicked one of those things
     const shouldClose = idsToClose.includes(target.id) || 
                         classesToClose.some(c => target.classList.contains(c));
 
     if (shouldClose) {
-        forceClose();
+        if(modal) modal.classList.remove('active');
+        document.getElementById('modalMediaContainer').innerHTML = "";
         return;
     }
 
-    // 4. Clean Mode Toggle Logic (Keep your existing logic here)
+    // 4. Handle "Clean" overlay (Legacy logic if you still use it)
     const overlay = document.getElementById('modalGlassOverlay');
     if (overlay && overlay.classList.contains('clean')) {
         toggleHistoryView('info'); 
