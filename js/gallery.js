@@ -154,7 +154,7 @@ export async function renderGallery() {
         let realIndex = allItems.indexOf(bestOf[0]);
         slot1.img.src = thumb;
         if(slot1.ref) slot1.ref.src = thumb;
-        slot1.card.onclick = () => window.openHistoryModal(realIndex);
+        slot1.card.onclick = async () => {await window.openHistoryModal(realIndex);};
         slot1.img.style.filter = "none";
     } else {
         slot1.img.src = IMG_QUEEN_MAIN;
@@ -169,7 +169,7 @@ export async function renderGallery() {
         thumb = await getSignedUrl(thumb);
         let realIndex = allItems.indexOf(bestOf[1]);
         slot2.img.src = thumb;
-        slot2.card.onclick = () => window.openHistoryModal(realIndex);
+        slot2.card.onclick = async () => {await window.openHistoryModal(realIndex);};
     } else {
         slot2.img.src = IMG_STATUE_SIDE;
         slot2.card.onclick = null;
@@ -181,7 +181,7 @@ export async function renderGallery() {
         thumb = await getSignedUrl(thumb);
         let realIndex = allItems.indexOf(bestOf[2]);
         slot3.img.src = thumb;
-        slot3.card.onclick = () => window.openHistoryModal(realIndex);
+        slot3.card.onclick = async () => {await window.openHistoryModal(realIndex);};
     } else {
         slot3.img.src = IMG_STATUE_SIDE;
         slot3.card.onclick = null;
@@ -306,7 +306,7 @@ window.atoneForTask = function(index) {
 };
 
 // REPLACE openHistoryModal
-export function openHistoryModal(index) {
+export async function openHistoryModal(index) {
     const items = getGalleryList();
     if (!items[index]) return;
 
@@ -315,7 +315,8 @@ export function openHistoryModal(index) {
 
     // 1. Setup Background Media
     let url = item.proofUrl || item.media;
-    const isVideo = url.match(/\.(mp4|webm|mov)($|\?)/i);
+    const isVideo = mediaType(url) === 'video';
+    url = await getSignedUrl(url);
     const mediaContainer = document.getElementById('modalMediaContainer');
     
     if (mediaContainer) {
