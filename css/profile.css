@@ -950,3 +950,106 @@ body {
     text-shadow: 0 0 15px rgba(197, 160, 89, 0.5);
     line-height: 1;
 }
+
+/* =========================================
+   8. MOBILE OPTIMIZATION (PASTE AT BOTTOM)
+   ========================================= */
+@media screen and (max-width: 768px) {
+
+    /* --- 1. GLOBAL LAYOUT (Stacking) --- */
+    .app-container {
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* --- 2. SIDEBAR (The Slide-Out Drawer) --- */
+    .layout-left {
+        position: fixed;
+        top: 0; left: 0;
+        width: 85%;       /* Covers most of screen, leaves edge visible */
+        height: 100%;
+        z-index: 9999;    /* On top of everything */
+        background: #080808;
+        box-shadow: 10px 0 50px rgba(0,0,0,0.9);
+        border-right: 1px solid var(--gold);
+        
+        /* HIDE IT BY DEFAULT */
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    /* Class to Open it (JS will toggle this) */
+    .layout-left.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* --- 3. RIGHT STAGE (Full Width) --- */
+    .layout-right {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* --- 4. TASK RIBBON (Compact HUD) --- */
+    .task-ribbon {
+        height: auto;
+        padding: 10px;
+        background: rgba(0,0,0,0.95);
+        border-bottom: 1px solid #333;
+    }
+    
+    /* Hide Side Stats on Mobile */
+    .ribbon-left, .ribbon-right { display: none; }
+    
+    /* Center the Timer */
+    .ribbon-center { 
+        width: 100%; 
+        border: none;
+        padding-left: 40px; /* Make room for Menu Button */
+    }
+    
+    /* Shrink Timer Slightly */
+    .t-box { width: 40px; height: 40px; font-size: 1.4rem; line-height: 40px; }
+    .t-sep { font-size: 1.2rem; }
+
+    /* --- 5. THE ALTAR (The Pyramid) --- */
+    .section-altar.triptych-stage {
+        height: 380px !important; /* Taller to fit vertical stack */
+        margin-top: 10px;
+        border: none !important;
+    }
+    
+    /* 1. QUEEN (Top Center) */
+    .center-idol {
+        top: 30%;
+        left: 50%;
+        width: 160px; height: 160px;
+        transform: translate(-50%, -50%);
+        z-index: 30;
+    }
+    
+    /* 2. LEFT OFFERING (Bottom Left) */
+    .left-offering {
+        top: 70%;
+        left: 25%;
+        transform: translate(-50%, -50%) scale(0.9);
+        z-index: 20;
+    }
+
+    /* 3. RIGHT OFFERING (Bottom Right) */
+    .right-offering {
+        top: 70%;
+        left: 75%;
+        transform: translate(-50%, -50%) scale(0.9);
+        z-index: 20;
+    }
+
+    /* Hide the Reflection/Bar on mobile to clean up look */
+    .reflection-mask, .gold-bar { display: none !important; }
+
+    /* --- 6. GALLERY & MODAL TWEAKS --- */
+    .item-blueprint, .item-trash { transform: scale(0.9); }
+    .modal-center-col { width: 95%; padding: 15px; }
+    
+    /* Show Hamburger Button (Hidden on Desktop) */
+    #mobileMenuBtn { display: flex !important; }
+}
