@@ -56,7 +56,7 @@ export function isBytescaleUrl(url) {
   return typeof url === "string" && url.includes("upcdn.io/");
 }
 
-export function isNotSigned(url) {
+/*export function isNotSigned(url) {
   console.log("isNotSigned CHECK:", url);
 
   if (!isBytescaleUrl(url)) return false;
@@ -70,7 +70,7 @@ export function isNotSigned(url) {
 
   console.log("Needs signing → true");
   return true;
-}
+}*/
 
 /* -----------------------------
  * URL parsing helpers
@@ -92,34 +92,36 @@ function extractFilePath(url) {
  * Signing
  * --------------------------- */
 
-export async function signUpcdnUrl(url) {
+export async function signBytescaleURL(url) {
   if (!isBytescaleUrl(url)) return url;
 
   console.log("Signing Upcdn URL:", url);
 
-  const filePath = extractFilePath(url);
-  if (!filePath) return url;
+  //const filePath = extractFilePath(url);
+  //if (!filePath) return url;
 
-  const query = extractQueryString(url);
+  //const query = extractQueryString(url);
 
-  const isThumbnail = url.includes("/thumbnail/");
+  //const isThumbnail = url.includes("/thumbnail/");
 
   try {
-    const result = await getPrivateFile(filePath);
+    const result = await getPrivateFile(url);
     const signed = typeof result === "string" ? result : url;
 
     let finalUrl = signed;
 
+    return finalUrl;
+
     // If original was thumbnail → convert signed raw → thumbnail
-    if (isThumbnail) {
+    /*if (isThumbnail) {
       finalUrl = finalUrl.replace("/raw/", "/thumbnail/");
-    }
+    }*/
 
     // If backend already includes query params, return as-is
-    if (finalUrl.includes("?")) return finalUrl;
+    //if (finalUrl.includes("?")) return finalUrl;
 
     // Otherwise re-append original transforms
-    return query ? `${finalUrl}${query}` : finalUrl;
+    //return query ? `${finalUrl}${query}` : finalUrl;
 
   } catch (err) {
     console.error("Failed to sign Upcdn URL:", url, err);
@@ -179,15 +181,15 @@ async function processMediaElement(el) {
   }
 }
 
-export async function scanExisting() {
+/*export async function scanExisting() {
   console.log("Scanning existing media elements for Bytescale URLs...");
   const elements = document.querySelectorAll("img, video");
   for (const el of elements) {
     await processMediaElement(el);
   }
-}
+}*/
 
-export function observeNewElements() {
+/*export function observeNewElements() {
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
       // 1. Newly added nodes
@@ -218,4 +220,4 @@ export function observeNewElements() {
     attributes: true,
     attributeFilter: ["src"]
   });
-}
+}*/

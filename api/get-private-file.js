@@ -60,8 +60,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const fileUrl = `https://upcdn.io/${ACCOUNT_ID}/raw${filePath}`;
-    const signedUrl = getSignedUrl(fileUrl, apiKeyId, hmacKey);
+    //const fileUrl = `https://upcdn.io/${ACCOUNT_ID}/raw${filePath}`;
+    const signedUrl = getSignedUrl(filePath, apiKeyId, hmacKey);
     res.json(signedUrl);
   } catch (error) {
     console.error('Signing error:', error);
