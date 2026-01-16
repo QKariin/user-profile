@@ -455,83 +455,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================
-// PART 2: FINAL APP MODE (SMART BOUNCER)
+// PART 2: FINAL APP MODE (NATIVE FLOW)
 // =========================================
 
 (function() {
     // Only run on Mobile
     if (window.innerWidth > 768) return;
 
-    // 1. THE SMART BOUNCER (Allows scroll, Kills hop)
-    function addSmartBounceProtection(el) {
-        let startY = 0;
-        
-        el.addEventListener('touchstart', function(e) {
-            startY = e.touches[0].pageY;
-        }, { passive: false });
-
-        el.addEventListener('touchmove', function(e) {
-            const y = e.touches[0].pageY;
-            const movingDown = y > startY; // Dragging down (Scrolling up)
-            const movingUp = y < startY;   // Dragging up (Scrolling down)
-            
-            const atTop = el.scrollTop <= 0;
-            const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // -1 buffer
-
-            // RULE 1: If at TOP and dragging DOWN -> STOP (Kills Top Hop)
-            if (atTop && movingDown) {
-                e.preventDefault();
-            }
-            
-            // RULE 2: If at BOTTOM and dragging UP -> STOP (Kills Bottom Hop)
-            if (atBottom && movingUp) {
-                e.preventDefault();
-            }
-            
-            // Otherwise: ALLOW SCROLL
-        }, { passive: false });
-    }
-
-    // 2. LOCK THE FRAME
+    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
     function lockVisuals() {
         const height = window.innerHeight;
         
-        // FREEZE BODY
+        // A. BODY: FROZEN SOLID
         Object.assign(document.body.style, {
             height: height + 'px',
             width: '100%',
-            position: 'fixed',
-            overflow: 'hidden',
+            position: 'fixed',      // Pins the app to the glass
+            overflow: 'hidden',     // No body scroll
             inset: '0',
-            touchAction: 'none' // Stop body gestures
+            overscrollBehavior: 'none', // STOPS THE BODY HOP (Modern CSS)
+            touchAction: 'none'     // Stops dragging the background
         });
 
+        // B. APP CONTAINER: FROZEN
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        // SETUP SCROLL STAGE
+        // C. CONTENT STAGE: FREE TO MOVE
         const stage = document.querySelector('.content-stage');
         if (stage) {
             Object.assign(stage.style, {
                 height: '100%',
-                overflowY: 'auto',
-                webkitOverflowScrolling: 'touch',
+                overflowY: 'auto',              // Force Scrollbar
+                webkitOverflowScrolling: 'touch', // Native iOS Momentum
                 paddingBottom: '100px',
-                touchAction: 'pan-y' // Explicitly allow vertical panning
+                
+                // THE MAGIC COMBO:
+                overscrollBehaviorY: 'contain', // Bounces INSIDE, doesn't bounce BODY
+                touchAction: 'pan-y'            // Explicitly allows 1-finger scrolling
             });
-            
-            // ACTIVATE THE BOUNCER ON THE CONTENT
-            addSmartBounceProtection(stage);
         }
         
-        // Setup Chat scroll too if it exists
-        const chatFrame = document.querySelector('.chat-body-frame');
-        if (chatFrame) {
-             addSmartBounceProtection(chatFrame);
+        // D. CHAT: FREE TO MOVE
+        const chat = document.querySelector('.chat-body-frame');
+        if (chat) {
+             Object.assign(chat.style, {
+                overscrollBehaviorY: 'contain',
+                touchAction: 'pan-y'
+            });
         }
     }
 
-    // 3. BUILD FOOTER
+    // 2. BUILD FOOTER
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -544,10 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
-            backdropFilter: 'blur(10px)', pointerEvents: 'auto', touchAction: 'none'
+            backdropFilter: 'blur(10px)', pointerEvents: 'auto', 
+            touchAction: 'none' // Footer itself cannot be dragged
         });
 
-        // Block footer drags
+        // Stop drags on footer only
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
         footer.innerHTML = `
@@ -568,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(footer);
     }
 
-    // 4. RUN
+    // 3. RUN
     window.addEventListener('load', () => { lockVisuals(); buildAppFooter(); });
     window.addEventListener('resize', lockVisuals);
     lockVisuals(); buildAppFooter();
