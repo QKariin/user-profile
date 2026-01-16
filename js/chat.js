@@ -13,16 +13,16 @@ import { mediaType } from './media.js';
 export async function renderChat(messages) {
     const chatBoxContainer = document.getElementById('chatBox');
     const chatContent = document.getElementById('chatContent');
-    const loadMoreBtn = document.getElementById('chatLoadMoreBtn'); // External button (we will hide this)
+    const loadMoreBtn = document.getElementById('chatLoadMoreBtn'); // External button (hidden)
 
     if (!messages || !chatContent) return;
 
-    // 1. SORTING (Untouched)
+    // 1. SORTING
     const sortedMessages = [...messages].sort(
         (a, b) => new Date(a._createdDate) - new Date(b._createdDate)
     );
 
-    // 2. ANTI-BLINK (Untouched)
+    // 2. ANTI-BLINK
     const currentJson = JSON.stringify(sortedMessages);
     if (currentJson === lastChatJson) return;
 
@@ -32,7 +32,7 @@ export async function renderChat(messages) {
 
     const wasInitialLoad = isInitialLoad;
 
-    // 3. NOTIFICATION LOGIC (Untouched)
+    // 3. NOTIFICATION LOGIC
     if (!isInitialLoad && sortedMessages.length > 0) {
         const lastMsg = sortedMessages[sortedMessages.length - 1];
         const sender = (lastMsg.sender || "").toLowerCase().trim();
@@ -51,15 +51,19 @@ export async function renderChat(messages) {
     setLastChatJson(currentJson);
     setIsInitialLoad(false);
 
-    // HIDE EXTERNAL BUTTON (We are moving it inside)
+    // Hide old external button
     if (loadMoreBtn) loadMoreBtn.style.display = 'none';
 
-    // SLICING (Using your existing chatLimit variable)
-    const visibleMessages = sortedMessages.slice(
-        Math.max(sortedMessages.length - chatLimit, 0)
-    );
+    // ============================================================
+    // 4. SMART SLICING (THE FIX)
+    // ============================================================
+    // Mobile: Show 10. Desktop: Show Global Limit (e.g. 50).
+    const activeLimit = window.innerWidth <= 768 ? 10 : chatLimit;
+    
+    // Slice the array to get only the last N messages
+    const visibleMessages = sortedMessages.slice(-activeLimit);
 
-    // Proxy Bytescale URLs (Untouched)
+    // Proxy Bytescale URLs
     const signingPromises = visibleMessages.map(async (m) => {
         if (m.message?.startsWith("https://upcdn.io/")) {
             m.mediaUrl = await getSignedUrl(m.message);
@@ -67,7 +71,7 @@ export async function renderChat(messages) {
     });
     await Promise.all(signingPromises);
 
-    // 4. RENDER HTML (THE CHANGE: Capture HTML first, then Add Button)
+    // 5. RENDER HTML
     let messagesHtml = visibleMessages.map(m => {
         let txt = DOMPurify.sanitize(m.message);
         txt = txt.replace(/\n/g, "<br>");
@@ -156,8 +160,10 @@ export async function renderChat(messages) {
         }
     }).join(''); 
 
-    // --- INJECT "ACCESS ARCHIVE" BUTTON IF NEEDED ---
-    // If we have more messages in total than what is visible, show the button
+    // ============================================================
+    // 6. INJECT "ACCESS ARCHIVE" BUTTON
+    // ============================================================
+    // If we have more messages in history than what we are showing
     if (sortedMessages.length > visibleMessages.length) {
         messagesHtml = `
             <div id="historyTrigger" style="width:100%; text-align:center; padding:15px 0;">
@@ -180,7 +186,7 @@ export async function renderChat(messages) {
     // APPLY TO DOM
     chatContent.innerHTML = messagesHtml;
 
-    // Load Listeners (Untouched)
+    // Load Listeners
     chatContent.querySelectorAll("img").forEach(img => {
         img.addEventListener("load", () => setTimeout(forceBottom, 30));
     });
