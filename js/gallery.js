@@ -278,6 +278,7 @@ export async function renderGallery() {
 export function loadMoreHistory() {
     setHistoryLimit(historyLimit + 25);
     renderGallery();
+    console.log("Increased history limit to", historyLimit);
 }
 
 // --- REDEMPTION LOGIC ---
@@ -591,4 +592,5 @@ window.loadMoreHistory = loadMoreHistory;
 window.setGalleryFilter = function(filterType) {
     activeStickerFilter = filterType;
     renderGallery(); 
+    console.log("render render", filterType);
 };

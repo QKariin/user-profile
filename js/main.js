@@ -260,6 +260,7 @@ window.addEventListener("message", (event) => {
                     setLastGalleryJson(currentGalleryJson);
                     setGalleryData(payload.galleryData);
                     renderGallery();
+                    console.log("Gallery data updated from backend.");
                     updateStats();
                 }
             }
