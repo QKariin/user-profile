@@ -444,33 +444,21 @@ export function toggleHistoryView(view) {
     }
 }
 
+// REPLACE your closeModal with this simple version
 export function closeModal(e) {
+    // If we have an event (e), stop it from triggering other things
+    if(e && e.stopPropagation) e.stopPropagation();
+
+    // Force Close Everything
     const modal = document.getElementById('glassModal');
-
-    // 1. Manual call (from Dismiss button) -> FORCE CLOSE
-    if (!e) {
-        forceClose();
-        return;
+    if (modal) {
+        modal.classList.remove('active');
+        modal.classList.remove('inspect-mode'); // Reset inspect mode too
     }
-
-    // 2. Inspect Mode (Clicking anywhere brings the menu back)
-    if (modal && modal.classList.contains('inspect-mode')) {
-        modal.classList.remove('inspect-mode');
-        return;
-    }
-
-    // 3. Clean/Proof Mode (Clicking the empty glass toggles the info back on)
-    const overlay = document.getElementById('modalGlassOverlay');
-    // If we clicked strictly on the overlay (not a button) and it's currently clean
-    if (overlay && overlay.classList.contains('clean') && e.target === overlay) {
-        toggleHistoryView('info'); 
-        return;
-    }
-
-    // 4. AGGRESSIVE CLOSE
-    // If the click reached here, it wasn't stopped by a button.
-    // So we assume the user clicked the Background, the Menu Box, or the Dismiss button.
-    forceClose();
+    
+    // Clear the Media/Video to stop it playing in background
+    const media = document.getElementById('modalMediaContainer');
+    if (media) media.innerHTML = "";
 }
 
 // Helper to ensure clean closing
@@ -515,6 +503,34 @@ window.toggleInspectMode = function() {
         modal.classList.toggle('inspect-mode');
     }
 };
+
+// --- PASTE THIS AT THE VERY BOTTOM OF gallery.js ---
+
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('glassModal');
+    const card = document.getElementById('modalUI');
+
+    // 1. If Modal is NOT open, stop here. Do nothing.
+    if (!modal || !modal.classList.contains('active')) return;
+
+    // 2. CHECK: Did we click INSIDE the Black Card (Text/Buttons)?
+    if (card && card.contains(e.target)) {
+        return;
+    }
+
+    // 3. CHECK: Are we in INSPECT MODE? (Photo only)
+    if (modal.classList.contains('inspect-mode')) {
+        // If we clicked the BLURRED BACKGROUND or IMAGE (Inside the modal wrapper)
+        if (modal.contains(e.target)) {
+            // User wants to revert back to the text card
+            modal.classList.remove('inspect-mode');
+            return;
+        }
+    
+    }
+
+    window.closeModal();
+}, true); // 'true' ensures we catch the click before other listeners stop it
 
 // FORCE WINDOW EXPORTS
 window.renderGallery = renderGallery;
