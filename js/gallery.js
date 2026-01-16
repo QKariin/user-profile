@@ -309,12 +309,11 @@ export function openHistoryModal(index) {
     setCurrentHistoryIndex(index);
     const item = items[index];
 
-    // 1. Setup Background Media (THE "PRISONED" IMAGE)
+    // 1. Setup Background Media
     let url = item.proofUrl || item.media;
     const isVideo = url.match(/\.(mp4|webm|mov)($|\?)/i);
     const mediaContainer = document.getElementById('modalMediaContainer');
     
-    // This puts the image in the background, filling the screen but blurred
     if (mediaContainer) {
         mediaContainer.innerHTML = isVideo ? 
             `<video src="${url}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>` :
@@ -326,14 +325,12 @@ export function openHistoryModal(index) {
     const status = (item.status || "").toLowerCase();
     const isRejected = status.includes('rej') || status.includes('fail');
 
-    // 3. Build The "Throne Room" UI (Center Stack)
+    // 3. Build The "Throne Room" UI
     const overlay = document.getElementById('modalGlassOverlay');
     if (overlay) {
-        // Verdict Text
         let verdictText = item.adminComment || "Logged without commentary.";
         if(isRejected && !item.adminComment) verdictText = "Submission rejected. Standards not met.";
 
-        // Redemption Button (Only if Rejected)
         let redemptionBtn = '';
         if (isRejected) {
             redemptionBtn = `<button onclick="event.stopPropagation(); window.atoneForTask(${index})" class="btn-glass-silver" style="border-color:var(--neon-red); color:var(--neon-red);">SEEK REDEMPTION (-100 🪙)</button>`;
@@ -342,20 +339,18 @@ export function openHistoryModal(index) {
         overlay.innerHTML = `
             <div class="modal-center-col" id="modalUI" onclick="event.stopPropagation()">
                 
-                <!-- TITLE -->
                 <div class="modal-merit-title">${isRejected ? "CAPITAL DEDUCTED" : "MERIT ACQUIRED"}</div>
                 <div class="modal-merit-value" style="color:${isRejected ? '#ff003c' : 'var(--gold)'}">
                     ${isRejected ? "0" : "+" + pts}
                 </div>
 
-                <!-- JUDGMENT -->
                 <div class="modal-verdict-box" id="verdictBox">
                     "${verdictText}"
                 </div>
 
-                <!-- ACTIONS -->
                 <div class="modal-btn-stack">
-                    <button onclick="window.toggleDirective('${item.text.replace(/'/g, "\\'")}')" class="btn-glass-silver">THE DIRECTIVE</button>
+                    <!-- FIX: Passing 'index' instead of text prevents the crash -->
+                    <button onclick="window.toggleDirective(${index})" class="btn-glass-silver">THE DIRECTIVE</button>
                     <button onclick="window.toggleInspectMode()" class="btn-glass-silver">INSPECT OFFERING</button>
                     ${redemptionBtn}
                     <button onclick="window.closeModal()" class="btn-glass-silver btn-glass-red">DISMISS</button>
@@ -367,7 +362,6 @@ export function openHistoryModal(index) {
     document.getElementById('glassModal').classList.add('active');
     document.getElementById('glassModal').classList.remove('inspect-mode');
 }
-
 // --- ADD THESE HELPERS TO JS (If missing) ---
 
 window.toggleInspectMode = function() {
@@ -385,11 +379,35 @@ window.toggleInspectMode = function() {
     }, 100);
 };
 
-window.toggleDirective = function(taskText) {
+window.toggleDirective = function(index) {
+    // 1. Find the Item using the Index
+    const items = getGalleryList(); 
+    const item = items[index];
+    if (!item) return;
+
+    // 2. Update the Box
     const box = document.getElementById('verdictBox');
-    box.innerText = taskText;
-    box.style.color = "#ccc";
-    box.style.fontStyle = "normal";
+    
+    // Toggle Logic
+    if (box.dataset.view === 'task') {
+        // Show Verdict Again
+        let verdictText = item.adminComment || "Logged without commentary.";
+        const status = (item.status || "").toLowerCase();
+        if((status.includes('rej') || status.includes('fail')) && !item.adminComment) {
+             verdictText = "Submission rejected. Standards not met.";
+        }
+        
+        box.innerText = `"${verdictText}"`;
+        box.style.color = "#eee";
+        box.style.fontStyle = "italic";
+        box.dataset.view = 'verdict';
+    } else {
+        // Show Directive (Task Text)
+        box.innerText = item.text || "No directive data.";
+        box.style.color = "#ccc";
+        box.style.fontStyle = "normal";
+        box.dataset.view = 'task';
+    }
 };
 
 // --- VIEW HELPERS ---
