@@ -92,7 +92,7 @@ function extractFilePath(url) {
  * Signing
  * --------------------------- */
 
-export async function signBytescaleURL(url) {
+export async function getBytescaleSignedUrl(url) {
   if (!isBytescaleUrl(url)) return url;
 
   console.log("Signing Upcdn URL:", url);
@@ -127,12 +127,6 @@ export async function signBytescaleURL(url) {
     console.error("Failed to sign Upcdn URL:", url, err);
     return url;
   }
-}
-
-export async function getSignedUrl(url) {
-  if (!url) return "";
-  if (!isNotSigned(url)) return url;
-  return await signUpcdnUrl(url);
 }
 
 /* -----------------------------

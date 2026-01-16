@@ -1,5 +1,5 @@
 // media.js
-import { getThumbnailBytescale, isBytescaleUrl, signUpcdnUrl, mediaTypeBytescale } from "./mediaBytescale.js";
+import { getThumbnailBytescale, isBytescaleUrl, getBytescaleSignedUrl, mediaTypeBytescale } from "./mediaBytescale.js";
 
 export function fileType(file) {
   if (!file) return "unknown";
@@ -92,7 +92,7 @@ export async function getSignedUrl(url) {
 
   // Only sign Bytescale URLs
   if (isBytescaleUrl(url)) {
-    return await signUpcdnUrl(url);
+    return await getBytescaleSignedUrl(url);
   }
 
   // Everything else passes through unchanged

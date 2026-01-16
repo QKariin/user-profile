@@ -7,7 +7,7 @@ import {
 } from './state.js'; 
 import { URLS } from './config.js';
 import { triggerSound } from './utils.js';
-import { signUpcdnUrl } from './mediaBytescale.js';
+import { getSignedUrl } from './media.js';
 import { mediaType } from './media.js';
 
 export async function renderChat(messages) {
@@ -61,7 +61,7 @@ export async function renderChat(messages) {
     // Proxy Bytescale URLs
     const signingPromises = visibleMessages.map(async (m) => {
         if (m.message?.startsWith("https://upcdn.io/")) {
-            m.mediaUrl = await signUpcdnUrl(m.message);
+            m.mediaUrl = await getSignedUrl(m.message);
         }
     });
     await Promise.all(signingPromises);
