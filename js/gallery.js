@@ -302,7 +302,6 @@ window.atoneForTask = function(index) {
     }, "*");
 };
 
-// REPLACE openHistoryModal
 export function openHistoryModal(index) {
     const items = getGalleryList();
     if (!items[index]) return;
@@ -324,18 +323,18 @@ export function openHistoryModal(index) {
     // 2. Setup Data
     const pts = getPoints(item);
     const status = (item.status || "").toLowerCase();
-    
-    // CRITICAL FIX: Add 'deni' and 'refus' to ensure the button shows for "Denied" tasks
     const isRejected = status.includes('rej') || status.includes('fail') || status.includes('deni') || status.includes('refus');
 
     // 3. Build UI
     const overlay = document.getElementById('modalGlassOverlay');
     if (overlay) {
+        // RESET OVERLAY CLICK LISTENER (Fixes "Click anywhere to close")
+        // We set the click on the overlay wrapper itself
+        overlay.onclick = function(e) { window.closeModal(e); };
+
         let verdictText = item.adminComment || "Logged without commentary.";
-        // If rejected but no comment, show default text
         if(isRejected && !item.adminComment) verdictText = "Submission rejected. Standards not met.";
 
-        // --- REDEMPTION BUTTON GENERATOR ---
         let redemptionBtn = '';
         if (isRejected) {
             redemptionBtn = `
@@ -347,6 +346,7 @@ export function openHistoryModal(index) {
         }
 
         overlay.innerHTML = `
+            <!-- CARD (Stop Propagation prevents closing when clicking here) -->
             <div class="modal-center-col" id="modalUI" onclick="event.stopPropagation()">
                 
                 <div class="modal-merit-title">${isRejected ? "CAPITAL DEDUCTED" : "MERIT ACQUIRED"}</div>
@@ -359,14 +359,11 @@ export function openHistoryModal(index) {
                 </div>
 
                 <div class="modal-btn-stack">
-                    <!-- FIX: Index based toggle to prevent text crashing -->
                     <button onclick="window.toggleDirective(${index})" class="btn-glass-silver">THE DIRECTIVE</button>
-                    
                     <button onclick="window.toggleInspectMode()" class="btn-glass-silver">INSPECT OFFERING</button>
-                    
-                    <!-- REDEMPTION BUTTON (Will only appear if isRejected is true) -->
                     ${redemptionBtn}
                     
+                    <!-- DISMISS BUTTON (Explicitly calls close) -->
                     <button onclick="window.closeModal()" class="btn-glass-silver btn-glass-red">DISMISS</button>
                 </div>
             </div>
@@ -435,18 +432,26 @@ export function toggleHistoryView(view) {
     }
 }
 
+// FIXED CLOSE FUNCTION
 export function closeModal(e) {
-    if (e && (e.target.id === 'modalCloseX' || e.target.classList.contains('btn-close-red'))) {
-        document.getElementById('glassModal').classList.remove('active');
-        document.getElementById('modalMediaContainer').innerHTML = "";
-        return;
-    }
+    const modal = document.getElementById('glassModal');
+    if (!modal) return;
 
-    const overlay = document.getElementById('modalGlassOverlay');
-    if (overlay && overlay.classList.contains('clean')) {
-        toggleHistoryView('info'); 
-        return;
-    }
+    // 1. Hide the Modal
+    modal.classList.remove('active');
+
+    // 2. Reset "Inspect Mode" (so UI comes back next time)
+    modal.classList.remove('inspect-mode');
+
+    // 3. Clear Media (Stops video audio & saves memory)
+    setTimeout(() => {
+        const container = document.getElementById('modalMediaContainer');
+        if (container) container.innerHTML = "";
+    }, 300);
+}
+
+// Ensure HTML can call it
+
 }
 
 export function openModal() {}
