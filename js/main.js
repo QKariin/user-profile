@@ -572,7 +572,7 @@ window.syncMobileDashboard = function() {
             position: 'fixed', 
             bottom: '0px', // Stick to bottom
             left: '50%', // Center horizontally
-            paddingBottom: '10px',
+            paddingBottom: '20px',
             transform: 'translateX(-50%)', // Correct center offset
             
             width: '100%', // Use full width instead of 110%
