@@ -573,7 +573,7 @@ window.syncMobileDashboard = function() {
         alignItems: 'flex-start', 
         
         position: 'fixed', 
-        bottom: '0px', 
+        bottom: '10px', 
         left: '0px',
         width: '100%', 
         
