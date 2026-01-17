@@ -414,7 +414,8 @@
 
         <!-- 2. THE EXECUTION BAR (Wide Kneel Button) -->
         <div class="mob-section-wrapper">
-            <div class="mob-kneel-bar" 
+            <!-- ADDED CLASS: mob-kneel-zone (So JS finds it) -->
+            <div class="mob-kneel-bar mob-kneel-zone" 
                  onmousedown="if(window.handleHoldStart) window.handleHoldStart(event)" 
                  onmouseup="if(window.handleHoldEnd) window.handleHoldEnd(event)" 
                  onmouseleave="if(window.handleHoldEnd) window.handleHoldEnd(event)" 
@@ -424,7 +425,8 @@
                 <div id="mob_kneelFill" class="mob-bar-fill"></div>
                 <div class="mob-bar-content">
                     <span class="kneel-icon-sm">◈</span>
-                    <span class="kneel-text">HOLD TO KNEEL</span>
+                    <!-- ADDED CLASS: kneel-label (So JS finds it) -->
+                    <span id="mob_kneelText" class="kneel-text kneel-label">HOLD TO KNEEL</span>
                 </div>
             </div>
         </div>
