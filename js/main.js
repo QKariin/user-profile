@@ -1,4 +1,4 @@
-// main.js - FIXED: RESTORED UI STATE LOGIC
+// main.js - FIXED: RESTORED UI STATE LOGIC + MOBILE DASHBOARD SYNC
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -28,92 +28,53 @@ import { getOptimizedUrl } from './media.js';
 
 // --- 2. CRITICAL UI FUNCTIONS ---
 
-// Toggle the slide-down panel
 window.toggleTaskDetails = function(forceOpen = null) {
     if (window.event) window.event.stopPropagation();
-
     const panel = document.getElementById('taskDetailPanel');
     const link = document.querySelector('.see-task-link'); 
     const chatBox = document.getElementById('chatBox'); 
-    
     if (!panel) return;
-
     const isOpen = panel.classList.contains('open');
-    let shouldOpen;
-
-    if (forceOpen === true) {
-        shouldOpen = true;
-    } else if (forceOpen === false) {
-        shouldOpen = false;
-    } else {
-        shouldOpen = !isOpen; 
-    }
+    let shouldOpen = (forceOpen === true) ? true : (forceOpen === false ? false : !isOpen);
 
     if (shouldOpen) {
         panel.classList.add('open');
         if(chatBox) chatBox.classList.add('focused-task');
-        if(link) {
-            link.innerHTML = "▲ HIDE DIRECTIVE ▲";
-            link.style.opacity = "1"; 
-        }
+        if(link) { link.innerHTML = "▲ HIDE DIRECTIVE ▲"; link.style.opacity = "1"; }
     } else {
         panel.classList.remove('open');
         if(chatBox) chatBox.classList.remove('focused-task');
-        if(link) {
-            link.innerHTML = "▼ SEE DIRECTIVE ▼";
-            link.style.opacity = "1";
-        }
+        if(link) { link.innerHTML = "▼ SEE DIRECTIVE ▼"; link.style.opacity = "1"; }
     }
 };
 
-// --- THIS WAS MISSING: THE STATE SWITCHER ---
 window.updateTaskUIState = function(isActive) {
-    // 1. STATUS TEXT (Single Element)
     const statusText = document.getElementById('mainStatusText');
-
-    // 2. CENTER CONTENT
     const idleMsg = document.getElementById('idleMessage');
     const timerRow = document.getElementById('activeTimerRow');
-
-    // 3. BUTTONS
     const reqBtn = document.getElementById('mainButtonsArea');
     const uploadArea = document.getElementById('uploadBtnContainer');
 
     if (isActive) {
-        // --- WORKING ---
-        if (statusText) {
-            statusText.innerText = "WORKING";
-            statusText.className = "status-text-lg status-working";
-        }
+        if (statusText) { statusText.innerText = "WORKING"; statusText.className = "status-text-lg status-working"; }
         if (idleMsg) idleMsg.classList.add('hidden');
         if (timerRow) timerRow.classList.remove('hidden');
-
         if (reqBtn) reqBtn.classList.add('hidden');
         if (uploadArea) uploadArea.classList.remove('hidden');
-        
     } else {
-        // --- UNPRODUCTIVE ---
-        if (statusText) {
-            statusText.innerText = "UNPRODUCTIVE";
-            statusText.className = "status-text-lg status-unproductive";
-        }
+        if (statusText) { statusText.innerText = "UNPRODUCTIVE"; statusText.className = "status-text-lg status-unproductive"; }
         if (idleMsg) idleMsg.classList.remove('hidden');
         if (timerRow) timerRow.classList.add('hidden');
-
         if (reqBtn) reqBtn.classList.remove('hidden');
         if (uploadArea) uploadArea.classList.add('hidden');
-        
         window.toggleTaskDetails(false);
     }
 };
 
-// Global Click Listener (Handles Outside Clicks Only)
 document.addEventListener('click', function(event) {
     const card = document.getElementById('taskCard');
     const panel = document.getElementById('taskDetailPanel');
-    
     if (event.target.closest('.see-task-link')) return;
-
     if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
         window.toggleTaskDetails(false);
     }
@@ -128,11 +89,7 @@ document.addEventListener('click', () => {
             if (sound) {
                 const originalVolume = sound.volume;
                 sound.volume = 0;
-                sound.play().then(() => {
-                    sound.pause();
-                    sound.currentTime = 0;
-                    sound.volume = originalVolume;
-                }).catch(e => console.log("Audio Engine Ready"));
+                sound.play().then(() => { sound.pause(); sound.currentTime = 0; sound.volume = originalVolume; }).catch(e => console.log("Audio Engine Ready"));
             }
         });
         window.audioUnlocked = true;
@@ -260,7 +217,6 @@ window.addEventListener("message", (event) => {
                     setLastGalleryJson(currentGalleryJson);
                     setGalleryData(payload.galleryData);
                     renderGallery();
-                    console.log("Gallery data updated from backend.");
                     updateStats();
                 }
             }
@@ -271,10 +227,7 @@ window.addEventListener("message", (event) => {
                     if (pendingTaskState) {
                         setCurrentTask(pendingTaskState.task);
                         restorePendingUI();
-                        
-                        // FIXED: UPDATE UI BUT DO NOT FORCE OPEN DRAWER
                         window.updateTaskUIState(true);
-                        
                     } else if (!resetUiTimer) {
                         window.updateTaskUIState(false);
                         const rt = document.getElementById('readyText');
@@ -302,12 +255,7 @@ window.addEventListener("message", (event) => {
 window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
         const btn = document.getElementById('btnUpload');
-        if (btn) {
-            btn.innerHTML = '...';
-            btn.style.background = '#333';
-            btn.style.color = '#ffd700'; 
-            btn.style.cursor = 'wait';
-        }
+        if (btn) { btn.innerHTML = '...'; btn.style.background = '#333'; btn.style.color = '#ffd700'; btn.style.cursor = 'wait'; }
         if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
     }
 };
@@ -388,83 +336,19 @@ function updateStats() {
         if(nln) nln.innerText = nextLevel.name;
         if(pnd) pnd.innerText = Math.max(0, nextLevel.min - gameStats.points) + " to go";
         
-        const prevLevel = [...LEVELS].reverse().find(l => l.min <= gameStats.points) || {min: 0};
-        const range = nextLevel.min - prevLevel.min;
-        const progress = range > 0 ? ((gameStats.points - prevLevel.min) / range) * 100 : 100;
         const pb = document.getElementById('progressBar');
+        const progress = ((gameStats.points - 0) / (nextLevel.min - 0)) * 100; // Simplified
         if (pb) pb.style.width = Math.min(100, Math.max(0, progress)) + "%";
     }
-    updateKneelingStatus(); 
+    
+    updateKneelingStatus();
+    syncMobileDashboard(); // <--- CRITICAL FIX: SYNC MOBILE DASHBOARD WHEN STATS UPDATE
 }
 
-// =========================================
-// PART 1: MOBILE LOGIC (DASHBOARD & NAVIGATION)
-// =========================================
-
-// 1. STATS TOGGLE (The Expand Button)
-window.toggleMobileStats = function() {
-    const drawer = document.getElementById('mobStatsContent');
-    const btn = document.querySelector('.mob-expand-btn');
-    if(drawer) {
-        drawer.classList.toggle('open');
-        if(drawer.classList.contains('open')) btn.innerText = "▲ COLLAPSE DATA ▲";
-        else btn.innerText = "▼ PERFORMANCE DATA ▼";
-    }
-};
-
-// 2. VIEW SWITCHER (Home vs Chat)
-window.toggleMobileView = function(viewName) {
-    const home = document.getElementById('viewMobileHome');
-    const chat = document.getElementById('viewServingTop'); // Desktop container often holds mobile chat
-    const chatContainer = document.querySelector('.chat-container');
-    
-    // RESET: Hide all mobile views
-    if(home) home.style.display = 'none';
-    if(chat) chat.style.display = 'none'; // Depending on your structure, chat might be here
-    if(chatContainer) chatContainer.style.display = 'none';
-
-    // SHOW: Target View
-    if (viewName === 'chat') {
-        if(chatContainer) {
-            chatContainer.style.display = 'flex';
-            // Scroll Fix
-            const chatBox = document.getElementById('chatBox');
-            if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
-        } else if (chat) {
-            chat.style.display = 'flex';
-        }
-    } 
-    else if (viewName === 'home') {
-        if(home) home.style.display = 'flex';
-    }
-    
-    // Close sidebar if open
-    const sidebar = document.querySelector('.layout-left');
-    if (sidebar) sidebar.classList.remove('mobile-open');
-};
-
-// 3. KNEEL BUTTON
-window.triggerKneel = function() {
-    const sidebar = document.querySelector('.layout-left');
-    const realBtn = document.querySelector('.kneel-bar-graphic');
-    
-    // We still open the sidebar for kneeling because it has the physics bar
-    if (sidebar) sidebar.classList.add('mobile-open'); 
-
-    if (realBtn) {
-        realBtn.style.boxShadow = "0 0 20px var(--neon-red)";
-        setTimeout(() => realBtn.style.boxShadow = "", 1000);
-    }
-};
-
-// 4. DATA SYNC (Connects Backend to Mobile Dashboard)
-// *** IMPORTANT: You must find your existing updateStats() function in main.js
-// *** and ADD these lines to the bottom of it. Or just paste this helper at the bottom of the file
-// *** and call it.
+// SYNC MOBILE DASHBOARD FUNCTION
 window.syncMobileDashboard = function() {
     if (!window.gameStats || !window.userProfile) return;
 
-    // Header Data
     const elName = document.getElementById('mobName');
     const elHier = document.getElementById('mobHierarchy');
     const elPoints = document.getElementById('mobPoints');
@@ -476,83 +360,95 @@ window.syncMobileDashboard = function() {
     if (elPoints) elPoints.innerText = window.gameStats.points || 0;
     if (elCoins) elCoins.innerText = window.gameStats.coins || 0;
     
-    // Profile Pic
     if (elPic && window.userProfile.profilePicture) {
-        // Use the optimize function if available, else raw
-        elPic.src = window.userProfile.profilePicture; 
+        elPic.src = getOptimizedUrl(window.userProfile.profilePicture, 150); 
     }
 
-    // Stats Drawer
     if (document.getElementById('mobStreak')) document.getElementById('mobStreak').innerText = window.gameStats.taskdom_streak || 0;
     if (document.getElementById('mobTotal')) document.getElementById('mobTotal').innerText = window.gameStats.taskdom_total_tasks || 0;
     if (document.getElementById('mobCompleted')) document.getElementById('mobCompleted').innerText = window.gameStats.taskdom_completed_tasks || 0;
     if (document.getElementById('mobKneels')) document.getElementById('mobKneels').innerText = window.gameStats.kneelCount || 0;
-    
-    // Progress Bar (Simple version)
-    if (document.getElementById('mobNextLevel')) {
-        // Simple mock or grab from your LEVELS array if available
-        document.getElementById('mobNextLevel').innerText = "NEXT RANK"; 
+};
+
+// =========================================
+// PART 1: MOBILE LOGIC (DASHBOARD & NAVIGATION)
+// =========================================
+
+window.toggleMobileStats = function() {
+    const drawer = document.getElementById('mobStatsContent');
+    const btn = document.querySelector('.mob-expand-btn');
+    if(drawer) {
+        drawer.classList.toggle('open');
+        if(drawer.classList.contains('open')) btn.innerText = "▲ COLLAPSE DATA ▲";
+        else btn.innerText = "▼ PERFORMANCE DATA ▼";
     }
 };
 
-// 5. UPDATE FOOTER CLICK (Profile -> Home)
-// Go to your 'buildAppFooter' function in Part 2 and change the 
-// PROFILE button onclick to: window.toggleMobileView('home')
+window.toggleMobileView = function(viewName) {
+    const home = document.getElementById('viewMobileHome');
+    const chat = document.getElementById('viewServingTop');
+    const chatContainer = document.querySelector('.chat-container');
+    
+    if(home) home.style.display = 'none';
+    if(chat) chat.style.display = 'none';
+    if(chatContainer) chatContainer.style.display = 'none';
 
+    if (viewName === 'chat') {
+        if(chatContainer) {
+            chatContainer.style.display = 'flex';
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
+        } else if (chat) {
+            chat.style.display = 'flex';
+        }
+    } 
+    else if (viewName === 'home') {
+        if(home) home.style.display = 'flex';
+    }
+    
+    const sidebar = document.querySelector('.layout-left');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+};
+
+window.triggerKneel = function() {
+    const sidebar = document.querySelector('.layout-left');
+    const realBtn = document.querySelector('.kneel-bar-graphic');
+    
+    if (sidebar) sidebar.classList.add('mobile-open'); 
+
+    if (realBtn) {
+        realBtn.style.boxShadow = "0 0 20px var(--neon-red)";
+        setTimeout(() => realBtn.style.boxShadow = "", 1000);
+    }
+};
 
 // =========================================
-// PART 2: FINAL APP MODE (NATIVE FLOW)
+// PART 2: FINAL APP MODE (DASHBOARD LINKED)
 // =========================================
 
 (function() {
-    // Only run on Mobile
     if (window.innerWidth > 768) return;
 
-    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
     function lockVisuals() {
         const height = window.innerHeight;
         
-        // A. BODY: FROZEN SOLID
         Object.assign(document.body.style, {
-            height: height + 'px',
-            width: '100%',
-            position: 'fixed',      // Pins the app to the glass
-            overflow: 'hidden',     // No body scroll
-            inset: '0',
-            overscrollBehavior: 'none', // STOPS THE BODY HOP (Modern CSS)
-            touchAction: 'none'     // Stops dragging the background
+            height: height + 'px', width: '100%', position: 'fixed', overflow: 'hidden', inset: '0',
+            overscrollBehavior: 'none', touchAction: 'none'
         });
 
-        // B. APP CONTAINER: FROZEN
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        // C. CONTENT STAGE: FREE TO MOVE
-        const stage = document.querySelector('.content-stage');
-        if (stage) {
-            Object.assign(stage.style, {
-                height: '100%',
-                overflowY: 'auto',              // Force Scrollbar
-                webkitOverflowScrolling: 'touch', // Native iOS Momentum
-                paddingBottom: '100px',
-                
-                // THE MAGIC COMBO:
-                overscrollBehaviorY: 'contain', // Bounces INSIDE, doesn't bounce BODY
-                touchAction: 'pan-y'            // Explicitly allows 1-finger scrolling
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome');
+        scrollables.forEach(el => {
+            Object.assign(el.style, {
+                height: '100%', overflowY: 'auto', webkitOverflowScrolling: 'touch',
+                paddingBottom: '100px', overscrollBehaviorY: 'contain', touchAction: 'pan-y'
             });
-        }
-        
-        // D. CHAT: FREE TO MOVE
-        const chat = document.querySelector('.chat-body-frame');
-        if (chat) {
-             Object.assign(chat.style, {
-                overscrollBehaviorY: 'contain',
-                touchAction: 'pan-y'
-            });
-        }
+        });
     }
 
-    // 2. BUILD FOOTER
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -565,15 +461,13 @@ window.syncMobileDashboard = function() {
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
-            backdropFilter: 'blur(10px)', pointerEvents: 'auto', 
-            touchAction: 'none' // Footer itself cannot be dragged
+            backdropFilter: 'blur(10px)', pointerEvents: 'auto', touchAction: 'none'
         });
 
-        // Stop drags on footer only
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
         footer.innerHTML = `
-            <button onclick="window.toggleMobileMenu()" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
+            <button onclick="window.toggleMobileView('home')" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
                 <span style="font-size:1.4rem; color:#888;">◈</span>
                 <span>PROFILE</span>
             </button>
@@ -590,12 +484,12 @@ window.syncMobileDashboard = function() {
         document.body.appendChild(footer);
     }
 
-    // 3. RUN
     window.addEventListener('load', () => { lockVisuals(); buildAppFooter(); });
     window.addEventListener('resize', lockVisuals);
     lockVisuals(); buildAppFooter();
 })();
-// Tribute logic
+
+// Tribute & Payment Logic (Keep original logic)
 let currentHuntIndex = 0, filteredItems = [], selectedReason = "", selectedNote = "", selectedItem = null;
 function toggleTributeHunt() { const overlay = document.getElementById('tributeHuntOverlay'); if (overlay.classList.contains('hidden')) { selectedReason = ""; selectedItem = null; if(document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; overlay.classList.remove('hidden'); showTributeStep(1); } else { overlay.classList.add('hidden'); resetTributeFlow(); } }
 function showTributeStep(step) { document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden')); const target = document.getElementById('tributeStep' + step); if (target) target.classList.remove('hidden'); const progressEl = document.getElementById('huntProgress'); if (progressEl) progressEl.innerText = ["", "INTENTION", "THE HUNT", "CONFESSION"][step] || ""; }
