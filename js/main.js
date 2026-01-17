@@ -569,7 +569,7 @@ window.syncMobileDashboard = function() {
             display: 'flex', 
             justifyContent: 'space-between', // Changed to space-between for 5 items
             alignItems: 'flex-start',
-            paddingTop: '10px',
+            paddingTop: '5px',
             position: 'fixed', 
             bottom: '0px', // Stick to bottom
             left: '50%', // Center horizontally
