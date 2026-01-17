@@ -583,7 +583,7 @@ window.syncMobileDashboard = function() {
             backdropFilter: 'blur(15px)', 
             pointerEvents: 'auto', 
             touchAction: 'none',
-            padding: '0 5px'
+            padding: '0px'
         });
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
