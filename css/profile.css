@@ -973,11 +973,11 @@ body {
 
 /* 1. DEFAULT STATE: HIDDEN ON DESKTOP */
 #MOBILE_APP {
-    display: none !important;
+    display: none;
 }
 
 #DESKTOP_APP {
-    display: block !important;
+    display: block;
 }
 
 /* 2. MOBILE STATE: ACTIVE */
