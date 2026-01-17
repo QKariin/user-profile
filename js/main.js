@@ -581,7 +581,7 @@ window.syncMobileDashboard = function() {
         height: '70px', 
         
         // This is the specific number to move items up or down from the top edge
-        paddingTop: '5px', 
+        paddingbottom: '25px', 
         
         background: 'rgba(10, 10, 10, 0.95)', 
         borderTop: '1px solid rgba(255, 255, 255, 0.15)',
