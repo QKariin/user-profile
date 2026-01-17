@@ -582,6 +582,42 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// ... inside renderGallery ...
+
+    // --- SYNC MOBILE ALTAR ---
+    const mob1 = document.getElementById('mobImgSlot1');
+    const mob2 = document.getElementById('mobImgSlot2');
+    const mob3 = document.getElementById('mobImgSlot3');
+
+    // Slot 1 (Center)
+    if (mob1) {
+        if (bestOf[0]) {
+            // Re-use logic for thumbnail
+            let thumb = getThumbnail(getOptimizedUrl(bestOf[0].proofUrl || bestOf[0].media, 400));
+            mob1.src = thumb;
+            mob1.style.filter = "none";
+            mob1.onclick = () => window.openHistoryModal(allItems.indexOf(bestOf[0]));
+        } else {
+            // Set default Queen image if empty
+            mob1.src = "https://static.wixstatic.com/media/ce3e5b_5fc6a144908b493b9473757471ec7ebb~mv2.png";
+            mob1.style.filter = "grayscale(100%) brightness(0.5)";
+        }
+    }
+
+    // Slot 2 (Left)
+    if (mob2 && bestOf[1]) {
+        let thumb = getThumbnail(getOptimizedUrl(bestOf[1].proofUrl || bestOf[1].media, 300));
+        mob2.src = thumb;
+        mob2.onclick = () => window.openHistoryModal(allItems.indexOf(bestOf[1]));
+    }
+
+    // Slot 3 (Right)
+    if (mob3 && bestOf[2]) {
+        let thumb = getThumbnail(getOptimizedUrl(bestOf[2].proofUrl || bestOf[2].media, 300));
+        mob3.src = thumb;
+        mob3.onclick = () => window.openHistoryModal(allItems.indexOf(bestOf[2]));
+    }
+
 // FORCE WINDOW EXPORTS
 window.renderGallery = renderGallery;
 window.openHistoryModal = openHistoryModal;
