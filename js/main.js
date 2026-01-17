@@ -518,54 +518,22 @@ window.syncMobileDashboard = function() {
         });
     }
 
-    // 2. BUILD FOOTER
+    // 2. BUILD FOOTER - DISABLED (Using new inline mobile system)
     function buildAppFooter() {
-        if (document.getElementById('app-mode-footer')) return;
-        
-        const footer = document.createElement('div');
-        footer.id = 'app-mode-footer';
-        
-        Object.assign(footer.style, {
-            display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-            position: 'fixed', bottom: '0', left: '0', width: '100%', height: '80px',
-            background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
-            padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
-            zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
-            backdropFilter: 'blur(10px)', pointerEvents: 'auto', 
-            touchAction: 'none'
-        });
-
-        footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-
-        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem; width:25%; cursor:pointer;";
-        const iconStyle = "font-size:1.4rem; color:#888;";
-
-        footer.innerHTML = `
-            <button class="mf-btn" onclick="window.toggleMobileView('home')" style="${btnStyle}">
-                <span style="${iconStyle}">◈</span><span>PROFILE</span>
-            </button>
-            <button class="mf-btn" onclick="window.toggleMobileView('record')" style="${btnStyle}">
-                <span style="${iconStyle}">▦</span><span>RECORD</span>
-            </button>
-            <button class="mf-btn" onclick="window.toggleMobileView('queen')" style="${btnStyle}">
-                <span style="${iconStyle}">♛</span><span>QUEEN</span>
-            </button>
-            <button class="mf-btn" onclick="window.toggleMobileView('chat')" style="${btnStyle}">
-                <span style="${iconStyle}">❖</span><span>LOGS</span>
-            </button>
-        `;
-        document.body.appendChild(footer);
+        // Disabled - footer conflicts with new MOBILE_APP system
+        return;
     }
 
     // 3. RUN
     window.addEventListener('load', () => { 
         lockVisuals(); 
-        buildAppFooter();
+        // buildAppFooter(); // DISABLED
         // FORCE HOME ON LOAD
-        if(window.toggleMobileView) window.toggleMobileView('home'); 
+        // if(window.toggleMobileView) window.toggleMobileView('home'); // DISABLED
     });
     window.addEventListener('resize', lockVisuals);
-    lockVisuals(); buildAppFooter();
+    lockVisuals(); 
+    // buildAppFooter(); // DISABLED
 })();
 
 // TIMER SYNC (The Twin System)
