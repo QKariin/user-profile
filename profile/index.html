@@ -398,17 +398,17 @@
 </div>
 
   
-<!-- 🟢 MOBILE UNIVERSE -->
+<!-- 🟢 MOBILE UNIVERSE (FRESH PASTE) -->
 <div id="MOBILE_APP" style="display:none;">
     
-    <!-- 1. SCROLLABLE DASHBOARD -->
-    <div id="viewMobileHome" class="mob-frame">
+    <!-- 1. DASHBOARD (Forced Visible) -->
+    <div id="viewMobileHome" class="mob-frame" style="display:flex !important; flex-direction:column;">
         
         <!-- HEADER -->
         <div class="mob-header">
             <div class="mob-hex-wrap">
-                <img id="mob_profilePic" src="" class="mob-hex-img">
-                <div id="mob_rankStamp" class="mob-rank-stamp">LOADING</div>
+                <img id="mob_profilePic" src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png" class="mob-hex-img">
+                <div id="mob_rankStamp" class="mob-rank-stamp">INITIATE</div>
             </div>
             <div id="mob_slaveName" class="mob-name">SLAVE</div>
         </div>
@@ -416,11 +416,10 @@
         <!-- CARD 1: DEVOTION -->
         <div class="mob-card devotion-card">
             <div class="mob-kneel-zone" 
-                 onmousedown="handleHoldStart(event)" 
-                 onmouseup="handleHoldEnd(event)" 
-                 onmouseleave="handleHoldEnd(event)" 
-                 ontouchstart="handleHoldStart(event)" 
-                 ontouchend="handleHoldEnd(event)">
+                 onmousedown="if(window.handleHoldStart) window.handleHoldStart(event)" 
+                 onmouseup="if(window.handleHoldEnd) window.handleHoldEnd(event)" 
+                 ontouchstart="if(window.handleHoldStart) window.handleHoldStart(event)" 
+                 ontouchend="if(window.handleHoldEnd) window.handleHoldEnd(event)">
                 <div class="mob-kneel-inner">
                     <span class="kneel-icon">◈</span>
                     <span class="kneel-label">HOLD</span>
@@ -430,7 +429,11 @@
 
             <div class="mob-grid-zone">
                 <div class="mob-grid-label">DAILY TRIBUTE</div>
-                <div id="mob_streakGrid" class="mob-streak-grid"></div>
+                <div id="mob_streakGrid" class="mob-streak-grid">
+                    <!-- Default Grid -->
+                    <div class="streak-sq"></div><div class="streak-sq"></div><div class="streak-sq"></div><div class="streak-sq"></div>
+                    <div class="streak-sq"></div><div class="streak-sq"></div><div class="streak-sq"></div><div class="streak-sq"></div>
+                </div>
             </div>
         </div>
 
@@ -442,18 +445,18 @@
             </div>
             
             <div class="op-action-row">
-                <button id="mob_btnRequest" class="mob-action-btn" onclick="window.getRandomTask()">REQUEST PROTOCOL</button>
+                <button id="mob_btnRequest" class="mob-action-btn" onclick="if(window.getRandomTask) window.getRandomTask()">REQUEST PROTOCOL</button>
                 <div id="mob_activeTimer" class="mob-timer hidden">
                     <span id="m_timerH">00</span>:<span id="m_timerM">00</span>:<span id="m_timerS">00</span>
                 </div>
             </div>
         </div>
 
-        <!-- SPACER (For Footer) -->
-        <div style="height: 100px;"></div>
+        <!-- SPACER -->
+        <div style="height: 120px;"></div>
 
-    </div> <!-- Closes viewMobileHome -->
-</div> <!-- Closes MOBILE_APP -->
+    </div> 
+</div>
 
 <!-- SWITCHER SCRIPT -->
 <!-- ADD THIS SWITCHER SCRIPT AT THE VERY BOTTOM (Before </body>) -->
