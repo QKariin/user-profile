@@ -398,51 +398,130 @@ function updateStats() {
 }
 
 // =========================================
-// PART 1: BUTTON LOGIC (KEEP THIS)
+// PART 1: MOBILE LOGIC (BRAIN & NAVIGATION)
 // =========================================
 
-// 1. PROFILE BUTTON
+// 1. MOBILE MENU TOGGLE (Legacy/Backup)
 window.toggleMobileMenu = function() {
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.toggle('mobile-open');
 };
 
-// 2. KNEEL BUTTON
+// 2. KNEEL TRIGGER (Opens Desktop Sidebar for Physics)
 window.triggerKneel = function() {
     const sidebar = document.querySelector('.layout-left');
     const realBtn = document.querySelector('.kneel-bar-graphic');
 
-    if (sidebar) sidebar.classList.add('mobile-open'); // Open drawer
+    if (sidebar) sidebar.classList.add('mobile-open'); 
 
     if (realBtn) {
-        // Highlight logic
         realBtn.style.boxShadow = "0 0 20px var(--neon-red)";
-        realBtn.style.borderColor = "var(--neon-red)";
-        setTimeout(() => {
-            realBtn.style.boxShadow = "";
-            realBtn.style.borderColor = "";
-        }, 1000);
+        setTimeout(() => realBtn.style.boxShadow = "", 1000);
     }
 };
 
-// 3. LOGS BUTTON (With Chat Scroll Fix)
+// 3. MAIN NAVIGATION CONTROLLER (Handles 4 Mobile Views)
 window.toggleMobileView = function(viewName) {
-    if (viewName === 'chat') {
-        const chatContainer = document.querySelector('.chat-container');
-        if (chatContainer) {
-            chatContainer.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        // Force scroll to bottom of chat history
-        const chatBox = document.getElementById('chatBox');
-        if (chatBox) {
-            setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 300);
+    // Hide everything first
+    const home = document.getElementById('viewMobileHome');
+    const chatContainer = document.querySelector('.chat-container');
+    const chatDesktop = document.getElementById('viewServingTop');
+    const history = document.getElementById('historySection');
+    const news = document.getElementById('viewNews');
+    
+    // Reset displays
+    if(home) home.style.display = 'none';
+    if(chatContainer) chatContainer.style.display = 'none';
+    if(chatDesktop) chatDesktop.style.display = 'none';
+    if(history) history.style.display = 'none';
+    if(news) news.style.display = 'none';
+
+    // Show Target
+    if (viewName === 'home') {
+        if(home) {
+            home.style.display = 'flex';
+            window.syncMobileDashboard(); // Update data
         }
     }
+    else if (viewName === 'chat') {
+        if(chatContainer) {
+            chatContainer.style.display = 'flex';
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
+        } else if (chatDesktop) {
+            chatDesktop.style.display = 'flex';
+        }
+    }
+    else if (viewName === 'record') {
+        if(history) {
+            history.style.display = 'flex';
+            if(window.renderGallery) window.renderGallery();
+        }
+    }
+    else if (viewName === 'queen') {
+        if(news) news.style.display = 'block';
+    }
+    
+    // Close sidebar
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
+    
+    // Update Footer Icons
+    document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
+    // (Optional: Add logic here to highlight the clicked icon if you add IDs to them)
 };
 
-// 4. AUTO-CLOSE DRAWER
+// 4. DATA SYNC (Fills the Mobile Dashboard)
+window.syncMobileDashboard = function() {
+    if (!window.gameStats || !window.userProfile) return;
+
+    const elName = document.getElementById('mobName');
+    const elHier = document.getElementById('mobHierarchy');
+    const elPoints = document.getElementById('mobPoints');
+    const elCoins = document.getElementById('mobCoins');
+    const elPic = document.getElementById('mobProfilePic');
+
+    if (elName) elName.innerText = window.userProfile.name || "SLAVE";
+    if (elHier) elHier.innerText = window.userProfile.hierarchy || "INITIATE";
+    if (elPoints) elPoints.innerText = window.gameStats.points || 0;
+    if (elCoins) elCoins.innerText = window.gameStats.coins || 0;
+    
+    if (elPic && window.userProfile.profilePicture) {
+        elPic.src = window.userProfile.profilePicture; 
+    }
+
+    // Grid / Stats
+    if (document.getElementById('mobStreak')) document.getElementById('mobStreak').innerText = window.gameStats.taskdom_streak || 0;
+    if (document.getElementById('mobTotal')) document.getElementById('mobTotal').innerText = window.gameStats.taskdom_total_tasks || 0;
+    if (document.getElementById('mobCompleted')) document.getElementById('mobCompleted').innerText = window.gameStats.taskdom_completed_tasks || 0;
+    if (document.getElementById('mobKneels')) document.getElementById('mobKneels').innerText = window.gameStats.kneelCount || 0;
+
+    // Fill the 24-Square Grid
+    const grid = document.getElementById('mob_streakGrid');
+    if(grid) {
+        grid.innerHTML = '';
+        const count = window.gameStats.kneelCount || 0;
+        const progress = count % 24;
+        for(let i=0; i<24; i++) {
+            const sq = document.createElement('div');
+            sq.className = 'streak-sq' + (i < progress ? ' active' : '');
+            grid.appendChild(sq);
+        }
+    }
+};
+
+// 5. STATS EXPANDER
+window.toggleMobileStats = function() {
+    const drawer = document.getElementById('mobStatsContent');
+    const btn = document.querySelector('.mob-expand-btn');
+    if(drawer) {
+        drawer.classList.toggle('open');
+        if(drawer.classList.contains('open')) btn.innerText = "▲ COLLAPSE DATA ▲";
+        else btn.innerText = "▼ PERFORMANCE DATA ▼";
+    }
+};
+
+// 6. AUTO-CLOSE DRAWER
 document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-btn');
     const sidebar = document.querySelector('.layout-left');
@@ -455,58 +534,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================
-// PART 2: FINAL APP MODE (NATIVE FLOW)
+// PART 2: FINAL APP MODE ENGINE (LAYOUT & FOOTER)
 // =========================================
 
 (function() {
     // Only run on Mobile
     if (window.innerWidth > 768) return;
 
-    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
+    // 1. LOCK VISUALS (Native App Feel)
     function lockVisuals() {
         const height = window.innerHeight;
         
-        // A. BODY: FROZEN SOLID
+        // Lock Body
         Object.assign(document.body.style, {
-            height: height + 'px',
-            width: '100%',
-            position: 'fixed',      // Pins the app to the glass
-            overflow: 'hidden',     // No body scroll
-            inset: '0',
-            overscrollBehavior: 'none', // STOPS THE BODY HOP (Modern CSS)
-            touchAction: 'none'     // Stops dragging the background
+            height: height + 'px', width: '100%', position: 'fixed', overflow: 'hidden', inset: '0',
+            overscrollBehavior: 'none', touchAction: 'none'
         });
 
-        // B. APP CONTAINER: FROZEN
+        // Lock Container
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        // C. CONTENT STAGE: FREE TO MOVE
-        const stage = document.querySelector('.content-stage');
-        if (stage) {
-            Object.assign(stage.style, {
-                height: '100%',
-                overflowY: 'auto',              // Force Scrollbar
-                webkitOverflowScrolling: 'touch', // Native iOS Momentum
-                paddingBottom: '100px',
-                
-                // THE MAGIC COMBO:
-                overscrollBehaviorY: 'contain', // Bounces INSIDE, doesn't bounce BODY
-                touchAction: 'pan-y'            // Explicitly allows 1-finger scrolling
+        // Unlock Scrollable Areas
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews');
+        scrollables.forEach(el => {
+            Object.assign(el.style, {
+                height: '100%', overflowY: 'auto', webkitOverflowScrolling: 'touch',
+                paddingBottom: '100px', overscrollBehaviorY: 'contain', touchAction: 'pan-y'
             });
-        }
-        
-        // D. CHAT: FREE TO MOVE
-        const chat = document.querySelector('.chat-body-frame');
-        if (chat) {
-             Object.assign(chat.style, {
-                overscrollBehaviorY: 'contain',
-                touchAction: 'pan-y'
-            });
-        }
+        });
     }
 
-    // 2. BUILD FOOTER
+    // 2. BUILD FOOTER (4 Icons)
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -514,42 +573,48 @@ document.addEventListener('DOMContentLoaded', () => {
         footer.id = 'app-mode-footer';
         
         Object.assign(footer.style, {
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            display: 'flex', justifyContent: 'space-around', alignItems: 'center',
             position: 'fixed', bottom: '0', left: '0', width: '100%', height: '80px',
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
-            padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
-            backdropFilter: 'blur(10px)', pointerEvents: 'auto', 
-            touchAction: 'none' // Footer itself cannot be dragged
+            backdropFilter: 'blur(10px)', pointerEvents: 'auto', touchAction: 'none'
         });
 
-        // Stop drags on footer only
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
+        // Helper style for icons
+        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem; width:25%; cursor:pointer;";
+        const iconStyle = "font-size:1.4rem; color:#888;";
+
         footer.innerHTML = `
-            <button onclick="window.toggleMobileMenu()" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
-                <span style="font-size:1.4rem; color:#888;">◈</span>
-                <span>PROFILE</span>
+            <button class="mf-btn" onclick="window.toggleMobileView('home')" style="${btnStyle}">
+                <span style="${iconStyle}">◈</span><span>PROFILE</span>
             </button>
-            <div style="position:relative; top:-20px;">
-                <button onclick="window.triggerKneel()" style="width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #c5a059, #5a4a22); border:2px solid #fff; box-shadow:0 0 20px rgba(197,160,89,0.6); color:#000; font-family:'Cinzel',serif; font-weight:700; font-size:0.7rem; cursor:pointer;">
-                    KNEEL
-                </button>
-            </div>
-            <button onclick="window.toggleMobileView('chat')" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
-                <span style="font-size:1.4rem; color:#888;">❖</span>
-                <span>LOGS</span>
+            <button class="mf-btn" onclick="window.toggleMobileView('record')" style="${btnStyle}">
+                <span style="${iconStyle}">▦</span><span>RECORD</span>
+            </button>
+            <button class="mf-btn" onclick="window.toggleMobileView('queen')" style="${btnStyle}">
+                <span style="${iconStyle}">♛</span><span>QUEEN</span>
+            </button>
+            <button class="mf-btn" onclick="window.toggleMobileView('chat')" style="${btnStyle}">
+                <span style="${iconStyle}">❖</span><span>LOGS</span>
             </button>
         `;
         document.body.appendChild(footer);
     }
 
-    // 3. RUN
+    // 3. LAUNCH
     window.addEventListener('load', () => { lockVisuals(); buildAppFooter(); });
     window.addEventListener('resize', lockVisuals);
     lockVisuals(); buildAppFooter();
 })();
-// Tribute logic
+
+
+// =========================================
+// PART 3: TRIBUTE & BACKEND FUNCTIONS (KEEP)
+// =========================================
+
 let currentHuntIndex = 0, filteredItems = [], selectedReason = "", selectedNote = "", selectedItem = null;
 function toggleTributeHunt() { const overlay = document.getElementById('tributeHuntOverlay'); if (overlay.classList.contains('hidden')) { selectedReason = ""; selectedItem = null; if(document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; overlay.classList.remove('hidden'); showTributeStep(1); } else { overlay.classList.add('hidden'); resetTributeFlow(); } }
 function showTributeStep(step) { document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden')); const target = document.getElementById('tributeStep' + step); if (target) target.classList.remove('hidden'); const progressEl = document.getElementById('huntProgress'); if (progressEl) progressEl.innerText = ["", "INTENTION", "THE HUNT", "CONFESSION"][step] || ""; }
@@ -566,5 +631,12 @@ function triggerCoinShower() { for (let i = 0; i < 40; i++) { const coin = docum
 function breakGlass(e) { if (e && e.stopPropagation) e.stopPropagation(); const overlay = document.getElementById('specialGlassOverlay'); if (overlay) overlay.classList.remove('active'); window.parent.postMessage({ type: "GLASS_BROKEN" }, "*"); }
 function submitSessionRequest() { const checked = document.querySelector('input[name="sessionType"]:checked'); if (!checked) return; window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*"); }
 function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedItem = null; const note = document.getElementById('huntNote'); if (note) note.value = ""; showTributeStep(1); }
+
+// *** CRITICAL HOOKS FOR MOBILE SYNC ***
+const originalUpdateStats = window.updateStats || function(){};
+window.updateStats = function() {
+    originalUpdateStats();
+    if (window.syncMobileDashboard) window.syncMobileDashboard();
+};
 
 window.parent.postMessage({ type: "UI_READY" }, "*");
