@@ -115,7 +115,7 @@ function completeKneelAction() {
     setTimeout(() => { setIgnoreBackendUpdates(false); }, 15000);
 }
 
-// --- 4. STATUS SYNC ---
+// --- 4. STATUS SYNC (UPDATED TEXT) ---
 export function updateKneelingStatus() {
     const now = Date.now();
     
@@ -146,7 +146,7 @@ export function updateKneelingStatus() {
         setIsLocked(true);
         const minLeft = Math.ceil((cooldownMs - diffMs) / 60000);
         
-        // Update Desktop
+        // Desktop
         if (txtMain && fill) {
             txtMain.innerText = `LOCKED: ${minLeft}m`;
             const progress = 100 - ((diffMs / cooldownMs) * 100);
@@ -155,9 +155,11 @@ export function updateKneelingStatus() {
             if(btn) btn.style.cursor = "not-allowed";
         }
 
-        // Update Mobile
+        // Mobile
         if (mobText && mobFill) {
-            mobText.innerText = `${minLeft}m`;
+            // *** THE FIX IS HERE ***
+            mobText.innerText = `LOCKED: ${minLeft}m`; 
+            
             const progress = 100 - ((diffMs / cooldownMs) * 100);
             mobFill.style.transition = "none";
             mobFill.style.width = Math.max(0, progress) + "%";
@@ -169,7 +171,7 @@ export function updateKneelingStatus() {
         }
     } 
     // B. UNLOCKED STATE
-    else if (!holdTimer) { 
+    else if (typeof holdTimer === 'undefined' || holdTimer === null) { 
         setIsLocked(false);
         
         // Reset Desktop
@@ -182,11 +184,11 @@ export function updateKneelingStatus() {
 
         // Reset Mobile
         if (mobText && mobFill) {
-            mobText.innerText = "HOLD";
+            mobText.innerText = "HOLD TO KNEEL";
             mobFill.style.transition = "width 0.3s ease";
             mobFill.style.width = "0%";
             if(mobBar) {
-                mobBar.style.borderColor = "#c5a059"; 
+                mobBar.style.borderColor = "#c5a059"; // Gold
                 mobBar.style.opacity = "1";
             }
         }
