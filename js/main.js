@@ -518,7 +518,7 @@ window.syncMobileDashboard = function() {
         });
     }
 
-    // 2. BUILD FOOTER - Fixed z-index to not block content
+    // 2. BUILD FOOTER
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -530,8 +530,7 @@ window.syncMobileDashboard = function() {
             position: 'fixed', bottom: '0', left: '0', width: '100%', height: '80px',
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
-            zIndex: '1000000', // LOWERED - was 2147483647, now below MOBILE_APP
-            borderTop: '1px solid rgba(197, 160, 89, 0.3)',
+            zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
             backdropFilter: 'blur(10px)', pointerEvents: 'auto', 
             touchAction: 'none'
         });
@@ -561,13 +560,12 @@ window.syncMobileDashboard = function() {
     // 3. RUN
     window.addEventListener('load', () => { 
         lockVisuals(); 
-        buildAppFooter(); // Re-enabled with fixed z-index
+        buildAppFooter();
         // FORCE HOME ON LOAD
         if(window.toggleMobileView) window.toggleMobileView('home'); 
     });
     window.addEventListener('resize', lockVisuals);
-    lockVisuals(); 
-    buildAppFooter(); // Re-enabled
+    lockVisuals(); buildAppFooter();
 })();
 
 // TIMER SYNC (The Twin System)
