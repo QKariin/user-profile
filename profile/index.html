@@ -398,11 +398,15 @@
     </div> 
     
 </div>
+
+  
+<!-- 🟢 MOBILE UNIVERSE -->
 <div id="MOBILE_APP" style="display:none;">
-<!-- 1. SCROLLABLE CONTENT AREA -->
-        <div id="viewMobileHome" class="mob-frame">
+    
+    <!-- 1. SCROLLABLE DASHBOARD -->
+    <div id="viewMobileHome" class="mob-frame">
         
-        <!-- HEADER: IDENTITY -->
+        <!-- HEADER -->
         <div class="mob-header">
             <div class="mob-hex-wrap">
                 <img id="mob_profilePic" src="" class="mob-hex-img">
@@ -411,9 +415,8 @@
             <div id="mob_slaveName" class="mob-name">SLAVE</div>
         </div>
 
-        <!-- CARD 1: DEVOTION (Kneel + Grid) -->
+        <!-- CARD 1: DEVOTION -->
         <div class="mob-card devotion-card">
-            <!-- Left: The Trigger -->
             <div class="mob-kneel-zone" 
                  onmousedown="handleHoldStart(event)" 
                  onmouseup="handleHoldEnd(event)" 
@@ -427,16 +430,13 @@
                 <div id="mob_kneelFill" class="mob-kneel-fill"></div>
             </div>
 
-            <!-- Right: The 24-Square Grid -->
             <div class="mob-grid-zone">
                 <div class="mob-grid-label">DAILY TRIBUTE</div>
-                <div id="mob_streakGrid" class="mob-streak-grid">
-                    <!-- JS will fill this with 24 squares -->
-                </div>
+                <div id="mob_streakGrid" class="mob-streak-grid"></div>
             </div>
         </div>
 
-        <!-- CARD 2: OPERATIONS (Task Status) -->
+        <!-- CARD 2: OPERATIONS -->
         <div class="mob-card operations-card">
             <div class="op-status-row">
                 <div id="mob_statusLight" class="status-light red"></div>
@@ -444,44 +444,20 @@
             </div>
             
             <div class="op-action-row">
-                <!-- Shows when Idle -->
-                <button id="mob_btnRequest" class="mob-action-btn" onclick="window.getRandomTask()">
-                    REQUEST PROTOCOL
-                </button>
-                
-                <!-- Shows when Working -->
+                <button id="mob_btnRequest" class="mob-action-btn" onclick="window.getRandomTask()">REQUEST PROTOCOL</button>
                 <div id="mob_activeTimer" class="mob-timer hidden">
                     <span id="m_timerH">00</span>:<span id="m_timerM">00</span>:<span id="m_timerS">00</span>
                 </div>
             </div>
         </div>
 
-        <!-- SPACER (So content isn't hidden behind footer) -->
+        <!-- SPACER (For Footer) -->
         <div style="height: 100px;"></div>
-    </div>
 
-    <!-- 2. FIXED FOOTER (4 Icons) -->
-    <div class="mob-footer">
-        <div class="mf-btn active" onclick="navMobile('home')">
-            <span class="mf-icon">◈</span>
-            <span class="mf-lbl">PROFILE</span>
-        </div>
-        <div class="mf-btn" onclick="navMobile('record')">
-            <span class="mf-icon">▦</span>
-            <span class="mf-lbl">RECORD</span>
-        </div>
-        <div class="mf-btn" onclick="navMobile('queen')">
-            <span class="mf-icon">♛</span>
-            <span class="mf-lbl">QUEEN</span>
-        </div>
-        <div class="mf-btn" onclick="navMobile('logs')">
-            <span class="mf-icon">❖</span>
-            <span class="mf-lbl">LOGS</span>
-        </div>
-    </div>
-</div>
+    </div> <!-- Closes viewMobileHome -->
+</div> <!-- Closes MOBILE_APP -->
 
-<!-- ADD THIS SWITCHER SCRIPT AT THE VERY BOTTOM (Before </body>) -->
+<!-- SWITCHER SCRIPT -->
 <script>
     function checkDevice() {
         const isMobile = window.innerWidth <= 768;
@@ -493,13 +469,11 @@
             if(mobile) mobile.style.display = 'flex';
         } else {
             if(mobile) mobile.style.display = 'none';
-            if(desktop) desktop.style.display = 'block'; // or flex depending on your css
+            if(desktop) desktop.style.display = 'flex'; 
         }
     }
-    // Run immediately and on resize
     checkDevice();
     window.addEventListener('resize', checkDevice);
 </script>
-  
 </body>
 </html>
