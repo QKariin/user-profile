@@ -76,9 +76,21 @@
             position: absolute; bottom: 0; left: 0; width: 0%; height: 100%; /* Fills Horizontal */
             background: linear-gradient(90deg, #8b0000, #ff003c); z-index: 1; transition: width 0.1s linear;
         }
+
+        .mob-kneel-fill {
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            height: 100%; /* Full Height */
+            width: 0%;    /* Start Empty (Width) */
+            background: linear-gradient(90deg, #8b0000, #ff003c); /* Left-to-Right Gradient */
+            z-index: 1; 
+            transition: width 0.1s linear; /* Allow JS to animate width */
+        }
         .mob-bar-content { z-index: 2; display: flex; align-items: center; gap: 10px; }
         .kneel-icon-sm { color: #c5a059; font-size: 1.2rem; }
         .kneel-text { font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 3px; color: #ccc; }
+      
 
         /* 3. HEATMAP STRIP */
         .mob-grid-label-center { font-size: 0.6rem; color: #555; letter-spacing: 2px; margin-bottom: 5px; }
