@@ -1033,6 +1033,12 @@ body {
         background: #000 !important;
     }
 
+    /* Make sure ALL children are visible */
+    #viewMobileHome * {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
     /* Scrollable Content */
     .mob-frame {
         flex: 1 !important;
@@ -1045,6 +1051,7 @@ body {
         gap: 15px !important;
         width: 100% !important;
         background: #000 !important;
+        min-height: 500px !important;
     }
 
     /* Header Styling */
@@ -1092,22 +1099,24 @@ body {
     .mob-name { 
         font-size: 1.2rem !important; 
         letter-spacing: 4px !important; 
-        color: #eee !important; 
+        color: #fff !important; 
         text-transform: uppercase !important;
         visibility: visible !important;
+        display: block !important;
     }
 
     /* Cards Styling */
     .mob-card {
         width: 100% !important; 
         background: rgba(18, 18, 18, 0.95) !important; 
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 12px !important; 
         padding: 15px !important; 
         box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
+        min-height: 100px !important;
     }
 
     /* Devotion Card */
@@ -1230,9 +1239,10 @@ body {
     .status-text { 
         font-family: 'Orbitron', sans-serif !important; 
         font-size: 0.9rem !important; 
-        color: #888 !important; 
+        color: #fff !important; 
         letter-spacing: 2px !important;
         visibility: visible !important;
+        display: block !important;
     }
 
     .mob-action-btn {
