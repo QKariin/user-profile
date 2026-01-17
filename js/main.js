@@ -1,4 +1,4 @@
-// main.js - FIXED: RESTORED UI STATE LOGIC
+// main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -28,92 +28,53 @@ import { getOptimizedUrl } from './media.js';
 
 // --- 2. CRITICAL UI FUNCTIONS ---
 
-// Toggle the slide-down panel
 window.toggleTaskDetails = function(forceOpen = null) {
     if (window.event) window.event.stopPropagation();
-
     const panel = document.getElementById('taskDetailPanel');
     const link = document.querySelector('.see-task-link'); 
     const chatBox = document.getElementById('chatBox'); 
-    
     if (!panel) return;
-
     const isOpen = panel.classList.contains('open');
-    let shouldOpen;
-
-    if (forceOpen === true) {
-        shouldOpen = true;
-    } else if (forceOpen === false) {
-        shouldOpen = false;
-    } else {
-        shouldOpen = !isOpen; 
-    }
+    let shouldOpen = (forceOpen === true) ? true : (forceOpen === false ? false : !isOpen);
 
     if (shouldOpen) {
         panel.classList.add('open');
         if(chatBox) chatBox.classList.add('focused-task');
-        if(link) {
-            link.innerHTML = "▲ HIDE DIRECTIVE ▲";
-            link.style.opacity = "1"; 
-        }
+        if(link) { link.innerHTML = "▲ HIDE DIRECTIVE ▲"; link.style.opacity = "1"; }
     } else {
         panel.classList.remove('open');
         if(chatBox) chatBox.classList.remove('focused-task');
-        if(link) {
-            link.innerHTML = "▼ SEE DIRECTIVE ▼";
-            link.style.opacity = "1";
-        }
+        if(link) { link.innerHTML = "▼ SEE DIRECTIVE ▼"; link.style.opacity = "1"; }
     }
 };
 
-// --- THIS WAS MISSING: THE STATE SWITCHER ---
 window.updateTaskUIState = function(isActive) {
-    // 1. STATUS TEXT (Single Element)
     const statusText = document.getElementById('mainStatusText');
-
-    // 2. CENTER CONTENT
     const idleMsg = document.getElementById('idleMessage');
     const timerRow = document.getElementById('activeTimerRow');
-
-    // 3. BUTTONS
     const reqBtn = document.getElementById('mainButtonsArea');
     const uploadArea = document.getElementById('uploadBtnContainer');
 
     if (isActive) {
-        // --- WORKING ---
-        if (statusText) {
-            statusText.innerText = "WORKING";
-            statusText.className = "status-text-lg status-working";
-        }
+        if (statusText) { statusText.innerText = "WORKING"; statusText.className = "status-text-lg status-working"; }
         if (idleMsg) idleMsg.classList.add('hidden');
         if (timerRow) timerRow.classList.remove('hidden');
-
         if (reqBtn) reqBtn.classList.add('hidden');
         if (uploadArea) uploadArea.classList.remove('hidden');
-        
     } else {
-        // --- UNPRODUCTIVE ---
-        if (statusText) {
-            statusText.innerText = "UNPRODUCTIVE";
-            statusText.className = "status-text-lg status-unproductive";
-        }
+        if (statusText) { statusText.innerText = "UNPRODUCTIVE"; statusText.className = "status-text-lg status-unproductive"; }
         if (idleMsg) idleMsg.classList.remove('hidden');
         if (timerRow) timerRow.classList.add('hidden');
-
         if (reqBtn) reqBtn.classList.remove('hidden');
         if (uploadArea) uploadArea.classList.add('hidden');
-        
         window.toggleTaskDetails(false);
     }
 };
 
-// Global Click Listener (Handles Outside Clicks Only)
 document.addEventListener('click', function(event) {
     const card = document.getElementById('taskCard');
     const panel = document.getElementById('taskDetailPanel');
-    
     if (event.target.closest('.see-task-link')) return;
-
     if (panel && panel.classList.contains('open') && card && !card.contains(event.target)) {
         window.toggleTaskDetails(false);
     }
@@ -128,11 +89,7 @@ document.addEventListener('click', () => {
             if (sound) {
                 const originalVolume = sound.volume;
                 sound.volume = 0;
-                sound.play().then(() => {
-                    sound.pause();
-                    sound.currentTime = 0;
-                    sound.volume = originalVolume;
-                }).catch(e => console.log("Audio Engine Ready"));
+                sound.play().then(() => { sound.pause(); sound.currentTime = 0; sound.volume = originalVolume; }).catch(e => console.log("Audio Engine Ready"));
             }
         });
         window.audioUnlocked = true;
@@ -260,7 +217,6 @@ window.addEventListener("message", (event) => {
                     setLastGalleryJson(currentGalleryJson);
                     setGalleryData(payload.galleryData);
                     renderGallery();
-                    console.log("Gallery data updated from backend.");
                     updateStats();
                 }
             }
@@ -271,10 +227,7 @@ window.addEventListener("message", (event) => {
                     if (pendingTaskState) {
                         setCurrentTask(pendingTaskState.task);
                         restorePendingUI();
-                        
-                        // FIXED: UPDATE UI BUT DO NOT FORCE OPEN DRAWER
                         window.updateTaskUIState(true);
-                        
                     } else if (!resetUiTimer) {
                         window.updateTaskUIState(false);
                         const rt = document.getElementById('readyText');
@@ -302,12 +255,7 @@ window.addEventListener("message", (event) => {
 window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
         const btn = document.getElementById('btnUpload');
-        if (btn) {
-            btn.innerHTML = '...';
-            btn.style.background = '#333';
-            btn.style.color = '#ffd700'; 
-            btn.style.cursor = 'wait';
-        }
+        if (btn) { btn.innerHTML = '...'; btn.style.background = '#333'; btn.style.color = '#ffd700'; btn.style.cursor = 'wait'; }
         if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
     }
 };
@@ -388,17 +336,39 @@ function updateStats() {
         if(nln) nln.innerText = nextLevel.name;
         if(pnd) pnd.innerText = Math.max(0, nextLevel.min - gameStats.points) + " to go";
         
-        const prevLevel = [...LEVELS].reverse().find(l => l.min <= gameStats.points) || {min: 0};
-        const range = nextLevel.min - prevLevel.min;
-        const progress = range > 0 ? ((gameStats.points - prevLevel.min) / range) * 100 : 100;
         const pb = document.getElementById('progressBar');
+        const progress = ((gameStats.points - 0) / (nextLevel.min - 0)) * 100;
         if (pb) pb.style.width = Math.min(100, Math.max(0, progress)) + "%";
     }
-    updateKneelingStatus(); 
+    
+    updateKneelingStatus();
+    // THE SYNC HOOK FOR MOBILE
+    if(window.syncMobileDashboard) window.syncMobileDashboard();
 }
 
 // =========================================
-// PART 1: MOBILE LOGIC (DASHBOARD & NAVIGATION)
+// PART 3: TRIBUTE & BACKEND FUNCTIONS (RESTORED)
+// =========================================
+
+let currentHuntIndex = 0, filteredItems = [], selectedReason = "", selectedNote = "", selectedItem = null;
+function toggleTributeHunt() { const overlay = document.getElementById('tributeHuntOverlay'); if (overlay.classList.contains('hidden')) { selectedReason = ""; selectedItem = null; if(document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; overlay.classList.remove('hidden'); showTributeStep(1); } else { overlay.classList.add('hidden'); resetTributeFlow(); } }
+function showTributeStep(step) { document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden')); const target = document.getElementById('tributeStep' + step); if (target) target.classList.remove('hidden'); const progressEl = document.getElementById('huntProgress'); if (progressEl) progressEl.innerText = ["", "INTENTION", "THE HUNT", "CONFESSION"][step] || ""; }
+function selectTributeReason(reason) { selectedReason = reason; renderHuntStore(gameStats.coins); showTributeStep(2); }
+function setTributeNote(note) { showTributeStep(3); }
+function filterByBudget(max) { renderHuntStore(max); showTributeStep(3); }
+function renderHuntStore(budget) { const grid = document.getElementById('huntStoreGrid'); if (!grid) return; filteredItems = (window.WISHLIST_ITEMS || []).filter(item => Number(item.price || item.Price || 0) <= budget); currentHuntIndex = 0; if (filteredItems.length === 0) { grid.innerHTML = '<div style="color:#666; text-align:center; padding:40px;">NO TRIBUTES IN THIS TIER...</div>'; return; } showTinderCard(); }
+function showTinderCard() { const grid = document.getElementById('huntStoreGrid'); const item = filteredItems[currentHuntIndex]; if (!item) { grid.innerHTML = `<div style="text-align:center; padding:40px;"><div style="font-size:2rem; margin-bottom:10px;">💨</div><div style="color:#666; font-size:0.7rem;">NO MORE ITEMS IN THIS TIER</div><button class="tab-btn" onclick="showTributeStep(2)" style="margin-top:15px; width:auto; padding:5px 15px;">CHANGE BUDGET</button></div>`; return; } grid.style.perspective = "1000px"; grid.innerHTML = `<div id="tinderCard" class="tinder-card-main"><div id="likeLabel" class="swipe-indicator like">SACRIFICE</div><div id="nopeLabel" class="swipe-indicator nope">SKIP</div><img src="${item.img || item.image}" draggable="false"><div class="tinder-card-info"><div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div><div style="color:white; letter-spacing:2px; font-weight:bold; font-size:0.8rem;">${item.name.toUpperCase()}</div></div></div>`; initSwipeEvents(document.getElementById('tinderCard'), item); }
+function initSwipeEvents(card, item) { let startX = 0; let currentX = 0; const handleStart = (e) => { startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; card.style.transition = 'none'; }; const handleMove = (e) => { if (!startX) return; currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; const diff = currentX - startX; card.style.transform = `translateX(${diff}px) rotate(${diff / 15}deg)`; const likeLabel = document.getElementById('likeLabel'); const nopeLabel = document.getElementById('nopeLabel'); if(likeLabel) likeLabel.style.opacity = diff > 0 ? (diff / 100) : 0; if(nopeLabel) nopeLabel.style.opacity = diff < 0 ? (Math.abs(diff) / 100) : 0; }; const handleEnd = () => { const diff = currentX - startX; card.style.transition = 'transform 0.4s ease, opacity 0.4s ease'; if (diff > 120) { card.style.transform = `translateX(600px) rotate(45deg)`; selectedItem = item; if(document.getElementById('huntSelectedImg')) document.getElementById('huntSelectedImg').src = item.img || item.image; if(document.getElementById('huntSelectedName')) document.getElementById('huntSelectedName').innerText = item.name.toUpperCase(); if(document.getElementById('huntSelectedPrice')) document.getElementById('huntSelectedPrice').innerText = item.price + " 🪙"; setTimeout(() => { showTributeStep(4); }, 200); } else if (diff < -120) { card.style.transform = `translateX(-600px) rotate(-45deg)`; card.style.opacity = "0"; currentHuntIndex++; setTimeout(() => { showTinderCard(); }, 300); } else { card.style.transform = `translateX(0) rotate(0)`; if(document.getElementById('likeLabel')) document.getElementById('likeLabel').style.opacity = 0; if(document.getElementById('nopeLabel')) document.getElementById('nopeLabel').style.opacity = 0; } startX = 0; }; card.addEventListener('mousedown', handleStart); card.addEventListener('touchstart', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('touchmove', handleMove); window.addEventListener('mouseup', handleEnd); window.addEventListener('touchend', handleEnd); }
+function toggleHuntNote(show) { const container = document.getElementById('huntNoteContainer'); const btn = document.getElementById('btnShowNote'); if (!container || !btn) return; if (show) { container.classList.remove('hidden'); btn.classList.add('hidden'); document.getElementById('huntNote').focus(); } else { container.classList.add('hidden'); btn.classList.remove('hidden'); } }
+function finalizeSacrifice() { const noteEl = document.getElementById('huntNote'); const note = noteEl ? noteEl.value.trim() : ""; if (!selectedItem || !selectedReason) return; if (gameStats.coins < selectedItem.price) { triggerSound('sfx-deny'); alert('Insufficient coins!'); return; } const tributeMessage = `💝 TRIBUTE: ${selectedReason}\n🎁 ITEM: ${selectedItem.name}\n💰 COST: ${selectedItem.price}\n💌 "${note || "A silent tribute."}"`; window.parent.postMessage({ type: "PURCHASE_ITEM", itemName: selectedItem.name, cost: selectedItem.price, messageToDom: tributeMessage }, "*"); triggerSound('sfx-buy'); triggerCoinShower(); toggleTributeHunt(); }
+function buyRealCoins(amount) { triggerSound('sfx-buy'); window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*"); }
+function triggerCoinShower() { for (let i = 0; i < 40; i++) { const coin = document.createElement('div'); coin.className = 'coin-particle'; coin.innerHTML = `<svg style="width:100%; height:100%; fill:gold;"><use href="#icon-coin"></use></svg>`; coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`); coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`); document.body.appendChild(coin); setTimeout(() => coin.remove(), 2000); } }
+function breakGlass(e) { if (e && e.stopPropagation) e.stopPropagation(); const overlay = document.getElementById('specialGlassOverlay'); if (overlay) overlay.classList.remove('active'); window.parent.postMessage({ type: "GLASS_BROKEN" }, "*"); }
+function submitSessionRequest() { const checked = document.querySelector('input[name="sessionType"]:checked'); if (!checked) return; window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*"); }
+function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedItem = null; const note = document.getElementById('huntNote'); if (note) note.value = ""; showTributeStep(1); }
+
+// =========================================
+// PART 1: MOBILE LOGIC (BRAIN & NAVIGATION)
 // =========================================
 
 // 1. STATS TOGGLE (The Expand Button)
@@ -417,17 +387,20 @@ window.toggleMobileView = function(viewName) {
     const home = document.getElementById('viewMobileHome');
     const chat = document.getElementById('viewServingTop');
     const chatContainer = document.querySelector('.chat-container');
+    const history = document.getElementById('historySection');
+    const news = document.getElementById('viewNews');
     
     // RESET: Hide all mobile views
     if(home) home.style.display = 'none';
     if(chat) chat.style.display = 'none'; 
     if(chatContainer) chatContainer.style.display = 'none';
+    if(history) history.style.display = 'none';
+    if(news) news.style.display = 'none';
 
     // SHOW: Target View
     if (viewName === 'chat') {
         if(chatContainer) {
             chatContainer.style.display = 'flex';
-            // Scroll Fix
             const chatBox = document.getElementById('chatBox');
             if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
         } else if (chat) {
@@ -436,13 +409,24 @@ window.toggleMobileView = function(viewName) {
     } 
     else if (viewName === 'home') {
         if(home) home.style.display = 'flex';
-        // Force a data refresh when we go home
         if(window.syncMobileDashboard) window.syncMobileDashboard();
+    }
+    else if (viewName === 'record') {
+        if(history) {
+            history.style.display = 'flex';
+            if(window.renderGallery) window.renderGallery();
+        }
+    }
+    else if (viewName === 'queen') {
+        if(news) news.style.display = 'block';
     }
     
     // Close sidebar if open
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
+    
+    // Update Footer Icons
+    document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
 };
 
 // 3. KNEEL BUTTON
@@ -450,7 +434,6 @@ window.triggerKneel = function() {
     const sidebar = document.querySelector('.layout-left');
     const realBtn = document.querySelector('.kneel-bar-graphic');
     
-    // We still open the sidebar for kneeling because it has the physics bar
     if (sidebar) sidebar.classList.add('mobile-open'); 
 
     if (realBtn) {
@@ -463,7 +446,6 @@ window.triggerKneel = function() {
 window.syncMobileDashboard = function() {
     if (!window.gameStats || !window.userProfile) return;
 
-    // Header Data
     const elName = document.getElementById('mobName');
     const elHier = document.getElementById('mobHierarchy');
     const elPoints = document.getElementById('mobPoints');
@@ -475,26 +457,27 @@ window.syncMobileDashboard = function() {
     if (elPoints) elPoints.innerText = window.gameStats.points || 0;
     if (elCoins) elCoins.innerText = window.gameStats.coins || 0;
     
-    // Profile Pic
     if (elPic && window.userProfile.profilePicture) {
         elPic.src = getOptimizedUrl(window.userProfile.profilePicture, 150); 
     }
 
-    // Stats Drawer
     if (document.getElementById('mobStreak')) document.getElementById('mobStreak').innerText = window.gameStats.taskdom_streak || 0;
     if (document.getElementById('mobTotal')) document.getElementById('mobTotal').innerText = window.gameStats.taskdom_total_tasks || 0;
     if (document.getElementById('mobCompleted')) document.getElementById('mobCompleted').innerText = window.gameStats.taskdom_completed_tasks || 0;
     if (document.getElementById('mobKneels')) document.getElementById('mobKneels').innerText = window.gameStats.kneelCount || 0;
     
-    // Progress Bar
-    if (document.getElementById('mobNextLevel')) {
-        document.getElementById('mobNextLevel').innerText = "NEXT RANK"; 
+    const grid = document.getElementById('mob_streakGrid');
+    if(grid) {
+        grid.innerHTML = '';
+        const count = window.gameStats.kneelCount || 0;
+        const progress = count % 24;
+        for(let i=0; i<24; i++) {
+            const sq = document.createElement('div');
+            sq.className = 'streak-sq' + (i < progress ? ' active' : '');
+            grid.appendChild(sq);
+        }
     }
 };
-
-// 5. UPDATE FOOTER CLICK (Profile -> Home)
-// (This is handled in Part 2 below)
-
 
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
@@ -508,7 +491,6 @@ window.syncMobileDashboard = function() {
     function lockVisuals() {
         const height = window.innerHeight;
         
-        // A. BODY: FROZEN SOLID
         Object.assign(document.body.style, {
             height: height + 'px',
             width: '100%',
@@ -519,14 +501,12 @@ window.syncMobileDashboard = function() {
             touchAction: 'none'
         });
 
-        // B. APP CONTAINER
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        // C. CONTENT STAGE: FREE TO MOVE
-        const stage = document.querySelector('.content-stage');
-        if (stage) {
-            Object.assign(stage.style, {
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews');
+        scrollables.forEach(el => {
+            Object.assign(el.style, {
                 height: '100%',
                 overflowY: 'auto',              
                 webkitOverflowScrolling: 'touch', 
@@ -534,20 +514,7 @@ window.syncMobileDashboard = function() {
                 overscrollBehaviorY: 'contain',
                 touchAction: 'pan-y'
             });
-        }
-        
-        // D. MOBILE DASHBOARD: FREE TO MOVE
-        const home = document.getElementById('viewMobileHome');
-        if (home) {
-             Object.assign(home.style, {
-                height: '100%',
-                overflowY: 'auto',
-                webkitOverflowScrolling: 'touch',
-                paddingBottom: '100px',
-                overscrollBehaviorY: 'contain',
-                touchAction: 'pan-y'
-            });
-        }
+        });
     }
 
     // 2. BUILD FOOTER
@@ -558,7 +525,7 @@ window.syncMobileDashboard = function() {
         footer.id = 'app-mode-footer';
         
         Object.assign(footer.style, {
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            display: 'flex', justifyContent: 'space-around', alignItems: 'center',
             position: 'fixed', bottom: '0', left: '0', width: '100%', height: '80px',
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             padding: '0 30px', paddingBottom: 'env(safe-area-inset-bottom)',
@@ -569,19 +536,21 @@ window.syncMobileDashboard = function() {
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
+        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem; width:25%; cursor:pointer;";
+        const iconStyle = "font-size:1.4rem; color:#888;";
+
         footer.innerHTML = `
-            <button onclick="window.toggleMobileView('home')" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
-                <span style="font-size:1.4rem; color:#888;">◈</span>
-                <span>PROFILE</span>
+            <button class="mf-btn" onclick="window.toggleMobileView('home')" style="${btnStyle}">
+                <span style="${iconStyle}">◈</span><span>PROFILE</span>
             </button>
-            <div style="position:relative; top:-20px;">
-                <button onclick="window.triggerKneel()" style="width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #c5a059, #5a4a22); border:2px solid #fff; box-shadow:0 0 20px rgba(197,160,89,0.6); color:#000; font-family:'Cinzel',serif; font-weight:700; font-size:0.7rem; cursor:pointer;">
-                    KNEEL
-                </button>
-            </div>
-            <button onclick="window.toggleMobileView('chat')" style="background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Cinzel',serif; font-size:0.65rem;">
-                <span style="font-size:1.4rem; color:#888;">❖</span>
-                <span>LOGS</span>
+            <button class="mf-btn" onclick="window.toggleMobileView('record')" style="${btnStyle}">
+                <span style="${iconStyle}">▦</span><span>RECORD</span>
+            </button>
+            <button class="mf-btn" onclick="window.toggleMobileView('queen')" style="${btnStyle}">
+                <span style="${iconStyle}">♛</span><span>QUEEN</span>
+            </button>
+            <button class="mf-btn" onclick="window.toggleMobileView('chat')" style="${btnStyle}">
+                <span style="${iconStyle}">❖</span><span>LOGS</span>
             </button>
         `;
         document.body.appendChild(footer);
@@ -597,5 +566,42 @@ window.syncMobileDashboard = function() {
     window.addEventListener('resize', lockVisuals);
     lockVisuals(); buildAppFooter();
 })();
+
+// TIMER SYNC (The Twin System)
+setInterval(() => {
+    const desktopH = document.getElementById('timerH');
+    const desktopM = document.getElementById('timerM');
+    const desktopS = document.getElementById('timerS');
+    const mobileH = document.getElementById('m_timerH');
+    const mobileM = document.getElementById('m_timerM');
+    const mobileS = document.getElementById('m_timerS');
+    
+    if (desktopH && mobileH) mobileH.innerText = desktopH.innerText;
+    if (desktopM && mobileM) mobileM.innerText = desktopM.innerText;
+    if (desktopS && mobileS) mobileS.innerText = desktopS.innerText;
+    
+    const activeRow = document.getElementById('activeTimerRow');
+    const mobTimer = document.getElementById('mob_activeTimer');
+    const mobRequestBtn = document.getElementById('mob_btnRequest');
+    
+    if (activeRow && mobTimer && mobRequestBtn) {
+        const isWorking = !activeRow.classList.contains('hidden');
+        if (isWorking) {
+            mobTimer.classList.remove('hidden');
+            mobRequestBtn.classList.add('hidden');
+            const light = document.getElementById('mob_statusLight');
+            const text = document.getElementById('mob_statusText');
+            if(light) light.className = 'status-light green';
+            if(text) text.innerText = "WORKING";
+        } else {
+            mobTimer.classList.add('hidden');
+            mobRequestBtn.classList.remove('hidden');
+            const light = document.getElementById('mob_statusLight');
+            const text = document.getElementById('mob_statusText');
+            if(light) light.className = 'status-light red';
+            if(text) text.innerText = "UNPRODUCTIVE";
+        }
+    }
+}, 500);
 
 window.parent.postMessage({ type: "UI_READY" }, "*");
