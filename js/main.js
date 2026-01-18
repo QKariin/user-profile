@@ -542,5 +542,178 @@ window.syncMobileDashboard = function() {
     }
 };
 
+// =========================================
+// PART 2: FINAL APP MODE (NATIVE FLOW)
+// =========================================
+
+(function() {
+    // Only run on Mobile
     if (window.innerWidth > 768) return;
 
+    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
+    function lockVisuals() {
+        const height = window.innerHeight;
+        
+        Object.assign(document.body.style, {
+            height: height + 'px',
+            width: '100%',
+            position: 'fixed',
+            overflow: 'hidden',
+            inset: '0',
+            overscrollBehavior: 'none',
+            touchAction: 'none'
+        });
+
+        const app = document.querySelector('.app-container');
+        if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
+
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews');
+        scrollables.forEach(el => {
+            Object.assign(el.style, {
+                height: '100%',
+                overflowY: 'auto',              
+                webkitOverflowScrolling: 'touch', 
+                paddingBottom: '100px',
+                overscrollBehaviorY: 'contain',
+                touchAction: 'pan-y'
+            });
+        });
+    }
+
+// 2. BUILD FOOTER (FULL WIDTH 5-SLOT)
+    function buildAppFooter() {
+        if (document.getElementById('app-mode-footer')) return;
+        
+        const footer = document.createElement('div');
+        footer.id = 'app-mode-footer';
+        
+        Object.assign(footer.style, {
+            display: 'flex', 
+            justifyContent: 'space-around', // Equal spacing
+            alignItems: 'center',
+            
+            // FULL WIDTH STYLE
+            position: 'fixed', 
+            bottom: '0', 
+            left: '0', 
+            width: '100%', 
+            height: '80px',
+            
+            background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            zIndex: '2147483647', 
+            borderTop: '1px solid rgba(197, 160, 89, 0.3)', // Gold Border
+            backdropFilter: 'blur(10px)', 
+            pointerEvents: 'auto', 
+            touchAction: 'none'
+        });
+
+        footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+        // STANDARD BUTTON STYLE (Width = 20% because 100% / 5 buttons)
+        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer;";
+        
+        // ACTIVE/HIGHLIGHT STYLE (For the Middle Chat Button)
+        const chatStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; text-shadow: 0 0 10px rgba(255,0,60,0.4);";
+
+        footer.innerHTML = `
+            <button onclick="window.toggleMobileView('home')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">◈</span><span>PROFILE</span>
+            </button>
+            
+            <button onclick="window.toggleMobileView('record')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">▦</span><span>RECORD</span>
+            </button>
+            
+            <!-- MIDDLE: CHAT (Red Highlight) -->
+            <button onclick="window.toggleMobileView('chat')" style="${chatStyle}">
+                <span style="font-size:1.6rem; color:#ff003c;">❖</span><span>LOGS</span>
+            </button>
+
+            <button onclick="window.toggleMobileView('queen')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">♛</span><span>QUEEN</span>
+            </button>
+
+            <button onclick="window.toggleMobileView('global')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">🌐</span><span>GLOBAL</span>
+            </button>
+        `;
+        document.body.appendChild(footer);
+    }
+
+    // 3. RUN (WITH FOCUS MODE ADDED)
+    window.addEventListener('load', () => { 
+        lockVisuals(); 
+        buildAppFooter();
+        
+        // --- FOCUS MODE (The Keyboard Fix) ---
+        const input = document.getElementById('chatMsgInput');
+        if (input) {
+            // WHEN TYPING: Hide Footer, Drop Input
+            input.addEventListener('focus', () => {
+                const footer = document.getElementById('app-mode-footer');
+                const chatBar = document.querySelector('.chat-footer');
+                
+                if (footer) footer.style.display = 'none'; // Hide Menu
+                if (chatBar) chatBar.style.bottom = '0px'; // Drop Chat Bar
+            });
+
+            // WHEN DONE: Show Footer, Raise Input
+            input.addEventListener('blur', () => {
+                const footer = document.getElementById('app-mode-footer');
+                const chatBar = document.querySelector('.chat-footer');
+                
+                // Small delay to prevent UI jumping if you hit Send
+                setTimeout(() => {
+                    if (footer) footer.style.display = 'flex';
+                    if (chatBar) chatBar.style.bottom = '80px';
+                }, 200);
+            });
+        }
+
+        // FORCE HOME ON LOAD
+        if(window.toggleMobileView) window.toggleMobileView('home'); 
+    });
+    
+    window.addEventListener('resize', lockVisuals);
+    lockVisuals(); 
+    buildAppFooter();
+
+// TIMER SYNC (The Twin System)
+setInterval(() => {
+    const desktopH = document.getElementById('timerH');
+    const desktopM = document.getElementById('timerM');
+    const desktopS = document.getElementById('timerS');
+    const mobileH = document.getElementById('m_timerH');
+    const mobileM = document.getElementById('m_timerM');
+    const mobileS = document.getElementById('m_timerS');
+    
+    if (desktopH && mobileH) mobileH.innerText = desktopH.innerText;
+    if (desktopM && mobileM) mobileM.innerText = desktopM.innerText;
+    if (desktopS && mobileS) mobileS.innerText = desktopS.innerText;
+    
+    const activeRow = document.getElementById('activeTimerRow');
+    const mobTimer = document.getElementById('mob_activeTimer');
+    const mobRequestBtn = document.getElementById('mob_btnRequest');
+    
+    if (activeRow && mobTimer && mobRequestBtn) {
+        const isWorking = !activeRow.classList.contains('hidden');
+        if (isWorking) {
+            mobTimer.classList.remove('hidden');
+            mobRequestBtn.classList.add('hidden');
+            const light = document.getElementById('mob_statusLight');
+            const text = document.getElementById('mob_statusText');
+            if(light) light.className = 'status-light green';
+            if(text) text.innerText = "WORKING";
+        } else {
+            mobTimer.classList.add('hidden');
+            mobRequestBtn.classList.remove('hidden');
+            const light = document.getElementById('mob_statusLight');
+            const text = document.getElementById('mob_statusText');
+            if(light) light.className = 'status-light red';
+            if(text) text.innerText = "UNPRODUCTIVE";
+        }
+    }
+}, 500);
+
+window.parent.postMessage({ type: "UI_READY" }, "*");
