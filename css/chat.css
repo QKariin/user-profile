@@ -1,102 +1,104 @@
 /* --- LUXURY TACTICAL CHAT DNA --- */
 :root {
     --pink: #ff00de;
-    --gold: #ffd700;
+    --gold: #c5a059;
     --gold-dim: rgba(255, 215, 0, 0.3);
     --panel-bg: rgba(10, 10, 10, 0.95);
     --border: #333;
 }
 
+/* =========================================
+   1. DESKTOP DEFAULT STYLES (KEEP AS IS)
+   ========================================= */
+
 /* Container Prison */
 .chat-container {
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--border) !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     box-shadow: inset 0 0 40px #000;
+    position: relative; /* Keep it relative on desktop */
 }
 
 .chat-body-frame {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    padding: 25px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 15px !important;
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* 1. INPUT AREA (Sits on top of the 80px App Footer) */
-    .chat-footer {
-        position: fixed !important;
-        bottom: 80px !important; /* EXACTLY the height of the App Footer */
-        left: 0 !important;
-        width: 100% !important;
-        z-index: 2147483640 !important;
-        
-        padding: 10px !important;
-        background: #050505 !important; 
-        border-top: 1px solid #222 !important;
-    }
+/* Input Terminal (Desktop Default) */
+.chat-footer {
+    background: #050505;
+    border-top: 1px solid var(--border);
+    padding: 15px;
+    position: relative; /* Normal flow on desktop */
+    z-index: 10;
+}
 
-    /* 2. CHAT SCROLL AREA (Leaves room for Footer + Input) */
-    .chat-body-frame {
-        padding: 10px 6px !important;
-        /* 80px (Footer) + ~60px (Input) = 140px safe space */
-        padding-bottom: 140px !important; 
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
+.chat-input {
+    background: #000;
+    border: 1px solid #222;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    border-radius: 4px;
+    width: 100%;
+}
 
 /* Avatar Fix - The "Shit" look stopper */
 .chat-av {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50% !important;
-    border: 1.5px solid var(--border) !important;
-    object-fit: cover !important;
-    flex-shrink: 0 !important;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Row Alignment */
 .msg-row {
-    display: flex !important;
-    gap: 10px !important;
-    max-width: 100% !important;
-    align-items: flex-end !important;
-    margin-bottom: 10px !important;
+    display: flex;
+    gap: 12px;
+    max-width: 100%;
+    align-items: flex-end;
+    margin-bottom: 10px;
 }
 
-/* --- ALIGNMENT --- */
 /* --- ALIGNMENT: SLAVE RIGHT / QUEEN LEFT --- */
 .mr-out { 
-    flex-direction: row-reverse !important; 
-    justify-content: flex-start !important; 
-} /* Slave Messages */
+    flex-direction: row-reverse; 
+    justify-content: flex-start; 
+} 
 
 .mr-in { 
-    flex-direction: row !important; 
-    justify-content: flex-start !important; 
-} /* Queen Messages */
+    flex-direction: row; 
+    justify-content: flex-start; 
+}
 
 /* --- KILL THE PINK BUBBLES --- */
 .m-slave {
-    background: rgba(20, 20, 20, 0.9) !important; /* Deep Dark Glass */
-    color: #ff00de !important; /* Retain pink only for text/glow */
-    border: 1px solid rgba(255, 0, 222, 0.2) !important; /* Subtle pink border glow */
-    border-radius: 12px 12px 2px 12px !important; /* Tactical tail on right */
-    box-shadow: 0 0 15px rgba(255, 0, 222, 0.05) !important;
-    font-weight: 500 !important;
-    text-shadow: 0 0 5px rgba(255, 0, 222, 0.2) !important;
+    background: rgba(20, 20, 20, 0.9);
+    color: #ff00de;
+    border: 1px solid rgba(255, 0, 222, 0.2);
+    border-radius: 12px 12px 2px 12px;
+    box-shadow: 0 0 15px rgba(255, 0, 222, 0.05);
+    font-weight: 500;
+    text-shadow: 0 0 5px rgba(255, 0, 222, 0.2);
 }
 
 /* Queen's Obsidian Bubble */
 .m-queen {
-    background: rgba(15, 15, 15, 0.95) !important;
-    border: 1px solid #333 !important;
-    color: #fff !important;
-    border-radius: 12px 12px 12px 2px !important; /* Tactical tail on left */
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 12px 12px 12px 2px;
 }
 
 /* Kill the Circus Avatars */
@@ -104,183 +106,175 @@
 
 /* --- LUXURY TERMINAL TYPOGRAPHY --- */
 .msg {
-    background: none !important;
-    border: none !important;
-    max-width: 70% !important;
-    padding: 8px 0 !important;
-    
-    /* THE NEW FONT: Cleaner and easier to read */
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.95rem !important;
-    font-weight: 400 !important;
-    line-height: 1.4 !important;
-    letter-spacing: 0.2px !important;
+    background: none;
+    border: none;
+    max-width: 70%;
+    padding: 8px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
 }
 
 /* SLAVE MESSAGE: Anchor Right, Silver Strip on Right */
 .mr-out .msg {
-    color: #bbbbbb !important;
-    text-align: right !important;
-    border-right: 2px solid #444444 !important; 
-    padding-right: 15px !important;
-    margin-left: auto !important;
+    color: #bbbbbb;
+    text-align: right;
+    border-right: 2px solid #444444; 
+    padding-right: 15px;
+    margin-left: auto;
 }
 
 /* QUEEN: Gold side-strip stays */
 .mr-in .msg {
-    color: #ffffff !important;
-    text-align: left !important;
-    border-left: 2px solid var(--gold) !important;
-    padding-left: 15px !important;
-    margin-right: auto !important;
+    color: #ffffff;
+    text-align: left;
+    border-left: 2px solid var(--gold);
+    padding-left: 15px;
+    margin-right: auto;
 }
 
 /* --- TIME STAMP POSITIONING --- */
 .msg-col {
-    display: flex !important;
-    flex-direction: column !important;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Slave: Pin time to the right edge */
 .mr-out .msg-col {
-    align-items: flex-end !important;
-    text-align: right !important;
+    align-items: flex-end;
+    text-align: right;
 }
 
-/* Queen: Pin time to the left edge */
 .mr-in .msg-col {
-    align-items: flex-start !important;
-    text-align: left !important;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .msg-time {
-    font-family: 'Rajdhani', sans-serif !important;
-    font-size: 0.65rem !important;
-    font-weight: 700 !important;
-    color: #333333 !important; /* Dark grey for minimalist look */
-    margin-top: 4px !important;
-    width: fit-content !important;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #333333;
+    margin-top: 4px;
+    width: fit-content;
 }
 
 .system-row {
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 8px 0 !important;
+    justify-content: center;
+    width: 100%;
+    margin: 8px 0;
 }
 
 /* System/Reward Messages */
 .msg-system {
-    width: 98% !important;
-    background: rgba(10, 10, 10, 0.9) !important;
-    border: 1px solid #1a1a1a !important;
-    padding: 10px 0 !important;
-    text-align: center !important;
-    font-family: 'Orbitron', sans-serif !important;
-    font-size: 0.45rem !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    color: var(--yellow) !important;
-    box-shadow: inset 0 0 10px rgba(0,0,0,1) !important;
+    width: 98%;
+    background: rgba(10, 10, 10, 0.9);
+    border: 1px solid #1a1a1a;
+    padding: 10px 0;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    box-shadow: inset 0 0 10px rgba(0,0,0,1);
 }
 
 .sys-gold {
-    color: var(--gold) !important;
-    border: 1px solid var(--gold-dim) !important;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05), transparent) !important;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05), transparent);
 }
 
 .sys-red {
-    color: #ff003c !important;
-    border-color: rgba(255, 0, 60, 0.2) !important;
+    color: #ff003c;
+    border-color: rgba(255, 0, 60, 0.2);
 }
 
-/* Input Terminal */
-.chat-footer {
-    background: #050505 !important;
-    border-top: 1px solid var(--border) !important;
-    padding: 15px !important;
-}
-
-.chat-input {
-    background: #000 !important;
-    border: 1px solid #222 !important;
-    color: #fff !important;
-    font-family: 'Rajdhani', sans-serif !important;
-    font-size: 0.9rem !important;
-    padding: 10px 15px !important;
-    border-radius: 4px !important;
-}
 
 /* =========================================
-   MOBILE CHAT FIX (POLISHED)
+   2. MOBILE OVERRIDE (FULL SCREEN + FOOTER FIX)
    ========================================= */
 @media screen and (max-width: 768px) {
 
-    /* 1. INPUT AREA (Sit ABOVE the Luxury Footer) */
+    /* FORCE FULL SCREEN OVERLAY */
+    .chat-container, #chatCard {
+        display: flex !important;
+        flex-direction: column !important;
+        position: fixed !important; 
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        
+        /* Reset Styles for Full Screen */
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #000000 !important;
+        box-shadow: none !important;
+        z-index: 5000 !important; /* Above Dashboard, Below Footer */
+    }
+
+    /* SCROLL AREA: Hide Scrollbar + Add Bottom Space */
+    .chat-body-frame {
+        width: 100% !important;
+        padding: 15px 10px !important;
+        
+        /* Space for Footer (80px) + Input (~60px) + Buffer */
+        padding-bottom: 150px !important; 
+        
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box !important;
+
+        /* HIDE SCROLLBARS */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE */
+    }
+    .chat-body-frame::-webkit-scrollbar { display: none; /* Chrome */ }
+
+    /* INPUT AREA: Sit ON TOP of Footer */
     .chat-footer {
         position: fixed !important;
-        bottom: 80px !important; /* Height of the Luxury Footer */
+        bottom: 80px !important; /* Sit exactly on the 80px App Footer */
         left: 0 !important;
         width: 100% !important;
-        z-index: 2147483640 !important;
-        padding: 10px !important;
+        z-index: 2147483640 !important; /* High Z-index */
+        
+        padding: 8px 10px !important;
         background: #050505 !important; 
         border-top: 1px solid #222 !important;
     }
 
-    /* 2. ADJUST CHAT BODY */
-    .chat-body-frame {
-        padding: 10px 0 !important; /* Zero side padding on container, handled by msgs */
-        padding-bottom: 140px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+    .chat-input {
+        font-size: 16px !important; /* Prevents Zoom on iPhone */
+        height: 40px !important;
     }
 
-    /* 3. MESSAGE BUBBLES */
+    /* CLEAN UP MESSAGES FOR MOBILE */
     .msg {
         max-width: 88% !important;
-        font-size: 0.8rem !important;
-        line-height: 1.3 !important;
-        padding: 4px 12px !important;
-        margin-bottom: 2px !important; /* Tighter to timestamp */
+        font-size: 0.85rem !important;
+        padding: 6px 12px !important;
         background: transparent !important;
+        border: none !important;
         box-shadow: none !important;
     }
 
-    /* 4. SERVICE MESSAGES (Fixed Line & Spacing) */
+    /* Keep the Colored Lines */
+    .m-slave { border-right: 2px solid var(--pink) !important; border-radius: 0 !important; }
+    .m-queen { border-left: 2px solid var(--gold) !important; border-radius: 0 !important; }
+
+    /* Fix Service Messages */
     .msg-system {
         font-size: 0.55rem !important;
         opacity: 0.6 !important;
-        
         background: transparent !important;
         border: none !important;
-        border-bottom: 1px solid rgba(255,255,255,0.15) !important; /* Sharper line */
-        
-        padding: 2px 0 !important; /* Reduced internal padding */
-        margin: 4px auto !important; /* Centered with auto margins */
-        letter-spacing: 1px !important;
-        
-        width: 85% !important; /* Stop edge-to-edge (Padding Fix) */
-        text-align: center !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        width: 90% !important;
+        margin: 6px auto !important;
     }
-
-    /* 5. RESTORE TIMESTAMP (Tactical Style) */
-    .msg-time {
-        display: block !important;
-        font-size: 0.6rem !important;
-        color: #444 !important;
-        margin-bottom: 8px !important; /* Space between messages */
-        font-family: 'Rajdhani', sans-serif !important;
-        opacity: 0.8 !important;
-    }
-
-    /* Align times correctly */
-    .mr-out .msg-time { text-align: right; padding-right: 12px; }
-    .mr-in .msg-time { text-align: left; padding-left: 12px; }
-
-    /* 6. SLAVE / QUEEN LINES */
-    .m-slave { border-right: 2px solid var(--pink) !important; text-align: right; border-radius: 0 !important; color: #ddd !important; }
-    .m-queen { border-left: 2px solid var(--gold) !important; text-align: left; border-radius: 0 !important; }
-
-    .chat-input { font-size: 16px !important; padding: 8px 10px !important; height: 40px !important; }
 }
