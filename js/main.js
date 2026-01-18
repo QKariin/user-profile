@@ -136,7 +136,10 @@ window.addEventListener("message", (event) => {
             }
         }
 
-        if (data.type === "INIT_TASKS" || data.dailyTasks) setTaskDatabase(data.dailyTasks || data.tasks || []);
+        if (data.type === "INIT_TASKS" || data.dailyTasks) {
+            setTaskDatabase(data.dailyTasks || data.tasks || []);
+            console.log("Task database initialized with", (data.dailyTasks || data.tasks || []).length, "tasks.");
+        }
         if (data.type === "INIT_WISHLIST" || data.wishlist) {
             setWishlistItems(data.wishlist || []);
             window.WISHLIST_ITEMS = data.wishlist || []; 
