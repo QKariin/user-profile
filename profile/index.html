@@ -831,39 +831,30 @@
                 <!-- Idle State -->
                 <button id="mob_btnRequest" class="mob-action-btn" onclick="if(window.getRandomTask) window.getRandomTask()">REQUEST PROTOCOL</button>
                 
-                <!-- Active State (REAL GAUGE RINGS) -->
+                <!-- Active State (The 3 Gold Rings) -->
                 <div id="mob_activeTimer" class="mob-timer-row hidden">
                     
-                    <!-- HOUR (0-24) -->
+                    <!-- HOURS -->
                     <div class="timer-gauge">
-                        <svg class="gauge-svg" width="70" height="70">
-                            <circle class="gauge-bg" cx="35" cy="35" r="30"></circle>
-                            <circle id="ring_H" class="gauge-progress" cx="35" cy="35" r="30"></circle>
-                        </svg>
+                        <div class="gauge-ring"></div>
                         <div class="gauge-content">
                             <span id="m_timerH" class="g-val">00</span>
                             <span class="g-lbl">HRS</span>
                         </div>
                     </div>
 
-                    <!-- MINUTE (0-60) -->
+                    <!-- MINUTES -->
                     <div class="timer-gauge">
-                        <svg class="gauge-svg" width="70" height="70">
-                            <circle class="gauge-bg" cx="35" cy="35" r="30"></circle>
-                            <circle id="ring_M" class="gauge-progress" cx="35" cy="35" r="30"></circle>
-                        </svg>
+                        <div class="gauge-ring"></div>
                         <div class="gauge-content">
                             <span id="m_timerM" class="g-val">00</span>
                             <span class="g-lbl">MIN</span>
                         </div>
                     </div>
 
-                    <!-- SECOND (0-60) -->
+                    <!-- SECONDS (Spinning) -->
                     <div class="timer-gauge">
-                        <svg class="gauge-svg" width="70" height="70">
-                            <circle class="gauge-bg" cx="35" cy="35" r="30"></circle>
-                            <circle id="ring_S" class="gauge-progress" cx="35" cy="35" r="30"></circle>
-                        </svg>
+                        <div class="gauge-ring active"></div>
                         <div class="gauge-content">
                             <span id="m_timerS" class="g-val">00</span>
                             <span class="g-lbl">SEC</span>
@@ -871,6 +862,8 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
 
         <!-- MOBILE REWARD OVERLAY (Twin) -->
         <div id="mobKneelReward" class="mob-reward-overlay hidden">
