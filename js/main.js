@@ -557,8 +557,7 @@ window.syncMobileDashboard = function() {
         });
     }
 
-// 2. BUILD FOOTER (FLOATING CAPSULE + RED CHAT)
-   // 2. BUILD FOOTER (5-SLOT COMMAND CENTER)
+// 2. BUILD FOOTER (FULL WIDTH 5-SLOT)
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -566,67 +565,54 @@ window.syncMobileDashboard = function() {
         footer.id = 'app-mode-footer';
         
         Object.assign(footer.style, {
-        display: 'flex', 
-        justifyContent: 'space-around', 
-        
-        // Push everything to the top of the 70px bar
-        alignItems: 'flex-start', 
-        
-        position: 'fixed', 
-        bottom: '10px', 
-        left: '0px',
-        width: '100%', 
-        
-        // Exact height you want
-        height: '70px', 
-        
-        // This is the specific number to move items up or down from the top edge
-        paddingbottom: '30px', 
-        
-        background: 'rgba(10, 10, 10, 0.95)', 
-        borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-        zIndex: '2147483647', 
-        backdropFilter: 'blur(15px)', 
-        pointerEvents: 'auto', 
-        touchAction: 'none',
-        
-        // Required so the 70px height stays exact
-        boxSizing: 'border-box'
-    });
+            display: 'flex', 
+            justifyContent: 'space-around', // Equal spacing
+            alignItems: 'center',
+            
+            // FULL WIDTH STYLE
+            position: 'fixed', 
+            bottom: '0', 
+            left: '0', 
+            width: '100%', 
+            height: '80px',
+            
+            background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            zIndex: '2147483647', 
+            borderTop: '1px solid rgba(197, 160, 89, 0.3)', // Gold Border
+            backdropFilter: 'blur(10px)', 
+            pointerEvents: 'auto', 
+            touchAction: 'none'
+        });
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-        // STANDARD ICON STYLE (Scaled down slightly for 5 items)
-        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-family:'Cinzel',serif; font-size:0.5rem; width:18%; height:100%; cursor:pointer; transition:0.2s;";
-        const iconStyle = "font-size:1.1rem; color:#888;";
-
-        // RED ORB STYLE (CENTER)
-        const chatBtnStyle = "background:linear-gradient(135deg, #ff003c, #8b0000); border:2px solid rgba(255,255,255,0.2); color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; cursor:pointer; box-shadow:0 0 15px rgba(255,0,60,0.3); margin-top:-5px; flex-shrink:0;";
+        // STANDARD BUTTON STYLE (Width = 20% because 100% / 5 buttons)
+        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer;";
+        
+        // ACTIVE/HIGHLIGHT STYLE (For the Middle Chat Button)
+        const chatStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; text-shadow: 0 0 10px rgba(255,0,60,0.4);";
 
         footer.innerHTML = `
-            <!-- 1. PROFILE -->
-            <button class="mf-btn" onclick="window.toggleMobileView('home')" style="${btnStyle}">
-                <span style="${iconStyle}">◈</span><span>PROFILE</span>
+            <button onclick="window.toggleMobileView('home')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">◈</span><span>PROFILE</span>
             </button>
             
-            <!-- 2. RECORD -->
-            <button class="mf-btn" onclick="window.toggleMobileView('record')" style="${btnStyle}">
-                <span style="${iconStyle}">▦</span><span>RECORD</span>
+            <button onclick="window.toggleMobileView('record')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">▦</span><span>RECORD</span>
             </button>
             
-            <!-- 3. CHAT (CENTER RED ORB) -->
-            <button class="mf-btn" onclick="window.toggleMobileView('chat')" style="${chatBtnStyle}">
-                <span style="font-size:1.4rem; color:white;">❖</span>
+            <!-- MIDDLE: CHAT (Red Highlight) -->
+            <button onclick="window.toggleMobileView('chat')" style="${chatStyle}">
+                <span style="font-size:1.6rem; color:#ff003c;">❖</span><span>LOGS</span>
             </button>
 
-            <!-- 4. QUEEN -->
-            <button class="mf-btn" onclick="window.toggleMobileView('queen')" style="${btnStyle}">
-                <span style="${iconStyle}">♛</span><span>QUEEN</span>
+            <button onclick="window.toggleMobileView('queen')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">♛</span><span>QUEEN</span>
             </button>
 
-            <!-- 5. GLOBAL -->
-            <button class="mf-btn" onclick="window.toggleMobileView('global')" style="${btnStyle}">
-                <span style="${iconStyle}">🌐</span><span>GLOBAL</span>
+            <button onclick="window.toggleMobileView('global')" style="${btnStyle}">
+                <span style="font-size:1.4rem; color:#888;">🌐</span><span>GLOBAL</span>
             </button>
         `;
         document.body.appendChild(footer);
