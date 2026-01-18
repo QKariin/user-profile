@@ -19,12 +19,32 @@
   <link rel="stylesheet" href="../css/reward.css">
 
   <!-- MOBILE STYLES (INJECTED DIRECTLY TO PREVENT LOADING ERRORS) -->
-  <style>
-   /* DEFAULT: Hide Mobile App */
+ <style>
+    /* =========================================
+       1. GLOBAL RESET & BLACKOUT (CRITICAL)
+       ========================================= */
+    html {
+        background-color: #000000 !important;
+        background: #000000 !important;
+        overscroll-behavior: none !important; /* Kills the bounce */
+        overflow: hidden;
+        height: 100%;
+    }
+    body {
+        background-color: #000000 !important;
+        background: #000000 !important;
+        overscroll-behavior: none !important;
+        height: 100%;
+        width: 100%;
+        position: fixed; /* Locks body in place */
+        margin: 0; padding: 0;
+    }
+
+    /* Default: Hide Mobile App on Desktop */
     #MOBILE_APP { display: none; }
 
     /* =========================================
-       MOBILE APP STYLING (MAX-WIDTH 768px)
+       2. MOBILE APP STYLING (MAX-WIDTH 768px)
        ========================================= */
     @media screen and (max-width: 768px) {
         
@@ -46,27 +66,18 @@
             overflow: hidden;
         }
 
-        /* 1. SCROLLABLE FRAME */
+        /* CONTENT FRAME */
         .mob-frame {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 120px; /* Space for footer */
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
             width: 100%;
             -webkit-overflow-scrolling: touch;
-            /* No Scroll Locking on Content - Let it flow */
-        }
-        
-        /* NO SCROLL LOCK (Static Dashboard) */
-        .mob-frame.no-scroll {
-            overflow: hidden !important; 
-            justify-content: flex-start; 
-            padding-top: 40px; 
-            gap: 20px;
         }
 
         /* HIDE SCROLLBARS */
@@ -74,47 +85,42 @@
         .mob-horiz-scroll::-webkit-scrollbar { display: none; }
         .mob-frame, .mob-horiz-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 2. HEADER IDENTITY (Side-by-Side) */
-        .mob-profile-row {
-            display: flex; flex-direction: row; align-items: center;
-            width: 100%; padding: 0 10px; gap: 20px; margin-bottom: 10px;
+        /* --- DASHBOARD HEADER (Side-by-Side) --- */
+        .mob-header {
+            width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 20px; margin-bottom: 10px;
         }
+        
+        /* Hexagon Profile */
         .mob-hex-wrap {
             width: 100px; height: 110px; position: relative;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             background: linear-gradient(135deg, #c5a059, #444); padding: 2px;
         }
+        .mob-hex-wrap.large { width: 120px; height: 135px; } /* Larger for Home */
+        
         .mob-hex-img { width: 100%; height: 100%; object-fit: cover; background: #111; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
         
-        .mob-profile-data { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
-        .mob-rank-text {
-            font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: #c5a059;
-            letter-spacing: 2px; margin-bottom: 5px; border: 1px solid #c5a059;
-            padding: 2px 8px; background: rgba(0,0,0,0.6);
-        }
-        .mob-name-static {
-            font-family: 'Cinzel', serif; font-size: 1.8rem; color: white;
-            letter-spacing: 4px; line-height: 1; text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(255,255,255,0.2);
-        }
-
-        /* 3. SHARED HEADER (For Record View) */
-        .mob-header {
-            margin-top: 20px; margin-bottom: 20px;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        .mob-rank-stamp {
+            position: absolute; bottom: 5px; right: -10px;
+            background: #000; border: 1px solid #c5a059; color: #c5a059;
+            font-family: 'Orbitron', sans-serif; font-size: 0.5rem; padding: 2px 6px;
+            transform: rotate(-5deg); box-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
         .mob-name { font-size: 1.2rem; letter-spacing: 4px; color: #eee; text-transform: uppercase; }
+        .mob-name-large { font-size: 1.5rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,255,255,0.2); margin-top: 10px; }
 
-        /* 4. CARDS */
+        /* --- CARDS (Shared) --- */
         .mob-card {
             width: 100%; background: rgba(18, 18, 18, 0.95); 
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-        .mob-card.compact { margin-bottom: 0; flex-shrink: 0; }
+        .mob-section-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px; }
 
-        /* Devotion Card */
+        /* --- DEVOTION CARD (Kneel + Grid) --- */
         .devotion-card { display: flex; flex-direction: row; height: 140px; gap: 15px; }
+        
+        /* Kneel Button */
         .mob-kneel-zone {
             flex: 0 0 35%; background: #080808; border: 1px solid #333;
             border-radius: 8px; position: relative; overflow: hidden; cursor: pointer;
@@ -123,22 +129,42 @@
         .mob-kneel-inner { z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .kneel-icon { font-size: 1.5rem; color: #555; }
         .kneel-label { font-size: 0.6rem; letter-spacing: 2px; color: #555; font-family:'Orbitron'; }
-        .mob-kneel-fill {
+        
+        /* Kneel Bar (Alternative Wide Layout) */
+        .mob-kneel-bar {
+            width: 100%; height: 60px; background: #080808; border: 1px solid #c5a059; border-radius: 4px;
+            position: relative; overflow: hidden; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+        }
+        .mob-bar-content { z-index: 2; display: flex; align-items: center; gap: 10px; }
+        .kneel-icon-sm { color: #c5a059; font-size: 1.2rem; }
+        .kneel-text { font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 3px; color: #ccc; }
+
+        /* The Red Fill (Horizontal) */
+        .mob-kneel-fill, .mob-bar-fill {
             position: absolute; bottom: 0; left: 0; width: 0%; height: 100%;
             background: linear-gradient(90deg, #8b0000, #ff003c); z-index: 1; transition: width 0.1s linear;
         }
 
-        /* Grid Zone */
+        /* --- GRID (Heatmap) --- */
         .mob-grid-zone { flex: 1; display: flex; flex-direction: column; }
-        .mob-grid-label { font-size: 0.6rem; color: #666; margin-bottom: 8px; letter-spacing: 1px; }
+        .mob-grid-label, .mob-grid-label-center { 
+            font-size: 0.6rem; color: #666; margin-bottom: 8px; letter-spacing: 1px; font-family: 'Orbitron'; 
+        }
+        .mob-grid-label-center { text-align: center; width: 100%; }
+        
         .mob-streak-grid {
             display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(3, 1fr);
             gap: 4px; height: 100%;
         }
+        .mob-streak-strip {
+            display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; width: 100%;
+        }
         .streak-sq { background: #1a1a1a; border-radius: 2px; }
         .streak-sq.active { background: #c5a059; box-shadow: 0 0 5px #c5a059; }
 
-        /* Operations Card */
+        /* --- OPERATIONS (Task Card) --- */
         .operations-card { display: flex; flex-direction: column; gap: 15px; border-top: 2px solid #333; }
         .op-status-row { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .status-light { width: 8px; height: 8px; border-radius: 50%; background: #333; }
@@ -156,14 +182,12 @@
             text-align: center; font-family: 'Rajdhani', sans-serif; font-size: 2.5rem;
             font-weight: 700; color: white;
         }
-        .hidden { display: none !important; }
 
-        /* 5. 3D PYRAMID (RECORD VIEW) */
+        /* --- RECORD VIEW (3D Altar + Horizontal Scroll) --- */
         .mob-pyramid-stage {
-            position: relative; width: 100%; height: 260px; margin-top: 15px;
-            perspective: 1000px;
+            position: relative; width: 100%; height: 260px; margin-top: 15px; perspective: 1000px;
         }
-        .mob-idol { position: absolute; background: #000; overflow: hidden; transition: all 0.3s ease; }
+        .mob-idol { position: absolute; background: #000; overflow: hidden; transition: all 0.3s ease; border-radius: 2px; }
         .mob-idol img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
         .mob-idol.center {
@@ -183,10 +207,10 @@
         }
         .mob-rank-badge.main { border-color: #c5a059; color: #c5a059; bottom: 10px; background: rgba(0,0,0,0.8); }
 
-        /* 6. HORIZONTAL SCROLL (ARCHIVE) */
+        /* Horizontal Scroll */
         .mob-horiz-scroll {
             display: flex; flex-direction: row; overflow-x: auto; gap: 10px;
-            width: 100%; padding-right: 20px; -webkit-overflow-scrolling: touch;
+            width: 100%; padding-right: 20px;
         }
         .mob-scroll-item {
             flex: 0 0 120px; height: 160px; position: relative;
@@ -196,7 +220,7 @@
         .mob-scroll-img { width: 100%; height: 100%; object-fit: cover; }
         .mob-pending-badge { position: absolute; top: 5px; right: 5px; font-size: 1rem; text-shadow: 0 0 5px black; }
 
-        /* 7. REWARD OVERLAY */
+        /* --- OVERLAYS --- */
         .mob-reward-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 9999;
@@ -211,16 +235,30 @@
         }
         .mob-reward-title { font-family: 'Cinzel', serif; color: white; font-size: 1.2rem; letter-spacing: 2px; }
         .mob-reward-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        
         .mob-hex-wrap.small-reward {
             width: 60px; height: 65px; background: linear-gradient(135deg, #ffd700, #000); margin-bottom: 10px;
         }
 
-        .mob-grid-label-center { font-size: 0.6rem; color: #555; letter-spacing: 2px; margin-bottom: 5px; text-align: center; width: 100%; }
-        .mob-section-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .hidden { display: none !important; }
     }
+
+    /* ============================
+       FOOTER & ANIMATIONS (GLOBAL)
+       ============================ */
+    #app-mode-footer {
+        transition: bottom 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        will-change: bottom;
+    }
+    .mf-btn { outline: none; -webkit-tap-highlight-color: transparent; }
+    .mf-btn:active { transform: scale(0.95); opacity: 0.7; }
     
-  </style>
+    /* Red Orb Pulse */
+    @keyframes pulseOrb {
+        0% { box-shadow: 0 0 15px rgba(255,0,60,0.3); }
+        50% { box-shadow: 0 0 25px rgba(255,0,60,0.6); }
+        100% { box-shadow: 0 0 15px rgba(255,0,60,0.3); }
+    }
+</style>
 </head>
 <body>
 
