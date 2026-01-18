@@ -21,11 +21,21 @@
 
   <!-- MOBILE STYLES (INJECTED DIRECTLY TO PREVENT LOADING ERRORS) -->
   <style>
-    /* Default: Mobile App is hidden */
+    html {
+        background-color: #000000 !important; /* Paints the browser canvas black */
+    }
     /* CRITICAL MOBILE STYLES */
     #MOBILE_APP { display: none; }
 
     @media screen and (max-width: 768px) {
+        /* Force Body Black */
+        body {
+            background-image: none !important;
+            background-color: #000000 !important;
+            background: #000000 !important;
+            color: #ffffff; /* Default text white */
+        }
+      
         #MOBILE_APP {
             display: flex !important;
             flex-direction: column;
