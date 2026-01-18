@@ -136,7 +136,7 @@
     .stat-lbl { font-family: 'Orbitron', sans-serif; font-size: 0.5rem; color: #666; letter-spacing: 2px; margin-top: 2px; }
     .stat-divider-vert { width: 1px; height: 25px; background: rgba(255,255,255,0.2); }
 
-    /* 4. Bottom Button (Full Width Ghost) */
+   /* 4. Bottom Button (Full Width Ghost) */
     .mob-stats-toggle-btn {
         width: 100%;
         background: transparent;
@@ -150,23 +150,38 @@
         border-radius: 4px;
         transition: 0.3s;
     }
-    /* DRAWER ANIMATION */
-    .mob-stats-drawer {
-        width: 100%; background: rgba(255,255,255,0.03);
-        border-radius: 4px; padding: 0 15px;
-        margin-bottom: 10px; overflow: hidden;
-        max-height: 0; opacity: 0;
-        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    .mob-stats-toggle-btn:active { opacity: 1; border-color: #fff; color: #fff; }
+
+    /* INTERNAL EXPANDING DRAWER (Replaces the old drawer) */
+    .mob-internal-drawer {
+        width: 100%;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: all 0.4s ease; /* Smooth expansion */
+        
+        /* Transparent because it lives inside the card now */
+        background: transparent; 
+        border-top: 1px solid transparent;
     }
-    .mob-stats-drawer.open {
-        max-height: 150px; opacity: 1; padding: 10px 15px; /* Expands */
-        border: 1px solid rgba(255,255,255,0.1);
+
+    .mob-internal-drawer.open {
+        max-height: 200px;
+        opacity: 1;
+        margin-top: 15px; /* Push away from button */
+        padding-top: 5px;
+        border-top: 1px solid rgba(255,255,255,0.1); /* Divider line */
     }
     
-    .drawer-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .d-lbl { font-size: 0.7rem; color: #888; font-family: 'Cinzel'; }
-    .d-val { font-size: 0.8rem; color: #fff; font-family: 'Orbitron'; }
+    .drawer-row { 
+        display: flex; justify-content: space-between; 
+        padding: 8px 0; 
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+    }
+    .drawer-row:last-child { border-bottom: none; }
 
+    .d-lbl { font-size: 0.7rem; color: #888; font-family: 'Cinzel'; letter-spacing: 1px; }
+    .d-val { font-size: 0.8rem; color: #c5a059; font-family: 'Orbitron'; }
         /* 2. KNEEL BAR */
         .mob-section-wrapper { width: 80%; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .mob-kneel-bar {
@@ -385,6 +400,8 @@
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
     }
+
+    
     
   </style>
 </head>
@@ -666,12 +683,11 @@
     <div id="viewMobileHome" class="mob-frame">
         
         <!-- HEADER: ROYAL CARD -->
+        <!-- HEADER: ROYAL CARD (EXPANDABLE) -->
         <div class="mob-profile-card">
             
             <!-- TOP ROW: FACE + DATA -->
             <div class="mob-card-top">
-                
-                <!-- LEFT: DIAMOND -->
                 <div class="mob-visual-col">
                     <div class="mob-hex-wrap">
                         <img id="mob_profilePic" src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png" class="mob-hex-img">
@@ -679,10 +695,8 @@
                     <div id="mob_rankStamp" class="mob-rank-banner">INITIATE</div>
                 </div>
 
-                <!-- RIGHT: NAME & STATS -->
                 <div class="mob-data-col">
                     <div id="mob_slaveName" class="mob-name-static">SLAVE</div>
-                    
                     <div class="mob-stat-row">
                         <div class="stat-pair">
                             <span class="stat-val gray" id="mobPoints">0</span>
@@ -695,21 +709,20 @@
                         </div>
                     </div>
                 </div>
-            
-            </div> <!-- End Top Row -->
+            </div> 
 
-            <!-- BOTTOM ROW: THE BUTTON (Restored) -->
+            <!-- TOGGLE BUTTON -->
             <div class="mob-stats-toggle-btn" onclick="toggleMobileStats()">
                 SLAVE STATS <span id="mobStatsArrow">▼</span>
             </div>
-            
-        </div> <!-- End Profile Card -->
 
-        <!-- THE DRAWER (Restored & Outside) -->
-        <div id="mobStatsContent" class="mob-stats-drawer">
-            <div class="drawer-row"><span class="d-lbl">CURRENT STREAK</span><span class="d-val" id="mobStreak">0</span></div>
-            <div class="drawer-row"><span class="d-lbl">TOTAL SERVED</span><span class="d-val" id="mobTotal">0</span></div>
-            <div class="drawer-row"><span class="d-lbl">KNEEL COUNT</span><span class="d-val" id="mobKneels">0</span></div>
+            <!-- INTERNAL DRAWER (Now inside the card) -->
+            <div id="mobStatsContent" class="mob-internal-drawer">
+                <div class="drawer-row"><span class="d-lbl">CURRENT STREAK</span><span class="d-val" id="mobStreak">0</span></div>
+                <div class="drawer-row"><span class="d-lbl">TOTAL SERVED</span><span class="d-val" id="mobTotal">0</span></div>
+                <div class="drawer-row"><span class="d-lbl">KNEEL COUNT</span><span class="d-val" id="mobKneels">0</span></div>
+            </div>
+            
         </div>
      
         <!-- CARD 1: THE EXECUTION BAR (Wide Kneel Button) -->
