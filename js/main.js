@@ -414,20 +414,17 @@ function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedIt
 // PART 1: MOBILE LOGIC (BRAIN & NAVIGATION)
 // =========================================
 
-// 5. STATS EXPANDER (FIXED ANIMATION)
+// 5. STATS EXPANDER (SIMPLE TOGGLE)
 window.toggleMobileStats = function() {
     const drawer = document.getElementById('mobStatsContent');
     const arrow = document.getElementById('mobStatsArrow');
     
-    if (drawer) {
-        // 1. Force remove 'hidden' so the browser renders it
-        drawer.classList.remove('hidden');
-        
-        // 2. Toggle the 'open' class (Triggers CSS Height/Opacity animation)
+    if(drawer) {
+        // Toggle the class that handles the animation (CSS)
         drawer.classList.toggle('open');
         
-        // 3. Rotate Arrow
-        if (arrow) {
+        // Rotate Arrow
+        if(arrow) {
             arrow.innerText = drawer.classList.contains('open') ? "▲" : "▼";
         }
     }
