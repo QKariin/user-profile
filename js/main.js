@@ -701,19 +701,51 @@ window.syncMobileDashboard = function() {
     lockVisuals(); buildAppFooter();
 })();
 
-// TIMER SYNC (The Twin System)
+// TIMER SYNC & VISUALIZATION
 setInterval(() => {
     const desktopH = document.getElementById('timerH');
     const desktopM = document.getElementById('timerM');
     const desktopS = document.getElementById('timerS');
+    
     const mobileH = document.getElementById('m_timerH');
     const mobileM = document.getElementById('m_timerM');
     const mobileS = document.getElementById('m_timerS');
     
-    if (desktopH && mobileH) mobileH.innerText = desktopH.innerText;
-    if (desktopM && mobileM) mobileM.innerText = desktopM.innerText;
-    if (desktopS && mobileS) mobileS.innerText = desktopS.innerText;
+    // SVG RINGS
+    const ringH = document.getElementById('ring_H');
+    const ringM = document.getElementById('ring_M');
+    const ringS = document.getElementById('ring_S');
+    const CIRCUMFERENCE = 188.5; // 2 * Pi * 30
+
+    if (desktopH && mobileH) {
+        // 1. Update Text
+        const hVal = parseInt(desktopH.innerText) || 0;
+        const mVal = parseInt(desktopM.innerText) || 0;
+        const sVal = parseInt(desktopS.innerText) || 0;
+
+        mobileH.innerText = desktopH.innerText;
+        mobileM.innerText = desktopM.innerText;
+        mobileS.innerText = desktopS.innerText;
+
+        // 2. Update Gauge Rings
+        if(ringH) {
+            // Hours (Max 24)
+            const hOffset = CIRCUMFERENCE - (hVal / 24) * CIRCUMFERENCE;
+            ringH.style.strokeDashoffset = hOffset;
+        }
+        if(ringM) {
+            // Minutes (Max 60)
+            const mOffset = CIRCUMFERENCE - (mVal / 60) * CIRCUMFERENCE;
+            ringM.style.strokeDashoffset = mOffset;
+        }
+        if(ringS) {
+            // Seconds (Max 60)
+            const sOffset = CIRCUMFERENCE - (sVal / 60) * CIRCUMFERENCE;
+            ringS.style.strokeDashoffset = sOffset;
+        }
+    }
     
+    // Sync Visibility Logic
     const activeRow = document.getElementById('activeTimerRow');
     const mobTimer = document.getElementById('mob_activeTimer');
     const mobRequestBtn = document.getElementById('mob_btnRequest');
