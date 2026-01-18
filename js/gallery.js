@@ -119,6 +119,7 @@ function renderStickerFilters() {
 }
 
 // REPLACE your renderGallery function with this:
+// REPLACE your renderGallery function with this:
 export async function renderGallery() {
     if (!galleryData) return;
     
@@ -131,33 +132,34 @@ export async function renderGallery() {
     const slot2 = { card: document.getElementById('altarSlot2'), img: document.getElementById('imgSlot2') };
     const slot3 = { card: document.getElementById('altarSlot3'), img: document.getElementById('imgSlot3') };
 
-    // Mobile Home Targets (The Dashboard)
+    // Mobile Home Targets
     const mob1 = document.getElementById('mobImgSlot1');
     const mob2 = document.getElementById('mobImgSlot2');
     const mob3 = document.getElementById('mobImgSlot3');
 
-    // Mobile Record Targets (The Vertical Vault)
+    // Mobile Record Targets (HORIZONTAL STRIPS)
     const rec1 = document.getElementById('mobRec_Slot1');
     const rec2 = document.getElementById('mobRec_Slot2');
     const rec3 = document.getElementById('mobRec_Slot3');
-    const recGrid = document.getElementById('mobRec_Grid');
+    const recGrid = document.getElementById('mobRec_Grid'); // Middle (Archive)
+    const recHeap = document.getElementById('mobRec_Heap'); // Bottom (Heap)
 
     if (!gridFailed || !gridOkay) return;
 
-    // Reset Grids
+    // Reset All Grids
     gridFailed.innerHTML = "";
     gridOkay.innerHTML = "";
     if(recGrid) recGrid.innerHTML = "";
+    if(recHeap) recHeap.innerHTML = "";
 
     const allItems = getGalleryList(); 
 
-    // --- SOLO MODE CHECK ---
     if (historySection) {
         if (allItems.length === 0) historySection.classList.add('solo-mode');
         else historySection.classList.remove('solo-mode');
     }
 
-    // --- 1. TOP 3 (THE ALTAR) - PARALLEL LOADING ---
+    // --- 1. TOP 3 (THE ALTAR) ---
     let bestOf = [...allItems]
         .filter(item => {
             const s = (item.status || "").toLowerCase();
@@ -166,7 +168,6 @@ export async function renderGallery() {
         .sort((a, b) => getPoints(b) - getPoints(a))
         .slice(0, 3);
 
-    // Helper to get thumbnails
     const getThumb = async (item, size) => {
         return await getSignedUrl(getThumbnail(getOptimizedUrl(item.proofUrl || item.media, size)));
     };
@@ -184,9 +185,8 @@ export async function renderGallery() {
             slot1.card.onclick = () => window.openHistoryModal(realIndex);
             slot1.img.style.filter = "none";
         }
-        // Mobile Home
+        // Mobile Sync
         if(mob1) { mob1.src = thumb; mob1.onclick = () => window.openHistoryModal(realIndex); }
-        // Mobile Record
         if(rec1) { rec1.src = thumb; rec1.onclick = () => window.openHistoryModal(realIndex); }
     } else {
         if(slot1.card) { slot1.img.src = IMG_QUEEN_MAIN; if(slot1.ref) slot1.ref.src = IMG_QUEEN_MAIN; }
@@ -220,24 +220,18 @@ export async function renderGallery() {
         if(rec3) rec3.src = IMG_STATUE_SIDE;
     }
 
-    // --- 2. MIDDLE (ARCHIVE) - SYNC DESKTOP & MOBILE GRID ---
+    // --- 2. MIDDLE (ARCHIVE) ---
     const middleItems = allItems.filter(item => {
         if (bestOf.includes(item)) return false; 
         const s = (item.status || "").toLowerCase();
         return !s.includes('rej') && !s.includes('fail');
     });
 
-    let desktopHtml = '';
-    let mobileHtml = '';
+    let desktopArchiveHtml = '';
+    let mobileArchiveHtml = '';
 
-    if (middleItems.length === 0 && allItems.length > 0) {
-        for(let i=0; i<6; i++) {
-            desktopHtml += `<div class="item-placeholder-slot"><img src="${IMG_MIDDLE_EMPTY}"></div>`;
-        }
-    } else if (middleItems.length > 0) {
-        const middlePromises = middleItems.map(item => 
-            getSignedUrl(getOptimizedUrl(item.proofUrl || item.media, 300))
-        );
+    if (middleItems.length > 0) {
+        const middlePromises = middleItems.map(item => getSignedUrl(getOptimizedUrl(item.proofUrl || item.media, 300)));
         const middleThumbs = await Promise.all(middlePromises);
         
         for (let i = 0; i < middleItems.length; i++) {
@@ -248,7 +242,7 @@ export async function renderGallery() {
             const mobBadge = isPending ? `<div class="mob-pending-badge">⏳</div>` : ``;
 
             // Desktop Blueprints
-            desktopHtml += `
+            desktopArchiveHtml += `
                 <div class="item-blueprint" onclick="window.openHistoryModal(${realIndex})">
                     <img class="blueprint-img" src="${thumb}" loading="lazy">
                     <div class="bp-corner bl-tl"></div><div class="bp-corner bl-tr"></div>
@@ -256,49 +250,56 @@ export async function renderGallery() {
                     ${overlay}
                 </div>`;
             
-            // Mobile Grid Squares
-            mobileHtml += `
-                <div class="mob-archive-item" onclick="window.openHistoryModal(${realIndex})">
-                    <img class="mob-archive-img" src="${thumb}" loading="lazy">
+            // Mobile Horizontal Scroll Item
+            mobileArchiveHtml += `
+                <div class="mob-scroll-item" onclick="window.openHistoryModal(${realIndex})">
+                    <img class="mob-scroll-img" src="${thumb}" loading="lazy">
                     ${mobBadge}
                 </div>`;
         }
+    } else {
+        for(let i=0; i<6; i++) desktopArchiveHtml += `<div class="item-placeholder-slot"><img src="${IMG_MIDDLE_EMPTY}"></div>`;
     }
     
-    // Inject HTML
-    gridOkay.innerHTML = desktopHtml;
-    if(recGrid) recGrid.innerHTML = mobileHtml;
+    gridOkay.innerHTML = desktopArchiveHtml;
+    if(recGrid) recGrid.innerHTML = mobileArchiveHtml;
 
-
-    // --- 3. BOTTOM (HEAP) - DESKTOP ONLY ---
+    // --- 3. BOTTOM (HEAP) - NOW SYNCED TO MOBILE ---
     const failedItems = allItems.filter(item => {
         const s = (item.status || "").toLowerCase();
         return s.includes('rej') || s.includes('fail');
     });
 
-    let failedHtml = '';
-    if (failedItems.length === 0 && allItems.length > 0) {
-        for(let i=0; i<6; i++) {
-            failedHtml += `<div class="item-placeholder-slot"><img src="${IMG_BOTTOM_EMPTY}"></div>`;
-        }
-    } else if (failedItems.length > 0) {
-        const failedPromises = failedItems.map(item => 
-            getSignedUrl(getOptimizedUrl(item.proofUrl || item.media, 300))
-        );
+    let desktopFailedHtml = '';
+    let mobileFailedHtml = '';
+
+    if (failedItems.length > 0) {
+        const failedPromises = failedItems.map(item => getSignedUrl(getOptimizedUrl(item.proofUrl || item.media, 300)));
         const failedThumbs = await Promise.all(failedPromises);
         
         for (let i = 0; i < failedItems.length; i++) {
             const thumb = failedThumbs[i];
             const realIndex = allItems.indexOf(failedItems[i]);
             
-            failedHtml += `
+            // Desktop Trash
+            desktopFailedHtml += `
                 <div class="item-trash" onclick="window.openHistoryModal(${realIndex})">
                     <img class="trash-img" src="${thumb}" loading="lazy">
                     <div class="trash-stamp">DENIED</div>
                 </div>`;
+            
+            // Mobile Heap (Small)
+            mobileFailedHtml += `
+                <div class="mob-scroll-item" onclick="window.openHistoryModal(${realIndex})">
+                    <img class="mob-scroll-img" src="${thumb}" loading="lazy">
+                </div>`;
         }
+    } else {
+        for(let i=0; i<6; i++) desktopFailedHtml += `<div class="item-placeholder-slot"><img src="${IMG_BOTTOM_EMPTY}"></div>`;
     }
-    gridFailed.innerHTML = failedHtml;
+    
+    gridFailed.innerHTML = desktopFailedHtml;
+    if(recHeap) recHeap.innerHTML = mobileFailedHtml;
 }
 
 // --- CRITICAL FIX: EXPORT THIS EMPTY FUNCTION TO PREVENT CRASH ---
