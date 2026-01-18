@@ -1,6 +1,4 @@
-
-
-// main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
+// main.js - CENTRAL NERVOUS SYSTEM (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
 import { 
@@ -28,7 +26,7 @@ import { handleHoldStart, handleHoldEnd, claimKneelReward, updateKneelingStatus 
 import { Bridge } from './bridge.js';
 import { getOptimizedUrl } from './media.js';
 
-// --- 2. CRITICAL UI FUNCTIONS ---
+// --- 1. DESKTOP UI LOGIC ---
 
 window.toggleTaskDetails = function(forceOpen = null) {
     if (window.event) window.event.stopPropagation();
@@ -82,7 +80,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// --- 3. INITIALIZATION ---
+// --- 2. INITIALIZATION ---
 
 document.addEventListener('click', () => {
     if (!window.audioUnlocked) {
@@ -114,7 +112,7 @@ function initDomProfile() {
 }
 initDomProfile();
 
-// --- 4. BRIDGE LISTENER ---
+// --- 3. DATA BRIDGE ---
 
 Bridge.listen((data) => {
     const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
@@ -194,10 +192,6 @@ window.addEventListener("message", (event) => {
                 renderRewardGrid();
                 if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
                 setStats(migrateGameStatsToStats(data.profile, stats));
-                if(data.profile.profilePicture) {
-                    const picEl = document.getElementById('profilePic');
-                    if(picEl) picEl.src = getOptimizedUrl(data.profile.profilePicture, 150);
-                }
                 updateStats(); 
             }
 
@@ -253,7 +247,7 @@ window.addEventListener("message", (event) => {
     } catch(err) { console.error("Main error:", err); }
 });
 
-// --- EXPORTS & HELPERS ---
+// --- 4. EXPORTS ---
 window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
         const btn = document.getElementById('btnUpload');
@@ -300,6 +294,7 @@ window.handleAdminUpload = handleAdminUpload;
 window.WISHLIST_ITEMS = WISHLIST_ITEMS;
 window.gameStats = gameStats;
 
+// --- 5. STATS & DATA SYNC (DUAL UPDATE) ---
 function updateStats() {
     const subName = document.getElementById('subName');
     const subHierarchy = document.getElementById('subHierarchy');
@@ -308,114 +303,92 @@ function updateStats() {
 
     if (!subName || !userProfile || !gameStats) return; 
 
+    // Desktop
     subName.textContent = userProfile.name || "Slave";
     if (subHierarchy) subHierarchy.textContent = userProfile.hierarchy || "HallBoy";
     if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
     if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
 
-    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? 0; };
-    if(gameStats) {
-        setVal('statStreak', gameStats.taskdom_streak || gameStats.currentStreak);
-        setVal('statTotal', gameStats.taskdom_total_tasks || gameStats.totalTasks);
-        setVal('statCompleted', gameStats.taskdom_completed_tasks || gameStats.completedTasks);
-        setVal('statSkipped', gameStats.skippedTasks || stats.skippedTasks);
-        setVal('statTotalKneels', gameStats.kneelCount || gameStats.totalKneels);
-    }
+    // Mobile Direct Sync (No external function needed)
+    const mobName = document.getElementById('mob_slaveName');
+    const mobRank = document.getElementById('mob_rankStamp');
+    const mobPic = document.getElementById('mob_profilePic');
 
-    const sinceEl = document.getElementById('slaveSinceDate');
-    if (sinceEl) {
-        if (userProfile && userProfile.joined) {
-            try { sinceEl.textContent = new Date(userProfile.joined).toLocaleDateString(); } catch(e) { sinceEl.textContent = "--/--/--"; }
+    if (mobName) mobName.innerText = userProfile.name || "SLAVE";
+    if (mobRank) mobRank.innerText = userProfile.hierarchy || "INITIATE";
+    
+    if (mobPic && userProfile.profilePicture) {
+        let rawUrl = userProfile.profilePicture;
+        if (rawUrl.startsWith("wix:image")) {
+            const uri = rawUrl.split('/')[3].split('#')[0];
+            mobPic.src = `https://static.wixstatic.com/media/${uri}`;
         } else {
-            sinceEl.textContent = "--/--/--";
+            mobPic.src = rawUrl;
         }
     }
 
+    // Grid Fill
+    const grid = document.getElementById('mob_streakGrid');
+    if(grid) {
+        grid.innerHTML = '';
+        const progress = (gameStats.kneelCount || 0) % 24;
+        for(let i=0; i<24; i++) {
+            const sq = document.createElement('div');
+            sq.className = 'streak-sq' + (i < progress ? ' active' : '');
+            grid.appendChild(sq);
+        }
+    }
+
+    // Levels
     if (typeof LEVELS !== 'undefined' && LEVELS.length > 0) {
         let nextLevel = LEVELS.find(l => l.min > gameStats.points) || LEVELS[LEVELS.length - 1];
         const nln = document.getElementById('nextLevelName');
         const pnd = document.getElementById('pointsNeeded');
         if(nln) nln.innerText = nextLevel.name;
         if(pnd) pnd.innerText = Math.max(0, nextLevel.min - gameStats.points) + " to go";
-        
         const pb = document.getElementById('progressBar');
         const progress = ((gameStats.points - 0) / (nextLevel.min - 0)) * 100;
         if (pb) pb.style.width = Math.min(100, Math.max(0, progress)) + "%";
     }
-    
-    updateKneelingStatus();
-    // THE SYNC HOOK FOR MOBILE
-    if(window.syncMobileDashboard) window.syncMobileDashboard();
+    updateKneelingStatus(); 
 }
 
 // =========================================
-// PART 3: TRIBUTE & BACKEND FUNCTIONS (RESTORED)
+// PART 6: MOBILE LOGIC (BRAIN & NAVIGATION)
 // =========================================
 
-let currentHuntIndex = 0, filteredItems = [], selectedReason = "", selectedNote = "", selectedItem = null;
-function toggleTributeHunt() { const overlay = document.getElementById('tributeHuntOverlay'); if (overlay.classList.contains('hidden')) { selectedReason = ""; selectedItem = null; if(document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; overlay.classList.remove('hidden'); showTributeStep(1); } else { overlay.classList.add('hidden'); resetTributeFlow(); } }
-function showTributeStep(step) { document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden')); const target = document.getElementById('tributeStep' + step); if (target) target.classList.remove('hidden'); const progressEl = document.getElementById('huntProgress'); if (progressEl) progressEl.innerText = ["", "INTENTION", "THE HUNT", "CONFESSION"][step] || ""; }
-function selectTributeReason(reason) { selectedReason = reason; renderHuntStore(gameStats.coins); showTributeStep(2); }
-function setTributeNote(note) { showTributeStep(3); }
-function filterByBudget(max) { renderHuntStore(max); showTributeStep(3); }
-function renderHuntStore(budget) { const grid = document.getElementById('huntStoreGrid'); if (!grid) return; filteredItems = (window.WISHLIST_ITEMS || []).filter(item => Number(item.price || item.Price || 0) <= budget); currentHuntIndex = 0; if (filteredItems.length === 0) { grid.innerHTML = '<div style="color:#666; text-align:center; padding:40px;">NO TRIBUTES IN THIS TIER...</div>'; return; } showTinderCard(); }
-function showTinderCard() { const grid = document.getElementById('huntStoreGrid'); const item = filteredItems[currentHuntIndex]; if (!item) { grid.innerHTML = `<div style="text-align:center; padding:40px;"><div style="font-size:2rem; margin-bottom:10px;">💨</div><div style="color:#666; font-size:0.7rem;">NO MORE ITEMS IN THIS TIER</div><button class="tab-btn" onclick="showTributeStep(2)" style="margin-top:15px; width:auto; padding:5px 15px;">CHANGE BUDGET</button></div>`; return; } grid.style.perspective = "1000px"; grid.innerHTML = `<div id="tinderCard" class="tinder-card-main"><div id="likeLabel" class="swipe-indicator like">SACRIFICE</div><div id="nopeLabel" class="swipe-indicator nope">SKIP</div><img src="${item.img || item.image}" draggable="false"><div class="tinder-card-info"><div style="color:var(--neon-yellow); font-size:1.8rem; font-weight:900;">${item.price} 🪙</div><div style="color:white; letter-spacing:2px; font-weight:bold; font-size:0.8rem;">${item.name.toUpperCase()}</div></div></div>`; initSwipeEvents(document.getElementById('tinderCard'), item); }
-function initSwipeEvents(card, item) { let startX = 0; let currentX = 0; const handleStart = (e) => { startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; card.style.transition = 'none'; }; const handleMove = (e) => { if (!startX) return; currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; const diff = currentX - startX; card.style.transform = `translateX(${diff}px) rotate(${diff / 15}deg)`; const likeLabel = document.getElementById('likeLabel'); const nopeLabel = document.getElementById('nopeLabel'); if(likeLabel) likeLabel.style.opacity = diff > 0 ? (diff / 100) : 0; if(nopeLabel) nopeLabel.style.opacity = diff < 0 ? (Math.abs(diff) / 100) : 0; }; const handleEnd = () => { const diff = currentX - startX; card.style.transition = 'transform 0.4s ease, opacity 0.4s ease'; if (diff > 120) { card.style.transform = `translateX(600px) rotate(45deg)`; selectedItem = item; if(document.getElementById('huntSelectedImg')) document.getElementById('huntSelectedImg').src = item.img || item.image; if(document.getElementById('huntSelectedName')) document.getElementById('huntSelectedName').innerText = item.name.toUpperCase(); if(document.getElementById('huntSelectedPrice')) document.getElementById('huntSelectedPrice').innerText = item.price + " 🪙"; setTimeout(() => { showTributeStep(4); }, 200); } else if (diff < -120) { card.style.transform = `translateX(-600px) rotate(-45deg)`; card.style.opacity = "0"; currentHuntIndex++; setTimeout(() => { showTinderCard(); }, 300); } else { card.style.transform = `translateX(0) rotate(0)`; if(document.getElementById('likeLabel')) document.getElementById('likeLabel').style.opacity = 0; if(document.getElementById('nopeLabel')) document.getElementById('nopeLabel').style.opacity = 0; } startX = 0; }; card.addEventListener('mousedown', handleStart); card.addEventListener('touchstart', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('touchmove', handleMove); window.addEventListener('mouseup', handleEnd); window.addEventListener('touchend', handleEnd); }
-function toggleHuntNote(show) { const container = document.getElementById('huntNoteContainer'); const btn = document.getElementById('btnShowNote'); if (!container || !btn) return; if (show) { container.classList.remove('hidden'); btn.classList.add('hidden'); document.getElementById('huntNote').focus(); } else { container.classList.add('hidden'); btn.classList.remove('hidden'); } }
-function finalizeSacrifice() { const noteEl = document.getElementById('huntNote'); const note = noteEl ? noteEl.value.trim() : ""; if (!selectedItem || !selectedReason) return; if (gameStats.coins < selectedItem.price) { triggerSound('sfx-deny'); alert('Insufficient coins!'); return; } const tributeMessage = `💝 TRIBUTE: ${selectedReason}\n🎁 ITEM: ${selectedItem.name}\n💰 COST: ${selectedItem.price}\n💌 "${note || "A silent tribute."}"`; window.parent.postMessage({ type: "PURCHASE_ITEM", itemName: selectedItem.name, cost: selectedItem.price, messageToDom: tributeMessage }, "*"); triggerSound('sfx-buy'); triggerCoinShower(); toggleTributeHunt(); }
-function buyRealCoins(amount) { triggerSound('sfx-buy'); window.parent.postMessage({ type: "INITIATE_STRIPE_PAYMENT", amount: amount }, "*"); }
-function triggerCoinShower() { for (let i = 0; i < 40; i++) { const coin = document.createElement('div'); coin.className = 'coin-particle'; coin.innerHTML = `<svg style="width:100%; height:100%; fill:gold;"><use href="#icon-coin"></use></svg>`; coin.style.setProperty('--tx', `${Math.random() * 200 - 100}vw`); coin.style.setProperty('--ty', `${-(Math.random() * 80 + 20)}vh`); document.body.appendChild(coin); setTimeout(() => coin.remove(), 2000); } }
-function breakGlass(e) { if (e && e.stopPropagation) e.stopPropagation(); const overlay = document.getElementById('specialGlassOverlay'); if (overlay) overlay.classList.remove('active'); window.parent.postMessage({ type: "GLASS_BROKEN" }, "*"); }
-function submitSessionRequest() { const checked = document.querySelector('input[name="sessionType"]:checked'); if (!checked) return; window.parent.postMessage({ type: "SESSION_REQUEST", sessionType: checked.value, cost: checked.getAttribute('data-cost') }, "*"); }
-function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedItem = null; const note = document.getElementById('huntNote'); if (note) note.value = ""; showTributeStep(1); }
-
-// =========================================
-// PART 1: MOBILE LOGIC (BRAIN & NAVIGATION)
-// =========================================
-
-// 1. STATS TOGGLE (The Expand Button)
-window.toggleMobileStats = function() {
-    const drawer = document.getElementById('mobStatsContent');
-    const btn = document.querySelector('.mob-expand-btn');
-    if(drawer) {
-        drawer.classList.toggle('open');
-        if(drawer.classList.contains('open')) btn.innerText = "▲ COLLAPSE DATA ▲";
-        else btn.innerText = "▼ PERFORMANCE DATA ▼";
-    }
-};
-
-// 3. MAIN NAVIGATION CONTROLLER (WITH CHAT TELEPORT)
+// MOBILE NAV SWITCHER
 window.toggleMobileView = function(viewName) {
     const home = document.getElementById('viewMobileHome');
     const chatCard = document.getElementById('chatCard');
     const mobileApp = document.getElementById('MOBILE_APP');
-    const history = document.getElementById('historySection');
+    const history = document.getElementById('viewMobileRecord');
     const news = document.getElementById('viewNews');
     const protocol = document.getElementById('viewProtocol');
     
-    // Hide All Mobile Views
+    // Hide All
     const views = [home, history, news, protocol];
     views.forEach(el => { if(el) el.style.display = 'none'; });
 
-    // Special Handling for Chat Visibility
-    if (chatCard) chatCard.style.display = 'none';
+    // Force Chat to Desktop to hide it
+    if (chatCard && mobileApp && chatCard.parentElement === mobileApp) {
+        // We move it out to hide it
+        const desktopParent = document.getElementById('viewServingTop');
+        if(desktopParent) desktopParent.appendChild(chatCard);
+    }
 
     // Show Target
     if (viewName === 'home') {
         if(home) {
             home.style.display = 'flex';
-            if(window.syncMobileDashboard) window.syncMobileDashboard();
+            updateStats(); // Refresh data
         }
     }
     else if (viewName === 'chat') {
+        // Teleport Chat to Mobile
         if(chatCard && mobileApp) {
-            // TELEPORT: Move Chat to Mobile App so it's visible
-            if (chatCard.parentElement !== mobileApp) {
-                mobileApp.appendChild(chatCard);
-            }
+            mobileApp.appendChild(chatCard);
             chatCard.style.display = 'flex';
-            
-            // Scroll Fix
             const chatBox = document.getElementById('chatBox');
             if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
         }
@@ -433,155 +406,50 @@ window.toggleMobileView = function(viewName) {
         if(protocol) protocol.style.display = 'block';
     }
     
-    // Close sidebar & update icons
+    // Close sidebar
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
     document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // Highlight active button (optional visual polish)
-    // You can add logic here to add .active class to the clicked button if you want
 };
 
-// HELPER: Restore Chat to Desktop on Resize
-// (Prevents chat from getting stuck in mobile view if user goes back to desktop)
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-        const chatCard = document.getElementById('chatCard');
-        const desktopParent = document.getElementById('viewServingTop');
-        if (chatCard && desktopParent && chatCard.parentElement !== desktopParent) {
-            desktopParent.appendChild(chatCard);
-            chatCard.style.display = 'flex'; // Reset display
-        }
-    }
-});
-
-// 3. KNEEL BUTTON
+// KNEEL BUTTON
 window.triggerKneel = function() {
     const sidebar = document.querySelector('.layout-left');
     const realBtn = document.querySelector('.kneel-bar-graphic');
-    
     if (sidebar) sidebar.classList.add('mobile-open'); 
-
     if (realBtn) {
         realBtn.style.boxShadow = "0 0 20px var(--neon-red)";
         setTimeout(() => realBtn.style.boxShadow = "", 1000);
     }
 };
 
-// 4. DATA SYNC (Connects Backend to Mobile Dashboard)
-// 4. DATA SYNC (CORRECTED IDs TO MATCH HTML)
-window.syncMobileDashboard = function() {
-    // 1. Safety Check
-    if (!gameStats || !userProfile) return;
-
-    // 2. Target the EXACT IDs from your HTML (I fixed these names)
-    const elName = document.getElementById('mob_slaveName');   // WAS mobName (WRONG)
-    const elRank = document.getElementById('mob_rankStamp');   // WAS mobHierarchy (WRONG)
-    const elPic = document.getElementById('mob_profilePic');   // Correct
-
-    // 3. Fill Data
-    if (elName) elName.innerText = userProfile.name || "SLAVE";
-    if (elRank) elRank.innerText = userProfile.hierarchy || "INITIATE";
-    
-    // 4. Profile Picture (The Wix Decrypter)
-    if (elPic) {
-        let rawUrl = userProfile.profilePicture;
-        const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
-
-        if (!rawUrl || rawUrl === "" || rawUrl === "undefined") {
-            elPic.src = defaultPic;
-        } 
-        else if (rawUrl.startsWith("wix:image")) {
-            // CONVERT WIX URL MANUALLY
-            // Format: wix:image://v1/<uri>/<filename>#originWidth=...
-            const uri = rawUrl.split('/')[3]; 
-            const cleanUri = uri.split('#')[0]; 
-            elPic.src = `https://static.wixstatic.com/media/${cleanUri}`;
-        } 
-        else {
-            // It's already a normal link
-            elPic.src = rawUrl;
-        }
-    }
-
-    // 5. Fill the Grid (Devotion)
-    const grid = document.getElementById('mob_streakGrid');
-    if(grid) {
-        grid.innerHTML = ''; // Clear it
-        const count = gameStats.kneelCount || 0;
-        const progress = count % 24; 
-        
-        for(let i=0; i<24; i++) {
-            const sq = document.createElement('div');
-            // If i is less than progress, it gets the 'active' class (Gold)
-            sq.className = 'streak-sq' + (i < progress ? ' active' : '');
-            grid.appendChild(sq);
-        }
-    }
-    
-    // 6. Update Operations Card (Working/Idle)
-    const activeRow = document.getElementById('activeTimerRow');
-    if (activeRow) {
-        const isWorking = !activeRow.classList.contains('hidden');
-        
-        const light = document.getElementById('mob_statusLight');
-        const text = document.getElementById('mob_statusText');
-        const timer = document.getElementById('mob_activeTimer');
-        const btn = document.getElementById('mob_btnRequest');
-
-        if (isWorking) {
-            if(light) light.className = 'status-light green';
-            if(text) text.innerText = "WORKING";
-            if(timer) timer.classList.remove('hidden');
-            if(btn) btn.classList.add('hidden');
-        } else {
-            if(light) light.className = 'status-light red';
-            if(text) text.innerText = "UNPRODUCTIVE";
-            if(timer) timer.classList.add('hidden');
-            if(btn) btn.classList.remove('hidden');
-        }
-    }
-};
-
 // =========================================
-// PART 2: FINAL APP MODE (NATIVE FLOW)
+// PART 7: APP MODE ENGINE (LAYOUT & FOOTER)
 // =========================================
 
 (function() {
-    // Only run on Mobile
     if (window.innerWidth > 768) return;
 
-    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
     function lockVisuals() {
         const height = window.innerHeight;
         
         Object.assign(document.body.style, {
-            height: height + 'px',
-            width: '100%',
-            position: 'fixed',
-            overflow: 'hidden',
-            inset: '0',
-            overscrollBehavior: 'none',
-            touchAction: 'none'
+            height: height + 'px', width: '100%', position: 'fixed', overflow: 'hidden', inset: '0',
+            overscrollBehavior: 'none', touchAction: 'none'
         });
 
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews');
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #viewMobileRecord, #viewNews');
         scrollables.forEach(el => {
             Object.assign(el.style, {
-                height: '100%',
-                overflowY: 'auto',              
-                webkitOverflowScrolling: 'touch', 
-                paddingBottom: '100px',
-                overscrollBehaviorY: 'contain',
-                touchAction: 'pan-y'
+                height: '100%', overflowY: 'auto', webkitOverflowScrolling: 'touch',
+                paddingBottom: '100px', overscrollBehaviorY: 'contain', touchAction: 'pan-y'
             });
         });
     }
 
-// 2. BUILD FOOTER (FULL WIDTH 5-SLOT)
     function buildAppFooter() {
         if (document.getElementById('app-mode-footer')) return;
         
@@ -589,52 +457,32 @@ window.syncMobileDashboard = function() {
         footer.id = 'app-mode-footer';
         
         Object.assign(footer.style, {
-            display: 'flex', 
-            justifyContent: 'space-around', // Equal spacing
-            alignItems: 'center',
-            
-            // FULL WIDTH STYLE
-            position: 'fixed', 
-            bottom: '0', 
-            left: '0', 
-            width: '100%', 
-            height: '80px',
-            
+            display: 'flex', justifyContent: 'space-around', alignItems: 'center',
+            position: 'fixed', bottom: '0', left: '0', width: '100%', height: '80px',
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             paddingBottom: 'env(safe-area-inset-bottom)',
-            zIndex: '2147483647', 
-            borderTop: '1px solid rgba(197, 160, 89, 0.3)', // Gold Border
-            backdropFilter: 'blur(10px)', 
-            pointerEvents: 'auto', 
-            touchAction: 'none'
+            zIndex: '2147483647', borderTop: '1px solid rgba(197, 160, 89, 0.3)',
+            backdropFilter: 'blur(10px)', pointerEvents: 'auto', touchAction: 'none'
         });
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-        // STANDARD BUTTON STYLE (Width = 20% because 100% / 5 buttons)
         const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer;";
-        
-        // ACTIVE/HIGHLIGHT STYLE (For the Middle Chat Button)
         const chatStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; text-shadow: 0 0 10px rgba(255,0,60,0.4);";
 
         footer.innerHTML = `
             <button onclick="window.toggleMobileView('home')" style="${btnStyle}">
                 <span style="font-size:1.4rem; color:#888;">◈</span><span>PROFILE</span>
             </button>
-            
             <button onclick="window.toggleMobileView('record')" style="${btnStyle}">
                 <span style="font-size:1.4rem; color:#888;">▦</span><span>RECORD</span>
             </button>
-            
-            <!-- MIDDLE: CHAT (Red Highlight) -->
             <button onclick="window.toggleMobileView('chat')" style="${chatStyle}">
                 <span style="font-size:1.6rem; color:#ff003c;">❖</span><span>LOGS</span>
             </button>
-
             <button onclick="window.toggleMobileView('queen')" style="${btnStyle}">
                 <span style="font-size:1.4rem; color:#888;">♛</span><span>QUEEN</span>
             </button>
-
             <button onclick="window.toggleMobileView('global')" style="${btnStyle}">
                 <span style="font-size:1.4rem; color:#888;">🌐</span><span>GLOBAL</span>
             </button>
@@ -642,18 +490,39 @@ window.syncMobileDashboard = function() {
         document.body.appendChild(footer);
     }
 
-    // 3. RUN
+    // RUN & FOCUS MODE
     window.addEventListener('load', () => { 
         lockVisuals(); 
         buildAppFooter();
-        // FORCE HOME ON LOAD
+        
+        // FOCUS MODE
+        const input = document.getElementById('chatMsgInput');
+        if (input) {
+            input.addEventListener('focus', () => {
+                const footer = document.getElementById('app-mode-footer');
+                const chatBar = document.querySelector('.chat-footer');
+                if (footer) { footer.style.transition = "bottom 0.3s ease"; footer.style.bottom = "-200px"; }
+                if (chatBar) { chatBar.style.transition = "bottom 0.3s ease"; chatBar.style.bottom = "0px"; }
+            });
+            input.addEventListener('blur', () => {
+                const footer = document.getElementById('app-mode-footer');
+                const chatBar = document.querySelector('.chat-footer');
+                setTimeout(() => {
+                    if (footer) footer.style.bottom = "0";
+                    if (chatBar) chatBar.style.bottom = "80px";
+                }, 100);
+            });
+        }
+
         if(window.toggleMobileView) window.toggleMobileView('home'); 
     });
+    
     window.addEventListener('resize', lockVisuals);
-    lockVisuals(); buildAppFooter();
+    lockVisuals(); 
+    buildAppFooter();
 })();
 
-// TIMER SYNC (The Twin System)
+// TIMER SYNC
 setInterval(() => {
     const desktopH = document.getElementById('timerH');
     const desktopM = document.getElementById('timerM');
@@ -689,5 +558,21 @@ setInterval(() => {
         }
     }
 }, 500);
+
+// RE-INJECT TRIBUTE FUNCTIONS
+window.toggleTributeHunt = function() { 
+    const overlay = document.getElementById('tributeHuntOverlay'); 
+    if (overlay.classList.contains('hidden')) { 
+        if(document.getElementById('huntNote')) document.getElementById('huntNote').value = ""; 
+        overlay.classList.remove('hidden'); 
+        const step1 = document.getElementById('tributeStep1');
+        if(step1) {
+            document.querySelectorAll('.tribute-step').forEach(el => el.classList.add('hidden'));
+            step1.classList.remove('hidden');
+        }
+    } else { 
+        overlay.classList.add('hidden'); 
+    } 
+};
 
 window.parent.postMessage({ type: "UI_READY" }, "*");
