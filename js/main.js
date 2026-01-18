@@ -383,18 +383,21 @@ window.toggleMobileStats = function() {
     }
 };
 
-// 3. MAIN NAVIGATION CONTROLLER (Updated for 5 Views)
+// 3. MAIN NAVIGATION CONTROLLER (WITH CHAT TELEPORT)
 window.toggleMobileView = function(viewName) {
     const home = document.getElementById('viewMobileHome');
-    const chatContainer = document.querySelector('.chat-container');
-    const chatDesktop = document.getElementById('viewServingTop');
+    const chatCard = document.getElementById('chatCard');
+    const mobileApp = document.getElementById('MOBILE_APP');
     const history = document.getElementById('historySection');
     const news = document.getElementById('viewNews');
-    const protocol = document.getElementById('viewProtocol'); // GLOBAL VIEW
+    const protocol = document.getElementById('viewProtocol');
     
-    // Hide All
-    const allViews = [home, chatContainer, chatDesktop, history, news, protocol];
-    allViews.forEach(el => { if(el) el.style.display = 'none'; });
+    // Hide All Mobile Views
+    const views = [home, history, news, protocol];
+    views.forEach(el => { if(el) el.style.display = 'none'; });
+
+    // Special Handling for Chat Visibility
+    if (chatCard) chatCard.style.display = 'none';
 
     // Show Target
     if (viewName === 'home') {
@@ -404,12 +407,16 @@ window.toggleMobileView = function(viewName) {
         }
     }
     else if (viewName === 'chat') {
-        if(chatContainer) {
-            chatContainer.style.display = 'flex';
+        if(chatCard && mobileApp) {
+            // TELEPORT: Move Chat to Mobile App so it's visible
+            if (chatCard.parentElement !== mobileApp) {
+                mobileApp.appendChild(chatCard);
+            }
+            chatCard.style.display = 'flex';
+            
+            // Scroll Fix
             const chatBox = document.getElementById('chatBox');
             if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
-        } else if (chatDesktop) {
-            chatDesktop.style.display = 'flex';
         }
     }
     else if (viewName === 'record') {
@@ -422,14 +429,30 @@ window.toggleMobileView = function(viewName) {
         if(news) news.style.display = 'block';
     }
     else if (viewName === 'global') {
-        if(protocol) protocol.style.display = 'block'; // Shows the Protocol/Rules
+        if(protocol) protocol.style.display = 'block';
     }
     
     // Close sidebar & update icons
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
     document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // Highlight active button (optional visual polish)
+    // You can add logic here to add .active class to the clicked button if you want
 };
+
+// HELPER: Restore Chat to Desktop on Resize
+// (Prevents chat from getting stuck in mobile view if user goes back to desktop)
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        const chatCard = document.getElementById('chatCard');
+        const desktopParent = document.getElementById('viewServingTop');
+        if (chatCard && desktopParent && chatCard.parentElement !== desktopParent) {
+            desktopParent.appendChild(chatCard);
+            chatCard.style.display = 'flex'; // Reset display
+        }
+    }
+});
 
 // 3. KNEEL BUTTON
 window.triggerKneel = function() {
