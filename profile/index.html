@@ -511,13 +511,15 @@
         <div style="height: 120px;"></div>
     </div>
 
-    <!-- VIEW 2: MOBILE RECORD (Vertical Vault) -->
-    <div id="viewMobileRecord" class="mob-frame" style="display:none; flex-direction:column;">
+    <!-- 2. MOBILE RECORD (HORIZONTAL STRIPS) -->
+    <div id="viewMobileRecord" class="mob-frame" style="display:none; flex-direction:column; padding-left:0; padding-right:0;">
+        
+        <!-- HEADER -->
         <div class="mob-header">
             <div class="mob-name" style="margin-top:20px;">SLAVE RECORD</div>
         </div>
 
-        <!-- Altar (Top 3) -->
+        <!-- SECTION 1: THE ALTAR (Top 3 Pyramid) -->
         <div class="mob-altar-container">
             <div class="mob-grid-label-center">HIGHEST MERIT</div>
             <div class="mob-pyramid-stage">
@@ -527,16 +529,22 @@
             </div>
         </div>
 
-        <!-- Grid (Archive) -->
-        <div class="mob-section-wrapper" style="margin-top:30px;">
-            <div class="mob-grid-label-center">FULL ARCHIVE</div>
-            <div id="mobRec_Grid" class="mob-archive-grid"></div>
+        <!-- SECTION 2: ARCHIVE (Horizontal Scroll - Normal) -->
+        <div class="mob-section-wrapper" style="margin-top:20px; align-items:flex-start; padding-left:20px;">
+            <div class="mob-grid-label">ACCEPTED PROTOCOLS</div>
+            <!-- Note: ID kept as mobRec_Grid for ease, but logic changes -->
+            <div id="mobRec_Grid" class="mob-horiz-scroll"></div>
+        </div>
+
+        <!-- SECTION 3: HEAP (Horizontal Scroll - Small) -->
+        <div class="mob-section-wrapper" style="margin-top:20px; align-items:flex-start; padding-left:20px;">
+            <div class="mob-grid-label" style="color:var(--neon-red);">DENIED / FAILED</div>
+            <div id="mobRec_Heap" class="mob-horiz-scroll small"></div>
         </div>
         
+        <!-- SPACER -->
         <div style="height: 120px;"></div>
     </div>
-
-</div>
 
 <!-- ADD THIS SWITCHER SCRIPT AT THE VERY BOTTOM (Before </body>) -->
 <script>
