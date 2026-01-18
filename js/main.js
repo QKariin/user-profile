@@ -414,18 +414,21 @@ function resetTributeFlow() { selectedReason = ""; selectedNote = ""; selectedIt
 // PART 1: MOBILE LOGIC (BRAIN & NAVIGATION)
 // =========================================
 
-// 5. STATS EXPANDER (FIXED FOR ROYAL LAYOUT)
+// 5. STATS EXPANDER (FIXED ANIMATION)
 window.toggleMobileStats = function() {
     const drawer = document.getElementById('mobStatsContent');
     const arrow = document.getElementById('mobStatsArrow');
     
     if (drawer) {
-        // Toggle the visibility class
-        drawer.classList.toggle('hidden');
+        // 1. Force remove 'hidden' so the browser renders it
+        drawer.classList.remove('hidden');
         
-        // Rotate the arrow icon
+        // 2. Toggle the 'open' class (Triggers CSS Height/Opacity animation)
+        drawer.classList.toggle('open');
+        
+        // 3. Rotate Arrow
         if (arrow) {
-            arrow.innerText = drawer.classList.contains('hidden') ? "▼" : "▲";
+            arrow.innerText = drawer.classList.contains('open') ? "▲" : "▼";
         }
     }
 };
