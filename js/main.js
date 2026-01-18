@@ -435,29 +435,36 @@ window.toggleMobileStats = function() {
 
 // 3. MAIN NAVIGATION CONTROLLER (FIXED FOR MOBILE RECORD)
 window.toggleMobileView = function(viewName) {
+    // 1. Define All Views
     const home = document.getElementById('viewMobileHome');
+    const mobRecord = document.getElementById('viewMobileRecord'); // <--- THE NEW VAULT
     const chatCard = document.getElementById('chatCard');
     const mobileApp = document.getElementById('MOBILE_APP');
-    
     const history = document.getElementById('historySection'); // Desktop View
-    const mobRecord = document.getElementById('viewMobileRecord'); // Mobile View (The one we want)
-    
     const news = document.getElementById('viewNews');
     const protocol = document.getElementById('viewProtocol');
     
-    // 1. Hide All Potential Views
-    const views = [home, history, mobRecord, news, protocol];
+    // 2. Hide Everything First
+    const views = [home, mobRecord, history, news, protocol];
     views.forEach(el => { if(el) el.style.display = 'none'; });
 
-    // 2. Force Hide Chat (Reset)
+    // 3. Reset Chat
     if (chatCard) chatCard.style.setProperty('display', 'none', 'important');
 
-    // 3. Show Target
+    // 4. SHOW THE TARGET
     if (viewName === 'home') {
         if(home) {
             home.style.display = 'flex';
             if(window.syncMobileDashboard) window.syncMobileDashboard();
         }
+    }
+    else if (viewName === 'record') {
+        // *** CRITICAL FIX: Open the Mobile Vault ***
+        if (mobRecord) {
+            mobRecord.style.display = 'flex';
+            // Trigger the gallery to paint the images
+            if(window.renderGallery) window.renderGallery();
+        } 
     }
     else if (viewName === 'chat') {
         if(chatCard && mobileApp) {
@@ -471,18 +478,6 @@ window.toggleMobileView = function(viewName) {
             if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
         }
     }
-    else if (viewName === 'record') {
-        // *** THE FIX: Check for Mobile Record First ***
-        if (mobRecord) {
-            mobRecord.style.display = 'flex';
-            if(window.renderGallery) window.renderGallery();
-        } 
-        // Fallback to desktop if mobile missing
-        else if (history) {
-            history.style.display = 'flex';
-            if(window.renderGallery) window.renderGallery();
-        }
-    }
     else if (viewName === 'queen') {
         if(news) news.style.display = 'block';
     }
@@ -490,7 +485,7 @@ window.toggleMobileView = function(viewName) {
         if(protocol) protocol.style.display = 'block';
     }
     
-    // 4. Cleanup
+    // 5. Cleanup UI
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
     document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
