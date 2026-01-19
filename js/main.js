@@ -122,6 +122,91 @@ Bridge.listen((data) => {
     window.postMessage(data, "*"); 
 });
 
+// =========================================
+// NEW: SLAVE SETTINGS & HUD LOGIC
+// =========================================
+
+// 1. OPEN SETTINGS
+window.openSlaveSettings = function() {
+    document.getElementById('slaveSettingsOverlay').classList.remove('hidden');
+    // Sync current coins to settings panel
+    if(gameStats) document.getElementById('settingsCoins').innerText = gameStats.coins;
+};
+
+window.closeSlaveSettings = function() {
+    document.getElementById('slaveSettingsOverlay').classList.add('hidden');
+};
+
+// 2. BUY NAME
+window.buyNameChange = function() {
+    const input = document.getElementById('inputNewName');
+    const newName = input.value.trim();
+    if(!newName) return;
+    
+    if(gameStats.coins < 100) { alert("Insufficient Capital (100)"); return; }
+    
+    // Process Transaction via existing Bridge logic
+    window.parent.postMessage({ 
+        type: "PURCHASE_ITEM", 
+        itemName: "Identity Rename", 
+        cost: 100, 
+        messageToDom: "Slave changed designation to: " + newName 
+    }, "*");
+    
+    // Optimistic Update
+    userProfile.name = newName;
+    updateStats(); 
+    closeSlaveSettings();
+};
+
+// 3. BUY PHOTO
+window.buyPhotoChange = function() {
+    const fileInput = document.getElementById('settingPhotoInput');
+    if(fileInput.files.length === 0) return;
+    
+    if(gameStats.coins < 500) { alert("Insufficient Capital (500)"); return; }
+    
+    // Use existing upload handler but tag it differently? 
+    // Actually, we use the existing handleProfileUpload but charge for it manually first.
+    window.parent.postMessage({ type: "SEND_CHAT_TO_BACKEND", text: "SYSTEM: 500 Coins deducted for Profile Update." }, "*");
+    
+    // Trigger the upload
+    if(window.handleProfileUpload) window.handleProfileUpload(fileInput);
+    
+    closeSlaveSettings();
+};
+
+// 4. BUY ROUTINE
+window.buyRoutine = function(type) {
+    const cost = type === 'standard' ? 1000 : 2000;
+    if(gameStats.coins < cost) { alert("Insufficient Capital ("+cost+")"); return; }
+    
+    window.parent.postMessage({ 
+        type: "PURCHASE_ITEM", 
+        itemName: "Daily Routine: " + type, 
+        cost: cost, 
+        messageToDom: "Slave initiated " + type + " daily protocol." 
+    }, "*");
+    
+    // Show the button on dashboard
+    document.getElementById('btnDailyRoutine').classList.remove('hidden');
+    closeSlaveSettings();
+};
+
+// 5. UPLOAD ROUTINE PROOF
+window.handleRoutineUpload = function(input) {
+    if(input.files.length > 0) {
+        // Send to backend
+        if(window.handleEvidenceUpload) window.handleEvidenceUpload(input);
+        
+        // Hide button
+        document.getElementById('btnDailyRoutine').classList.add('hidden');
+        alert("Routine Submitted.");
+    }
+};
+
+
+
 window.addEventListener("message", (event) => {
     try {
         const data = event.data;
