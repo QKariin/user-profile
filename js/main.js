@@ -124,11 +124,12 @@ Bridge.listen((data) => {
 });
 
 // =========================================
-// NEW: SETTINGS LOGIC (DIRECT & FUNCTIONAL)
+// NEW: SETTINGS LOGIC (FIXED ROUTINE CRASH)
 // =========================================
 
 let currentActionType = "";
 let currentActionCost = 0;
+let selectedRoutineValue = ""; // <--- NEW VARIABLE TO STORE SELECTION
 
 // 1. NAVIGATION
 window.openLobby = function() {
@@ -188,16 +189,16 @@ window.showLobbyAction = function(type) {
         prompt.innerText = "Select a Daily Routine.";
         routineArea.classList.remove('hidden');
         
-        // Reset Dropdown logic
-        document.getElementById('routineDropdown').value = "Morning Kneel";
-        window.checkRoutineDropdown(); // This sets the price/visibility
-        return; // checkRoutineDropdown handles the cost display
+        // Reset Selection
+        selectedRoutineValue = "";
+        document.querySelectorAll('.routine-tile').forEach(t => t.classList.remove('selected'));
+        currentActionCost = 0;
     }
 
     costDisplay.innerText = currentActionCost;
 };
 
-// NEW: HANDLE ROUTINE TILE SELECTION
+// 3. HANDLE ROUTINE TILE SELECTION (FIXED)
 window.selectRoutineItem = function(el, value) {
     // 1. Visually deselect all others
     document.querySelectorAll('.routine-tile').forEach(t => t.classList.remove('selected'));
@@ -205,27 +206,29 @@ window.selectRoutineItem = function(el, value) {
     // 2. Select clicked
     el.classList.add('selected');
     
-    // 3. Handle Logic
+    // 3. Save Value to Variable (Not Element)
+    selectedRoutineValue = value;
+
+    // 4. Handle Logic
     const input = document.getElementById('routineCustomInput');
     const costDisplay = document.getElementById('lobbyCostDisplay');
     
     if (value === 'custom') {
         input.classList.remove('hidden');
         currentActionCost = 2000;
-        // Clear the dropdown value so we know to check the input
-        document.getElementById('routineDropdown').value = "custom"; 
     } else {
         input.classList.add('hidden');
         currentActionCost = 1000;
-        // Store the selected value in the hidden dropdown or a temp variable
-        document.getElementById('routineDropdown').value = value;
     }
     
     costDisplay.innerText = currentActionCost;
 };
 
-// 4. EXECUTE ACTION (WITH FEEDBACK NOTIFICATION)
+// 4. EXECUTE ACTION (FIXED CRASH)
 window.confirmLobbyAction = function() {
+    // Cost Check (Skip if routine is not selected yet)
+    if (currentActionType === 'routine' && currentActionCost === 0) return;
+
     if (gameStats.coins < currentActionCost) {
         alert("INSUFFICIENT FUNDS");
         return;
@@ -237,16 +240,18 @@ window.confirmLobbyAction = function() {
 
     // A. ROUTINE
     if (currentActionType === 'routine') {
-        let taskName = document.getElementById('routineDropdown').value; 
+        // READ FROM VARIABLE, NOT DROPDOWN
+        let taskName = selectedRoutineValue; 
+        
         if (taskName === 'custom') {
             taskName = document.getElementById('routineCustomInput').value;
         }
         
         if(!taskName) return;
 
-        // Message Logic
+        // Notification
         notifyTitle = "PROTOCOL ASSIGNED";
-        notifyText = "Daily Routine set to: " + taskName;
+        notifyText = taskName;
 
         // Send to Wix
         window.parent.postMessage({ 
@@ -257,12 +262,16 @@ window.confirmLobbyAction = function() {
             message: "Routine set to: " + taskName
         }, "*");
         
-        // Dashboard Update
+        // Dashboard Button Update
         const btn = document.getElementById('btnDailyRoutine');
         if(btn) {
             btn.classList.remove('hidden');
-            const txt = btn.querySelector('.kneel-text');
+            const txt = btn.querySelector('.kneel-text'); // Corrected for new HTML
             if(txt) txt.innerText = "SUBMIT: " + taskName.toUpperCase();
+            
+            // Also need to find inner text if structure differs
+            const innerLbl = btn.querySelector('.kneel-label'); 
+            if(innerLbl) innerLbl.innerText = "SUBMIT: " + taskName.toUpperCase();
         }
     } 
     
@@ -289,7 +298,7 @@ window.confirmLobbyAction = function() {
         if(!text) return;
         
         notifyTitle = "IDENTITY REWRITTEN";
-        notifyText = "Designation changed to: " + text.toUpperCase();
+        notifyText = text.toUpperCase();
 
         window.parent.postMessage({ 
             type: "UPDATE_CMS_FIELD", 
@@ -299,8 +308,11 @@ window.confirmLobbyAction = function() {
             message: "Designation changed to: " + text
         }, "*");
 
+        // Update UI
         const el = document.getElementById('mob_slaveName');
+        const haloName = document.getElementById('mob_slaveName'); // Covers both IDs if they differ
         if(el) el.innerText = text;
+        if(haloName) haloName.innerText = text;
         userProfile.name = text;
     }
     
@@ -309,8 +321,8 @@ window.confirmLobbyAction = function() {
         const text = document.getElementById('lobbyInputText').value;
         if(!text) return;
 
-        notifyTitle = "DATA APPENDEED";
-        notifyText = currentActionType.toUpperCase() + " updated in file.";
+        notifyTitle = "DATA APPENDED";
+        notifyText = currentActionType.toUpperCase() + " updated.";
 
         window.parent.postMessage({ 
             type: "PURCHASE_ITEM", 
@@ -320,7 +332,7 @@ window.confirmLobbyAction = function() {
         }, "*");
     }
 
-    // Close Menu & Trigger Notification
+    // Close & Notify
     window.closeLobby();
     window.showSystemNotification(notifyTitle, notifyText);
 };
