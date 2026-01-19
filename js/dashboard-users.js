@@ -205,6 +205,7 @@ async function updateHistory(u) {
         const normalized = await Promise.all(
             historyToShow.map(async h => {
                 const raw = h.proofUrl || "";
+                console.log("RAW:", h.proofUrl);
 
                 // 1. Optimized thumbnail (unsigned)
                 const optimized = raw ? getOptimizedUrl(raw, 150) : "";
