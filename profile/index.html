@@ -563,7 +563,60 @@
     .setting-btn.gold { border-color: #c5a059; color: #c5a059; margin-bottom: 5px; width:100%; }
     .setting-label { font-size: 0.7rem; color: #888; margin-bottom: 5px; font-family:'Orbitron'; }
 
+    /* LOBBY (SETTINGS) STYLES */
+    .lobby-card {
+        width: 90% !important;
+        padding: 30px 20px !important;
+        background: #050505 !important;
+        border: 1px solid var(--mob-gold);
+        box-shadow: 0 0 50px rgba(197, 160, 89, 0.15);
+    }
+
+    .lobby-header { margin-bottom: 25px; text-align: center; }
+    .lobby-title { font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--mob-gold); letter-spacing: 4px; border-bottom: 1px solid #333; padding-bottom: 10px; display: inline-block;}
+    .lobby-subtitle { font-family: 'Cinzel', serif; font-size: 0.6rem; color: #666; margin-top: 5px; letter-spacing: 2px; }
+
+    .lobby-content { width: 100%; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+
+    /* ELEGANT BUTTONS */
+    .lobby-btn {
+        background: transparent;
+        border: 1px solid #333;
+        color: #ccc;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        padding: 12px;
+        width: 100%;
+        cursor: pointer;
+        transition: 0.3s;
+        letter-spacing: 2px;
+    }
+    .lobby-btn:active { background: rgba(255,255,255,0.05); border-color: #666; }
+    .lobby-btn.gold { border-color: var(--mob-gold); color: var(--mob-gold); font-weight: 700; }
+    .lobby-btn.close { border: none; color: #555; font-size: 0.7rem; margin-top: 5px; }
+    .lobby-btn.small { font-size: 0.6rem; padding: 10px; }
+
+    .lobby-divider { width: 50%; height: 1px; background: #222; margin: 5px 0; }
+
+    /* ACTION VIEW */
+    .lobby-prompt { font-family: 'Cinzel', serif; color: white; font-size: 1rem; text-align: center; margin-bottom: 15px; line-height: 1.4; }
     
+    .lobby-input {
+        background: #111; border: 1px solid #444; color: var(--mob-gold);
+        font-family: 'Cinzel', serif; font-size: 1rem; padding: 10px;
+        width: 100%; text-align: center; outline: none;
+    }
+    
+    .lobby-file-btn {
+        background: #111; border: 1px dashed #444; color: #888;
+        padding: 20px; width: 100%; font-family: 'Cinzel'; cursor: pointer;
+    }
+
+    .lobby-cost-area { margin-top: 10px; margin-bottom: 5px; font-size: 0.7rem; color: #666; font-family: 'Orbitron'; letter-spacing: 1px; }
+    .cost-val { color: var(--mob-gold); font-weight: bold; margin-left: 5px; }
+    
+    /* HUD PICS */
+    .hud-circle img { object-fit: cover; }
     
   </style>
 </head>
@@ -852,15 +905,14 @@
 
          <!-- A. THE NEW HUD (Top Corners) -->
         <div class="mob-hud-row">
-            <!-- Left: Slave Settings -->
-            <div class="hud-circle slave" onclick="openSlaveSettings()">
+            <!-- Left: You (Click to enter Lobby) -->
+            <div class="hud-circle slave" onclick="openLobby()">
                 <img id="hudSlavePic" src="">
                 <div class="hud-gear">⚙</div>
             </div>
-            <!-- Right: Queen Status -->
+            <!-- Right: Her (Visual Only) -->
             <div class="hud-circle queen">
                 <img src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png">
-                <!-- Green/Gold Dot -->
                 <div id="hudDomStatus" class="hud-status-dot offline"></div>
             </div>
         </div>
@@ -879,33 +931,53 @@
         <!-- ... (Keep your existing Background, Halo, Stats, etc. here) ... -->
 
         <!-- C. SLAVE SETTINGS OVERLAY (Hidden) -->
-        <div id="slaveSettingsOverlay" class="mob-reward-overlay hidden">
-            <div class="mob-reward-card" style="align-items:stretch; text-align:left; gap:15px;">
-                <div style="text-align:center; margin-bottom:10px;">
-                    <h2 class="mob-reward-title">IDENTITY CONFIG</h2>
-                    <div style="font-size:0.6rem; color:#666;">CAPITAL: <span id="settingsCoins">0</span></div>
+        <!-- C. THE QUEEN'S LOBBY (Settings Redesign) -->
+        <div id="lobbyOverlay" class="mob-reward-overlay hidden">
+            <div class="mob-reward-card lobby-card">
+                
+                <!-- HEADER -->
+                <div class="lobby-header">
+                    <div class="lobby-title">THE ANTECHAMBER</div>
+                    <div class="lobby-subtitle">REQUEST AUDIENCE</div>
                 </div>
 
-                <!-- 1. NAME CHANGE -->
-                <div class="setting-row">
-                    <input type="text" id="inputNewName" class="setting-input" placeholder="NEW DESIGNATION">
-                    <button class="setting-btn" onclick="buyNameChange()">UPDATE (100)</button>
+                <!-- VIEW 1: MENU LIST -->
+                <div id="lobbyMenu" class="lobby-content">
+                    <button class="lobby-btn" onclick="showLobbyAction('name')">CHANGE DESIGNATION</button>
+                    <button class="lobby-btn" onclick="showLobbyAction('photo')">UPDATE VISAGE</button>
+                    <button class="lobby-btn" onclick="showLobbyAction('routine')">REQUEST ROUTINE</button>
+                    <button class="lobby-btn" onclick="showLobbyAction('kinks')">REGISTER KINKS</button>
+                    <button class="lobby-btn" onclick="showLobbyAction('limits')">DEFINE LIMITS</button>
+                    <div class="lobby-divider"></div>
+                    <button class="lobby-btn close" onclick="closeLobby()">LEAVE</button>
                 </div>
 
-                <!-- 2. PHOTO CHANGE -->
-                <div class="setting-row">
-                    <button class="setting-btn outline" onclick="document.getElementById('settingPhotoInput').click()">SELECT PHOTO</button>
-                    <input type="file" id="settingPhotoInput" hidden>
-                    <button class="setting-btn" onclick="buyPhotoChange()">UPDATE (500)</button>
+                <!-- VIEW 2: ACTION INPUT -->
+                <div id="lobbyActionView" class="lobby-content hidden">
+                    <div id="lobbyPrompt" class="lobby-prompt">...</div>
+                    
+                    <!-- Text Input -->
+                    <input type="text" id="lobbyInputText" class="lobby-input hidden" placeholder="Type here...">
+                    
+                    <!-- File Input -->
+                    <button id="lobbyInputFileBtn" class="lobby-file-btn hidden" onclick="document.getElementById('lobbyFile').click()">CHOOSE FILE</button>
+                    <input type="file" id="lobbyFile" hidden onchange="document.getElementById('lobbyInputFileBtn').innerText = 'FILE SELECTED'">
+
+                    <!-- Routine Buttons -->
+                    <div id="lobbyRoutineBtns" class="hidden" style="width:100%; display:flex; gap:10px;">
+                        <button class="lobby-btn small" onclick="confirmLobbyAction('standard')">STANDARD (1000)</button>
+                        <button class="lobby-btn small" onclick="confirmLobbyAction('custom')">CUSTOM (2000)</button>
+                    </div>
+
+                    <div class="lobby-cost-area">
+                        <span class="cost-lbl">TRIBUTE REQUIRED:</span>
+                        <span id="lobbyCostDisplay" class="cost-val">0</span>
+                    </div>
+
+                    <button id="btnLobbyConfirm" class="lobby-btn gold" onclick="confirmLobbyAction()">SUBMIT REQUEST</button>
+                    <button class="lobby-btn close" onclick="backToLobbyMenu()">CANCEL</button>
                 </div>
 
-                <!-- 3. ROUTINE -->
-                <div style="border-top:1px solid #333; margin:10px 0;"></div>
-                <div class="setting-label">DAILY PROTOCOL</div>
-                <button class="setting-btn gold" onclick="buyRoutine('standard')">STANDARD (1000)</button>
-                <button class="setting-btn gold" onclick="buyRoutine('custom')">CUSTOM (2000)</button>
-
-                <button onclick="closeSlaveSettings()" style="margin-top:20px; background:none; border:none; color:#888; width:100%;">CLOSE</button>
             </div>
         </div>
 
