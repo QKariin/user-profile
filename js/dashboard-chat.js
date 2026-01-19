@@ -24,7 +24,7 @@ export async function renderChat(msgs) {
                 //const filePath = '/' + parts[1];
                 try {
                     //m.mediaUrl = await getPrivateFile(filePath);
-                    m.mediaUrl = await getSignedUrl(filePath);
+                    m.mediaUrl = await getSignedUrl(m.message);
                 } catch (e) {
                     console.error('Failed to sign URL', e);
                 }
