@@ -119,10 +119,10 @@ function renderStickerFilters() {
     filterBar.innerHTML = html;
 }
 
-// REPLACE your renderGallery function with this:
-// REPLACE your renderGallery function with this:
 export async function renderGallery() {
     if (!galleryData) return;
+    
+    // --- 1. DEFINE TARGETS (The Connection) ---
     
     // Desktop Targets
     const gridFailed = document.getElementById('gridFailed'); 
@@ -133,34 +133,35 @@ export async function renderGallery() {
     const slot2 = { card: document.getElementById('altarSlot2'), img: document.getElementById('imgSlot2') };
     const slot3 = { card: document.getElementById('altarSlot3'), img: document.getElementById('imgSlot3') };
 
-    // Mobile Home Targets
+    // Mobile Home Targets (Dashboard Altar)
     const mob1 = document.getElementById('mobImgSlot1');
     const mob2 = document.getElementById('mobImgSlot2');
     const mob3 = document.getElementById('mobImgSlot3');
 
-    // Mobile Record Targets (HORIZONTAL STRIPS)
-    const rec1 = document.getElementById('mobRec_Slot1');
-    const rec2 = document.getElementById('mobRec_Slot2');
-    const rec3 = document.getElementById('mobRec_Slot3');
-    const recGrid = document.getElementById('mobRec_Grid'); // Middle (Archive)
-    const recHeap = document.getElementById('mobRec_Heap'); // Bottom (Heap)
+    // *** MOBILE RECORD TARGETS (This is what was missing/broken) ***
+    const rec1 = document.getElementById('mobRec_Slot1'); // Pyramid Top
+    const rec2 = document.getElementById('mobRec_Slot2'); // Pyramid Left
+    const rec3 = document.getElementById('mobRec_Slot3'); // Pyramid Right
+    const recGrid = document.getElementById('mobRec_Grid'); // Archive Strip
+    const recHeap = document.getElementById('mobRec_Heap'); // Trash Strip (WAS MISSING)
 
     if (!gridFailed || !gridOkay) return;
 
-    // Reset All Grids
+    // --- 2. RESET (Clean the Canvas) ---
     gridFailed.innerHTML = "";
     gridOkay.innerHTML = "";
     if(recGrid) recGrid.innerHTML = "";
-    if(recHeap) recHeap.innerHTML = "";
+    if(recHeap) recHeap.innerHTML = ""; // Clean the Mobile Trash
 
     const allItems = getGalleryList(); 
 
+    // Solo Mode Logic
     if (historySection) {
         if (allItems.length === 0) historySection.classList.add('solo-mode');
         else historySection.classList.remove('solo-mode');
     }
 
-    // --- 1. TOP 3 (THE ALTAR) ---
+    // --- 3. SORT & RANK ---
     let bestOf = [...allItems]
         .filter(item => {
             const s = (item.status || "").toLowerCase();
@@ -173,7 +174,9 @@ export async function renderGallery() {
         return await getSignedUrl(getThumbnail(getOptimizedUrl(item.proofUrl || item.media, size)));
     };
 
-    // --- RANK 1 (Center) ---
+    // --- 4. POPULATE ALTAR (Desktop + Mobile Home + Mobile Record) ---
+
+    // RANK 1
     if (bestOf[0]) {
         let thumb = await getThumb(bestOf[0], 400);
         let realIndex = allItems.indexOf(bestOf[0]);
@@ -186,16 +189,18 @@ export async function renderGallery() {
             slot1.card.onclick = () => window.openHistoryModal(realIndex);
             slot1.img.style.filter = "none";
         }
-        // Mobile Sync
+        // Mobile Home
         if(mob1) { mob1.src = thumb; mob1.onclick = () => window.openHistoryModal(realIndex); }
+        // Mobile Record (The Fix)
         if(rec1) { rec1.src = thumb; rec1.onclick = () => window.openHistoryModal(realIndex); }
     } else {
-        if(slot1.card) { slot1.img.src = IMG_QUEEN_MAIN; if(slot1.ref) slot1.ref.src = IMG_QUEEN_MAIN; }
-        if(mob1) mob1.src = IMG_QUEEN_MAIN;
-        if(rec1) rec1.src = IMG_QUEEN_MAIN;
+        // Empty State
+        if(slot1.card) { slot1.img.src = "https://static.wixstatic.com/media/ce3e5b_5fc6a144908b493b9473757471ec7ebb~mv2.png"; if(slot1.ref) slot1.ref.src = slot1.img.src; }
+        if(mob1) mob1.src = "https://static.wixstatic.com/media/ce3e5b_5fc6a144908b493b9473757471ec7ebb~mv2.png";
+        if(rec1) rec1.src = "https://static.wixstatic.com/media/ce3e5b_5fc6a144908b493b9473757471ec7ebb~mv2.png";
     }
 
-    // --- RANK 2 (Left) ---
+    // RANK 2
     if (bestOf[1]) {
         let thumb = await getThumb(bestOf[1], 300);
         let realIndex = allItems.indexOf(bestOf[1]);
@@ -203,12 +208,13 @@ export async function renderGallery() {
         if(mob2) { mob2.src = thumb; mob2.onclick = () => window.openHistoryModal(realIndex); }
         if(rec2) { rec2.src = thumb; rec2.onclick = () => window.openHistoryModal(realIndex); }
     } else {
-        if(slot2.img) slot2.img.src = IMG_STATUE_SIDE;
-        if(mob2) mob2.src = IMG_STATUE_SIDE;
-        if(rec2) rec2.src = IMG_STATUE_SIDE;
+        const emptyStatue = "https://static.wixstatic.com/media/ce3e5b_5424edc9928d49e5a3c3a102cb4e3525~mv2.png";
+        if(slot2.img) slot2.img.src = emptyStatue;
+        if(mob2) mob2.src = emptyStatue;
+        if(rec2) rec2.src = emptyStatue;
     }
 
-    // --- RANK 3 (Right) ---
+    // RANK 3
     if (bestOf[2]) {
         let thumb = await getThumb(bestOf[2], 300);
         let realIndex = allItems.indexOf(bestOf[2]);
@@ -216,12 +222,14 @@ export async function renderGallery() {
         if(mob3) { mob3.src = thumb; mob3.onclick = () => window.openHistoryModal(realIndex); }
         if(rec3) { rec3.src = thumb; rec3.onclick = () => window.openHistoryModal(realIndex); }
     } else {
-        if(slot3.img) slot3.img.src = IMG_STATUE_SIDE;
-        if(mob3) mob3.src = IMG_STATUE_SIDE;
-        if(rec3) rec3.src = IMG_STATUE_SIDE;
+        const emptyStatue = "https://static.wixstatic.com/media/ce3e5b_5424edc9928d49e5a3c3a102cb4e3525~mv2.png";
+        if(slot3.img) slot3.img.src = emptyStatue;
+        if(mob3) mob3.src = emptyStatue;
+        if(rec3) rec3.src = emptyStatue;
     }
 
-    // --- 2. MIDDLE (ARCHIVE) ---
+
+    // --- 5. POPULATE ARCHIVE (Desktop Grid + Mobile Strip) ---
     const middleItems = allItems.filter(item => {
         if (bestOf.includes(item)) return false; 
         const s = (item.status || "").toLowerCase();
@@ -251,7 +259,7 @@ export async function renderGallery() {
                     ${overlay}
                 </div>`;
             
-            // Mobile Horizontal Scroll Item
+            // Mobile Archive (Strip)
             mobileArchiveHtml += `
                 <div class="mob-scroll-item" onclick="window.openHistoryModal(${realIndex})">
                     <img class="mob-scroll-img" src="${thumb}" loading="lazy">
@@ -259,13 +267,17 @@ export async function renderGallery() {
                 </div>`;
         }
     } else {
-        for(let i=0; i<6; i++) desktopArchiveHtml += `<div class="item-placeholder-slot"><img src="${IMG_MIDDLE_EMPTY}"></div>`;
+        // Desktop Placeholders
+        const emptyMid = "https://static.wixstatic.com/media/ce3e5b_1628753a2b5743f1bef739cc392c67b5~mv2.webp";
+        for(let i=0; i<6; i++) desktopArchiveHtml += `<div class="item-placeholder-slot"><img src="${emptyMid}"></div>`;
     }
     
+    // Inject
     gridOkay.innerHTML = desktopArchiveHtml;
-    if(recGrid) recGrid.innerHTML = mobileArchiveHtml;
+    if(recGrid) recGrid.innerHTML = mobileArchiveHtml; // <--- FILLS MOBILE ARCHIVE
 
-    // --- 3. BOTTOM (HEAP) - NOW SYNCED TO MOBILE ---
+
+    // --- 6. POPULATE HEAP (Desktop Trash + Mobile Trash) ---
     const failedItems = allItems.filter(item => {
         const s = (item.status || "").toLowerCase();
         return s.includes('rej') || s.includes('fail');
@@ -289,25 +301,20 @@ export async function renderGallery() {
                     <div class="trash-stamp">DENIED</div>
                 </div>`;
             
-            // Mobile Heap (Small)
+            // Mobile Trash (Strip)
             mobileFailedHtml += `
                 <div class="mob-scroll-item" onclick="window.openHistoryModal(${realIndex})">
                     <img class="mob-scroll-img" src="${thumb}" loading="lazy">
                 </div>`;
         }
     } else {
-        for(let i=0; i<6; i++) desktopFailedHtml += `<div class="item-placeholder-slot"><img src="${IMG_BOTTOM_EMPTY}"></div>`;
+        const emptyBot = "https://static.wixstatic.com/media/ce3e5b_33f53711eece453da8f3d04caddd7743~mv2.png";
+        for(let i=0; i<6; i++) desktopFailedHtml += `<div class="item-placeholder-slot"><img src="${emptyBot}"></div>`;
     }
     
+    // Inject
     gridFailed.innerHTML = desktopFailedHtml;
-    if(recHeap) recHeap.innerHTML = mobileFailedHtml;
-}
-
-// --- CRITICAL FIX: EXPORT THIS EMPTY FUNCTION TO PREVENT CRASH ---
-export function loadMoreHistory() {
-    setHistoryLimit(historyLimit + 25);
-    renderGallery();
-    console.log("Increased history limit to", historyLimit);
+    if(recHeap) recHeap.innerHTML = mobileFailedHtml; // <--- FILLS MOBILE TRASH
 }
 
 // --- REDEMPTION LOGIC ---
