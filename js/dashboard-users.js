@@ -207,12 +207,8 @@ async function updateHistory(u) {
                 const raw = h.proofUrl || "";
                 console.log("RAW:", h.proofUrl);
 
-                // 1. Optimized thumbnail (unsigned)
-                const optimized = raw ? getOptimizedUrl(raw, 150) : "";
-
-                // 2. Sign both URLs
-                const thumbSigned = optimized ? await getSignedUrl(optimized) : "";
-                const fullSigned  = raw ? await getSignedUrl(raw) : "";
+                const thumbSigned = await getSignedUrl(getOptimizedUrl(raw, 150));
+                const fullSigned  = await getSignedUrl(raw);
 
                 return {
                     ...h,
