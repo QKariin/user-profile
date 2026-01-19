@@ -1017,7 +1017,7 @@ window.syncMobileDashboard = function() {
             
             // FULL WIDTH STYLE
             position: 'fixed', 
-            bottom: '0', 
+            bottom: '5', 
             left: '0', 
             width: '100%', 
             height: '60px',
