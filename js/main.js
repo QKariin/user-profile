@@ -1017,10 +1017,10 @@ window.syncMobileDashboard = function() {
             
             // FULL WIDTH STYLE
             position: 'fixed', 
-            bottom: '0', 
+            bottom: '5', 
             left: '0', 
             width: '100%', 
-            height: '80px',
+            height: '60px',
             
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             paddingBottom: 'env(safe-area-inset-bottom)',
