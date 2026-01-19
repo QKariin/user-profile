@@ -204,14 +204,10 @@ async function updateHistory(u) {
         
         const signingPromises = historyToShow.map(async h => {
             console.log("RAW:", h.proofUrl);
-            const thumbSigned = await getSignedUrl(getOptimizedUrl(h.proofUrl, 150));
-            const fullSigned  = await getSignedUrl(h.proofUrl);
-
-            return {
-                ...h,
-                thumbSigned,
-                fullSigned
-            };
+            h.thumbSigned = await getSignedUrl(getOptimizedUrl(h.proofUrl, 150));
+            h.fullSigned  = await getSignedUrl(h.proofUrl);
+            console.log("thumb:", thumbSigned);
+ 
         });
         await Promise.all(signingPromises);
 
