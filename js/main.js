@@ -753,66 +753,66 @@ window.triggerKneel = function() {
     }
 };
 
-// 4. DATA SYNC (Connects Backend to Mobile Dashboard)
-// 4. DATA SYNC (CORRECTED IDs TO MATCH HTML)
+// 4. DATA SYNC (FIXED: Updates Face AND Background)
 window.syncMobileDashboard = function() {
     // 1. Safety Check
     if (!gameStats || !userProfile) return;
 
-    // 2. Target the EXACT IDs from your HTML (I fixed these names)
-    const elName = document.getElementById('mob_slaveName');   // WAS mobName (WRONG)
-    const elRank = document.getElementById('mob_rankStamp');   // WAS mobHierarchy (WRONG)
-    const elPic = document.getElementById('mob_profilePic');   // Correct
-    const hudPic = document.getElementById('hudSlavePic');
+    // 2. Target IDs
+    const elName = document.getElementById('mob_slaveName');
+    const elRank = document.getElementById('mob_rankStamp');
+    const elPic = document.getElementById('mob_profilePic'); // The Hexagon Face
+    const elBg = document.getElementById('mob_bgPic');       // The Blurred Wallpaper
 
+    const elPoints = document.getElementById('mobPoints');
+    const elCoins = document.getElementById('mobCoins');
 
-    // 3. Fill Data
+    // 3. Fill Text Data
     if (elName) elName.innerText = userProfile.name || "SLAVE";
     if (elRank) elRank.innerText = userProfile.hierarchy || "INITIATE";
-    if(hudPic && elPic) hudPic.src = elPic.src;
-
+    if (elPoints) elPoints.innerText = gameStats.points || 0;
+    if (elCoins) elCoins.innerText = gameStats.coins || 0;
     
-    // 4. Profile Picture (The Wix Decrypter)
-    if (elPic) {
+    // 4. SYNC IMAGES (Face & Background)
+    if (userProfile.profilePicture) {
         let rawUrl = userProfile.profilePicture;
-        const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
+        let finalUrl = rawUrl;
 
+        // Wix URL Fixer
+        const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
+        
         if (!rawUrl || rawUrl === "" || rawUrl === "undefined") {
-            elPic.src = defaultPic;
+            finalUrl = defaultPic;
         } 
         else if (rawUrl.startsWith("wix:image")) {
-            // CONVERT WIX URL MANUALLY
-            // Format: wix:image://v1/<uri>/<filename>#originWidth=...
-            const uri = rawUrl.split('/')[3]; 
-            const cleanUri = uri.split('#')[0]; 
-            elPic.src = `https://static.wixstatic.com/media/${cleanUri}`;
-        } 
-        else {
-            // It's already a normal link
-            elPic.src = rawUrl;
+            const uri = rawUrl.split('/')[3].split('#')[0]; 
+            finalUrl = `https://static.wixstatic.com/media/${uri}`;
         }
+
+        // Apply to Hexagon
+        if (elPic) elPic.src = finalUrl;
+        
+        // Apply to Background (Atmosphere)
+        if (elBg) elBg.src = finalUrl;
     }
 
-    // 5. Fill the Grid (Devotion)
+    // 5. Fill Grid
     const grid = document.getElementById('mob_streakGrid');
     if(grid) {
-        grid.innerHTML = ''; // Clear it
+        grid.innerHTML = '';
         const count = gameStats.kneelCount || 0;
         const progress = count % 24; 
-        
         for(let i=0; i<24; i++) {
             const sq = document.createElement('div');
-            // If i is less than progress, it gets the 'active' class (Gold)
             sq.className = 'streak-sq' + (i < progress ? ' active' : '');
             grid.appendChild(sq);
         }
     }
     
-    // 6. Update Operations Card (Working/Idle)
+    // 6. Update Operations Card
     const activeRow = document.getElementById('activeTimerRow');
     if (activeRow) {
         const isWorking = !activeRow.classList.contains('hidden');
-        
         const light = document.getElementById('mob_statusLight');
         const text = document.getElementById('mob_statusText');
         const timer = document.getElementById('mob_activeTimer');
