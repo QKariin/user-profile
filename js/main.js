@@ -761,9 +761,12 @@ window.syncMobileDashboard = function() {
     // 2. Target IDs
     const elName = document.getElementById('mob_slaveName');
     const elRank = document.getElementById('mob_rankStamp');
+    
+    // IMAGES
     const elPic = document.getElementById('mob_profilePic'); // The Hexagon Face
-    const elBg = document.getElementById('mob_bgPic');       // The Background Wallpaper (NEW ID)
+    const elBg = document.getElementById('mob_bgPic');       // The Background (NEW)
 
+    // STATS
     const elPoints = document.getElementById('mobPoints');
     const elCoins = document.getElementById('mobCoins');
 
@@ -778,7 +781,7 @@ window.syncMobileDashboard = function() {
         let rawUrl = userProfile.profilePicture;
         let finalUrl = rawUrl;
 
-        // Wix URL Fixer
+        // Wix URL Fixer (Decodes wix:image://... to https://...)
         const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
         
         if (!rawUrl || rawUrl === "" || rawUrl === "undefined") {
