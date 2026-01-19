@@ -203,11 +203,9 @@ async function updateHistory(u) {
         if (loadBtn) loadBtn.style.display = (cleanHist.length > histLimit) ? 'block' : 'none';
         
         const signingPromises = historyToShow.map(async h => {
-            const raw = h.proofUrl || "";
             console.log("RAW:", h.proofUrl);
-
-            const thumbSigned = await getSignedUrl(getOptimizedUrl(raw, 150));
-            const fullSigned  = await getSignedUrl(raw);
+            const thumbSigned = await getSignedUrl(getOptimizedUrl(h.proofUrl, 150));
+            const fullSigned  = await getSignedUrl(h.proofUrl);
 
             return {
                 ...h,
