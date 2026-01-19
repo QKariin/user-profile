@@ -554,15 +554,21 @@
     .setting-label { font-size: 0.7rem; color: #888; margin-bottom: 5px; font-family:'Orbitron'; }
 
     /* LOBBY (SETTINGS) STYLES */
-    .lobby-card {
-        width: 90% !important;
-        padding: 30px 20px !important;
-        background: #050505 !important;
-        border: 1px solid var(--mob-gold);
-        box-shadow: 0 0 50px rgba(197, 160, 89, 0.15);
-    }
-
-    .lobby-header { margin-bottom: 25px; text-align: center; }
+    /* SETTINGS WINDOW SCROLL FIX */
+        .lobby-card {
+            max-height: 75vh !important; /* Never taller than 75% of screen */
+            overflow-y: auto !important; /* Allow scrolling INSIDE the card */
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iPhone */
+            
+            /* Hide Scrollbar */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .lobby-card::-webkit-scrollbar { 
+            display: none; 
+        }
+        
+     .lobby-header { margin-bottom: 25px; text-align: center; }
     .lobby-title { font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--mob-gold); letter-spacing: 4px; border-bottom: 1px solid #333; padding-bottom: 10px; display: inline-block;}
     .lobby-subtitle { font-family: 'Cinzel', serif; font-size: 0.6rem; color: #666; margin-top: 5px; letter-spacing: 2px; }
 
