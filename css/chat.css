@@ -238,7 +238,7 @@
     /* INPUT AREA: Sit ON TOP of Footer */
     .chat-footer {
         position: fixed !important;
-        bottom: 80px !important; /* Sit exactly on the 80px App Footer */
+        bottom: 60px !important; /* Sit exactly on the 80px App Footer */
         left: 0 !important;
         width: 100% !important;
         z-index: 2147483640 !important; /* High Z-index */
@@ -249,15 +249,15 @@
     }
 
     .chat-input {
-        font-size: 16px !important; /* Prevents Zoom on iPhone */
+        font-size: 12px !important; /* Prevents Zoom on iPhone */
         height: 40px !important;
     }
 
     /* CLEAN UP MESSAGES FOR MOBILE */
     .msg {
         max-width: 88% !important;
-        font-size: 0.85rem !important;
-        padding: 6px 12px !important;
+        font-size: 0.65rem !important;
+        padding: 1px 12px !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
