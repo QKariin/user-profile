@@ -426,9 +426,32 @@ window.addEventListener("message", (event) => {
                 renderRewardGrid();
                 if (data.profile.lastWorship) setLastWorshipTime(new Date(data.profile.lastWorship).getTime());
                 setStats(migrateGameStatsToStats(data.profile, stats));
+                // *** DIRECT IMAGE SYNC (DESKTOP + MOBILE) ***
                 if(data.profile.profilePicture) {
+                    const rawUrl = data.profile.profilePicture;
+                    
+                    // 1. Update Desktop (Existing Logic)
                     const picEl = document.getElementById('profilePic');
-                    if(picEl) picEl.src = getOptimizedUrl(data.profile.profilePicture, 150);
+                    if(picEl) picEl.src = getOptimizedUrl(rawUrl, 150);
+        
+                    // 2. Update Mobile (Direct Injection)
+                    const mobPic = document.getElementById('mob_profilePic'); // Hexagon
+                    const mobBg = document.getElementById('mob_bgPic');       // Background
+                    
+                    // Decode Wix URL if needed
+                    let finalUrl = rawUrl;
+                    if (rawUrl.startsWith("wix:image")) {
+                        const uri = rawUrl.split('/')[3].split('#')[0];
+                        finalUrl = `https://static.wixstatic.com/media/${uri}`;
+                    }
+        
+                    if(mobPic) mobPic.src = finalUrl;
+                    if(mobBg) mobBg.src = finalUrl;
+                    
+                    // 3. Force Save to Memory (Safe Way)
+                    if(typeof userProfile !== 'undefined') {
+                        userProfile.profilePicture = rawUrl;
+                    }
                 }
                 updateStats(); 
             }
