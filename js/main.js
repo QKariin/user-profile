@@ -753,7 +753,7 @@ window.triggerKneel = function() {
     }
 };
 
-// 4. DATA SYNC (FIXED: Updates Face AND Background)
+// 4. DATA SYNC (FIXED: MAPS IMAGE_FLD TO BOTH VIEWS)
 window.syncMobileDashboard = function() {
     // 1. Safety Check
     if (!gameStats || !userProfile) return;
@@ -762,7 +762,7 @@ window.syncMobileDashboard = function() {
     const elName = document.getElementById('mob_slaveName');
     const elRank = document.getElementById('mob_rankStamp');
     const elPic = document.getElementById('mob_profilePic'); // The Hexagon Face
-    const elBg = document.getElementById('mob_bgPic');       // The Blurred Wallpaper
+    const elBg = document.getElementById('mob_bgPic');       // The Background Wallpaper
 
     const elPoints = document.getElementById('mobPoints');
     const elCoins = document.getElementById('mobCoins');
@@ -773,12 +773,12 @@ window.syncMobileDashboard = function() {
     if (elPoints) elPoints.innerText = gameStats.points || 0;
     if (elCoins) elCoins.innerText = gameStats.coins || 0;
     
-    // 4. SYNC IMAGES (Face & Background)
+    // 4. SYNC IMAGES (from CMS 'image_fld')
     if (userProfile.profilePicture) {
         let rawUrl = userProfile.profilePicture;
         let finalUrl = rawUrl;
 
-        // Wix URL Fixer
+        // Wix URL Fixer (Decodes wix:image://... to https://...)
         const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
         
         if (!rawUrl || rawUrl === "" || rawUrl === "undefined") {
@@ -789,7 +789,7 @@ window.syncMobileDashboard = function() {
             finalUrl = `https://static.wixstatic.com/media/${uri}`;
         }
 
-        // Apply to Hexagon
+        // Apply to Hexagon (Face)
         if (elPic) elPic.src = finalUrl;
         
         // Apply to Background (Atmosphere)
