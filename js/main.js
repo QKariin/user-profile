@@ -847,9 +847,13 @@ window.toggleMobileView = function(viewName) {
         if (mobRecord) {
             mobRecord.style.display = 'flex';
             if(window.renderGallery) window.renderGallery();
+            console.log("Rendering Gallery from Mobile Record View");
         } else if (history) {
             history.style.display = 'flex';
             if(window.renderGallery) window.renderGallery();
+            console.log("Rendering Gallery from Mobile History View");
+        } else {
+            console.warn("No valid element found for Record/History view.");        
         }
     }
     else if (viewName === 'queen') {
