@@ -294,9 +294,8 @@
         font-size: 16px !important; /* Prevents Zoom on iPhone */
         height: 40px !important;
         font-family: 'Inter', sans-serif !important;
-        opacity: 0.5 !important;
-        transform: scale(0.75)
-    }
+        opacity: 0.3 !important;
+     }
 
     /* CLEAN UP MESSAGES FOR MOBILE */
     .msg {
