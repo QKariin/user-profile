@@ -790,13 +790,38 @@ window.addEventListener("message", (event) => {
             renderWishlist();
         }
 
+        // UPDATED STATUS HANDLER (DESKTOP + MOBILE)
         if (data.type === "UPDATE_DOM_STATUS") {
+            // 1. Desktop Updates
             const badge = document.getElementById('chatStatusBadge');
             const ring = document.getElementById('chatStatusRing');
             const domBadge = document.getElementById('domStatusBadge');
-            if(badge) { badge.innerHTML = data.online ? "ONLINE" : data.text; badge.className = data.online ? "chat-status-text chat-online" : "chat-status-text"; }
+            
+            if(badge) { 
+                badge.innerHTML = data.online ? "ONLINE" : data.text; 
+                badge.className = data.online ? "chat-status-text chat-online" : "chat-status-text"; 
+            }
             if(ring) ring.className = data.online ? "dom-status-ring ring-active" : "dom-status-ring ring-inactive";
-            if(domBadge) { domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; domBadge.className = data.online ? "dom-status status-online" : "dom-status"; }
+            if(domBadge) { 
+                domBadge.innerHTML = data.online ? '<span class="status-dot"></span> ONLINE' : `<span class="status-dot"></span> ${data.text}`; 
+                domBadge.className = data.online ? "dom-status status-online" : "dom-status"; 
+            }
+
+            // 2. Mobile Updates (The New Header)
+            const mobText = document.getElementById('mobChatStatusText');
+            const mobDot = document.getElementById('mobChatOnlineDot');
+            const hudDot = document.getElementById('hudDomStatus'); // The Dashboard Circle
+
+            if(mobText) {
+                mobText.innerText = data.online ? "ONLINE NOW" : data.text.toUpperCase();
+                mobText.style.color = data.online ? "#00ff00" : "#888";
+            }
+            
+            const dotClass = data.online ? 'status-dot online' : 'status-dot'; // Reuse class logic
+            if(mobDot) mobDot.className = dotClass;
+            
+            // Update Dashboard HUD too
+            if(hudDot) hudDot.className = data.online ? 'hud-status-dot online' : 'hud-status-dot offline';
         }
 
         if (data.type === "UPDATE_Q_FEED") {
