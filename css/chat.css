@@ -200,7 +200,7 @@
 
     /* MOBILE CHAT HEADER */
     .mob-chat-header {
-        position: absolute; /* Sticks to top of chat card */
+        position: fixed; /* Sticks to top of chat card */
         top: 0; left: 0; width: 100%; height: 65px;
         background: rgba(10, 10, 10, 0.95);
         border-bottom: 1px solid #333;
