@@ -1,5 +1,3 @@
-// js/state.js - CENTRAL DATA STORE
-
 // --- 1. DATA STORAGE ---
 export let gameStats = { 
     totalTasks: 0, 
@@ -7,10 +5,8 @@ export let gameStats = {
     currentStreak: 0, 
     points: 0, 
     coins: 0,
-    kneelCount: 0,      
-    todayKneeling: 0,
-    taskdom_streak: 0,      // Sync naming
-    taskdom_total_tasks: 0  // Sync naming
+    kneelCount: 0,      // Added for the Kneel button
+    todayKneeling: 0    // Added for the Kneel button
 };
 
 export let stats = { 
@@ -28,13 +24,7 @@ export let userProfile = {
     name: "Slave", 
     hierarchy: "Loading...", 
     avatar: "",
-    joined: null,
-    
-    // *** NEW FIELDS (INITIALIZED) ***
-    profilePicture: "",      // For the Hexagon/Background
-    kneelHistory: null,      // For the 24-Square Grid
-    routine: "",             // For Daily Routine Logic
-    kinks: ""                // For Kink List
+    joined: null 
 };
 
 // --- NEW: REWARD SYSTEM DATA ---
@@ -70,10 +60,9 @@ export let lastWorshipTime = 0;
 export let currentHistoryIndex = 0;
 export let touchStartX = 0;
 
-// --- 3. SETTERS (THE ONLY WAY TO UPDATE STATE SAFELY) ---
-
+// js/state.js - THE ONLY WAY TO RECONNECT DATA
 export function setGameStats(newStats) {
-    Object.assign(gameStats, newStats); 
+    Object.assign(gameStats, newStats); // Correct: Updates the existing brain
 }
 
 export function setStats(newStats) {
@@ -91,7 +80,7 @@ export function setGalleryData(data) { galleryData = data; }
 export function setWishlistItems(items) { WISHLIST_ITEMS = items; }
 export function setCmsHierarchyData(data) { cmsHierarchyData = data; }
 
-// SYSTEM SETTERS
+// CRITICAL: These were missing and caused your crash!
 export function setCooldownInterval(val) { cooldownInterval = val; }
 export function setTaskJustFinished(val) { taskJustFinished = val; }
 export function setIgnoreBackendUpdates(val) { ignoreBackendUpdates = val; }
@@ -110,7 +99,7 @@ export function setIsLocked(val) { isLocked = val; }
 export function setCurrentHistoryIndex(val) { currentHistoryIndex = val; }
 export function setTouchStartX(val) { touchStartX = val; }
 
-// REWARD SETTERS
+// --- NEW: REWARD SETTERS ---
 export function setActiveRevealMap(val) { activeRevealMap = val || []; }
 export function setVaultItems(val) { vaultItems = val || []; }
 export function setCurrentLibraryMedia(val) { currentLibraryMedia = val || ""; }
