@@ -494,6 +494,7 @@ window.addEventListener("message", (event) => {
                     memberId: data.profile.memberId || "",
                     joined: data.profile.joined,
                     profilePicture: data.profile.profilePicture // <--- ADD THIS LINE
+                    kneelHistory: data.profile.kneelHistory 
                 });
                 
                 if (data.profile.taskQueue) setTaskQueue(data.profile.taskQueue);
@@ -699,48 +700,40 @@ function updateStats() {
         }
     }
 
-// 5. FILL GRID (Safe Midnight Reset)
+// --- B. TIME-BASED GRID (CMS VERSION) ---
     const grid = document.getElementById('mob_streakGrid');
     if(grid) {
         grid.innerHTML = '';
         
-        let todayCount = 0;
-        const totalCount = gameStats.kneelCount || 0;
-        
-        // 1. Get the timestamps
-        const lastDate = userProfile.lastWorship ? new Date(userProfile.lastWorship) : null;
+        let loggedHours = [];
         const now = new Date();
 
-        // 2. The "Is Today" Check
-        let isToday = false;
-        if (lastDate) {
-            // Compare "Mon Jan 19 2026" strings. Ignores timezones/hours.
-            isToday = lastDate.toDateString() === now.toDateString();
-        }
-        
-        // 3. The "Locked" Safety Check
-        // If you are currently locked (cooldown), you MUST have kneeled today.
-        // This fixes glitches where the date might be slightly off.
-        const isLockedState = document.querySelector('.mob-kneel-text') && 
-                              document.querySelector('.mob-kneel-text').innerText.includes("LOCKED");
-                              
-        if (isToday || isLockedState) {
-            // It is today. Show the progress (0-24).
-            todayCount = totalCount % 24;
-            
-            // Edge case: If count is 24, 48, etc, mod is 0, but we want to show full if just finished?
-            // For now, let's stick to the cycle.
-            if (todayCount === 0 && totalCount > 0) todayCount = 24; 
-        } else {
-            // It was yesterday (or older). Reset visuals to 0.
-            todayCount = 0;
+        // 1. Read from Backend Data
+        if (userProfile.kneelHistory) {
+            try {
+                const historyObj = JSON.parse(userProfile.kneelHistory);
+                // Only use the hours if the date matches Today
+                if (historyObj.date === now.toDateString()) {
+                    loggedHours = historyObj.hours || [];
+                }
+            } catch(e) { console.error("Grid parse error", e); }
         }
 
-        // 4. Render 24 Micro-Squares
+        // 2. Render 24 Hour Squares
         for(let i=0; i<24; i++) {
             const sq = document.createElement('div');
-            // If i is less than todayCount, light it up
-            sq.className = 'streak-sq' + (i < todayCount ? ' active' : '');
+            sq.className = 'streak-sq';
+            
+            // Active: If this hour is in the list
+            if (loggedHours.includes(i)) {
+                sq.classList.add('active');
+            }
+            // Failed: If the hour has passed and it's empty
+            else if (i < now.getHours()) {
+                sq.style.opacity = "0.3"; 
+                sq.style.borderColor = "#333";
+            }
+            
             grid.appendChild(sq);
         }
     }
