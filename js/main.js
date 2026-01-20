@@ -958,13 +958,18 @@ window.triggerKneel = function() {
     }
 };
 
-// 4. DATA SYNC (COMPLETE: Dashboard, Grid, & Queen Menu)
+// 4. DATA SYNC (COMPLETE & FIXED)
 window.syncMobileDashboard = function() {
+    // 1. Safety Check
     if (!gameStats || !userProfile) return;
 
-    // --- 1. IDENTITY & STATS ---
+    // --- A. IDENTITY & IMAGES ---
     const elName = document.getElementById('mob_slaveName');
     const elRank = document.getElementById('mob_rankStamp');
+    const elPic = document.getElementById('mob_profilePic');
+    const elBg = document.getElementById('mob_bgPic');
+    const hudPic = document.getElementById('hudSlavePic');
+
     const elPoints = document.getElementById('mobPoints');
     const elCoins = document.getElementById('mobCoins');
 
@@ -972,14 +977,9 @@ window.syncMobileDashboard = function() {
     if (elRank) elRank.innerText = userProfile.hierarchy || "INITIATE";
     if (elPoints) elPoints.innerText = gameStats.points || 0;
     if (elCoins) elCoins.innerText = gameStats.coins || 0;
-    
-    // --- 2. IMAGES (Face, Background, HUD) ---
-    const elPic = document.getElementById('mob_profilePic');
-    const elBg = document.getElementById('mob_bgPic');
-    const hudPic = document.getElementById('hudSlavePic');
 
+    // Image Logic
     let finalUrl = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
-    
     if (userProfile.profilePicture && userProfile.profilePicture.length > 5) {
         let rawUrl = userProfile.profilePicture;
         if (rawUrl.startsWith("wix:image")) {
@@ -993,14 +993,22 @@ window.syncMobileDashboard = function() {
     if (elBg) elBg.src = finalUrl;
     if (hudPic) hudPic.src = finalUrl;
 
-    // --- 3. THE GRID (24-Hour Timeline) ---
+    // Stats Drawer
+    const mobStreak = document.getElementById('mobStreak');
+    const mobTotal = document.getElementById('mobTotal');
+    const mobKneels = document.getElementById('mobKneels');
+    if (mobStreak) mobStreak.innerText = gameStats.taskdom_streak || 0;
+    if (mobTotal) mobTotal.innerText = gameStats.taskdom_total_tasks || 0;
+    if (mobKneels) mobKneels.innerText = gameStats.kneelCount || 0;
+
+    // --- B. TIME-BASED GRID (24h Timeline) ---
     const grid = document.getElementById('mob_streakGrid');
     if(grid) {
         grid.innerHTML = '';
         let loggedHours = [];
         const now = new Date();
 
-        // Try to read history from CMS
+        // Read History
         if (userProfile.kneelHistory) {
             try {
                 const historyObj = JSON.parse(userProfile.kneelHistory);
@@ -1010,15 +1018,11 @@ window.syncMobileDashboard = function() {
             } catch(e) { console.error("Grid parse error", e); }
         }
 
+        // Render Squares
         for(let i=0; i<24; i++) {
             const sq = document.createElement('div');
             sq.className = 'streak-sq';
-            
-            // Gold if logged
-            if (loggedHours.includes(i)) {
-                sq.classList.add('active');
-            } 
-            // Dim if hour passed & empty
+            if (loggedHours.includes(i)) sq.classList.add('active');
             else if (i < now.getHours()) {
                 sq.style.opacity = "0.3"; 
                 sq.style.borderColor = "#333";
@@ -1027,7 +1031,7 @@ window.syncMobileDashboard = function() {
         }
     }
     
-    // --- 4. OPERATIONS CARD (Status) ---
+    // --- C. OPERATIONS CARD (Status) ---
     const activeRow = document.getElementById('activeTimerRow');
     if (activeRow) {
         const isWorking = !activeRow.classList.contains('hidden');
@@ -1049,34 +1053,60 @@ window.syncMobileDashboard = function() {
         }
     }
 
-    // --- 5. QUEEN'S MENU UPDATES (This was missing) ---
+    // --- D. QUEEN'S MENU (TIME GATED ROUTINE) ---
     
-    // A. Kneel Progress Bar
+    // 1. Kneel Progress
     const kneelFill = document.getElementById('kneelDailyFill');
     const kneelText = document.getElementById('kneelDailyText');
     if (kneelFill && kneelText) {
-        // Fallback to modulo if todayKneeling isn't tracked yet
         const count = gameStats.todayKneeling || (gameStats.kneelCount % 8) || 0; 
         const goal = 8;
         const pct = Math.min(100, (count / goal) * 100);
-        
         kneelFill.style.width = pct + "%";
         kneelText.innerText = `${count} / ${goal}`;
     }
 
-    // B. Routine Button Text
+    // 2. Routine Button Logic
     const routineBtn = document.getElementById('btnDailyRoutine');
     const noRoutineMsg = document.getElementById('noRoutineMsg');
     
     if (userProfile.routine && userProfile.routine.length > 2) {
-        if (routineBtn) {
-            routineBtn.classList.remove('hidden');
-            routineBtn.innerText = "SUBMIT: " + userProfile.routine.toUpperCase();
+        // Time & Done Check
+        const now = new Date();
+        const currentHour = now.getHours(); 
+        const isTime = currentHour >= 7; // 7:00 AM
+        const lastDoneDate = localStorage.getItem('routine_done_date');
+        const isDoneToday = lastDoneDate === now.toDateString();
+
+        if (isTime && !isDoneToday) {
+            // SHOW
+            if (routineBtn) {
+                routineBtn.classList.remove('hidden');
+                routineBtn.innerText = "SUBMIT: " + userProfile.routine.toUpperCase();
+            }
+            if (noRoutineMsg) noRoutineMsg.style.display = 'none';
+        } else {
+            // HIDE
+            if (routineBtn) routineBtn.classList.add('hidden');
+            if (noRoutineMsg) {
+                noRoutineMsg.style.display = 'block';
+                if (isDoneToday) {
+                    noRoutineMsg.innerText = "DUTY COMPLETED FOR TODAY";
+                    noRoutineMsg.style.color = "#00ff00";
+                } else {
+                    noRoutineMsg.innerText = "AWAITING 07:00 HOURS";
+                    noRoutineMsg.style.color = "#666";
+                }
+            }
         }
-        if (noRoutineMsg) noRoutineMsg.style.display = 'none';
     } else {
+        // No Routine
         if (routineBtn) routineBtn.classList.add('hidden');
-        if (noRoutineMsg) noRoutineMsg.style.display = 'block';
+        if (noRoutineMsg) {
+            noRoutineMsg.style.display = 'block';
+            noRoutineMsg.innerText = "NO ROUTINE ASSIGNED";
+            noRoutineMsg.style.color = "#666";
+        }
     }
 };
 
