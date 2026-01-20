@@ -897,6 +897,24 @@ window.toggleMobileView = function(viewName) {
     document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
 };
 
+// QUEEN'S MENU NAVIGATION
+window.openQueenMenu = function() {
+    const menu = document.getElementById('queenOverlay');
+    if (menu) {
+        menu.classList.remove('hidden');
+        menu.style.display = 'flex';
+        // Force a data refresh so the progress bar updates
+        if(window.syncMobileDashboard) window.syncMobileDashboard();
+    }
+};
+
+window.closeQueenMenu = function() {
+    const menu = document.getElementById('queenOverlay');
+    if (menu) {
+        menu.classList.add('hidden');
+        menu.style.display = 'none';
+    }
+};
 // 3. KNEEL BUTTON
 window.triggerKneel = function() {
     const sidebar = document.querySelector('.layout-left');
@@ -910,89 +928,76 @@ window.triggerKneel = function() {
     }
 };
 
-// 4. DATA SYNC (FIXED: Updates Face AND Background)
+// 4. DATA SYNC (COMPLETE: Dashboard, Grid, & Queen Menu)
 window.syncMobileDashboard = function() {
-    // 1. Safety Check
     if (!gameStats || !userProfile) return;
 
-    // 2. Target IDs
+    // --- 1. IDENTITY & STATS ---
     const elName = document.getElementById('mob_slaveName');
     const elRank = document.getElementById('mob_rankStamp');
-    
-    // IMAGES
-    const elPic = document.getElementById('mob_profilePic'); // The Hexagon Face
-    const elBg = document.getElementById('mob_bgPic');       // The Background (NEW)
-
-    // STATS
     const elPoints = document.getElementById('mobPoints');
     const elCoins = document.getElementById('mobCoins');
 
-    // 3. Fill Text Data
     if (elName) elName.innerText = userProfile.name || "SLAVE";
     if (elRank) elRank.innerText = userProfile.hierarchy || "INITIATE";
     if (elPoints) elPoints.innerText = gameStats.points || 0;
     if (elCoins) elCoins.innerText = gameStats.coins || 0;
     
-    // 4. SYNC IMAGES (Face & Background)
-    if (userProfile.profilePicture) {
-        let rawUrl = userProfile.profilePicture;
-        let finalUrl = rawUrl;
+    // --- 2. IMAGES (Face, Background, HUD) ---
+    const elPic = document.getElementById('mob_profilePic');
+    const elBg = document.getElementById('mob_bgPic');
+    const hudPic = document.getElementById('hudSlavePic');
 
-        // Wix URL Fixer (Decodes wix:image://... to https://...)
-        const defaultPic = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
-        
-        if (!rawUrl || rawUrl === "" || rawUrl === "undefined") {
-            finalUrl = defaultPic;
-        } 
-        else if (rawUrl.startsWith("wix:image")) {
+    let finalUrl = "https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png";
+    
+    if (userProfile.profilePicture && userProfile.profilePicture.length > 5) {
+        let rawUrl = userProfile.profilePicture;
+        if (rawUrl.startsWith("wix:image")) {
             const uri = rawUrl.split('/')[3].split('#')[0]; 
             finalUrl = `https://static.wixstatic.com/media/${uri}`;
+        } else {
+            finalUrl = rawUrl;
         }
-
-        // Apply to Hexagon
-        if (elPic) elPic.src = finalUrl;
-        
-        // Apply to Background (Atmosphere)
-        if (elBg) elBg.src = finalUrl;
-        
-        // Apply to HUD Small Circle (Settings Button)
-        const hud = document.getElementById('hudSlavePic');
-        if (hud) hud.src = finalUrl;
     }
+    if (elPic) elPic.src = finalUrl;
+    if (elBg) elBg.src = finalUrl;
+    if (hudPic) hudPic.src = finalUrl;
 
-    // 5. FILL 24-HOUR GRID (Timeline)
+    // --- 3. THE GRID (24-Hour Timeline) ---
     const grid = document.getElementById('mob_streakGrid');
     if(grid) {
         grid.innerHTML = '';
-        
-        // Data Source: Ideally 'gameStats.kneelHours' (Array of hours), 
-        // fallback to 'kneelCount' for now.
-        const count = gameStats.kneelCount || 0;
-        
-        // Generate 24 Squares (00 to 23)
+        let loggedHours = [];
+        const now = new Date();
+
+        // Try to read history from CMS
+        if (userProfile.kneelHistory) {
+            try {
+                const historyObj = JSON.parse(userProfile.kneelHistory);
+                if (historyObj.date === now.toDateString()) {
+                    loggedHours = historyObj.hours || [];
+                }
+            } catch(e) { console.error("Grid parse error", e); }
+        }
+
         for(let i=0; i<24; i++) {
             const sq = document.createElement('div');
             sq.className = 'streak-sq';
             
-            // LOGIC: If we have specific hours, check them.
-            // If not, just fill the first N squares based on count.
-            if (i < count) {
-                sq.classList.add('active'); // Gold
-            } else {
-                // Determine if this hour has passed (Failure check)
-                const currentHour = new Date().getHours();
-                if (i < currentHour) {
-                    // It's 2 PM, this is 9 AM, and it's empty -> FAILURE
-                    sq.style.borderColor = "#333"; // Or "#ff003c" for red shame
-                    sq.style.opacity = "0.5";
-                }
+            // Gold if logged
+            if (loggedHours.includes(i)) {
+                sq.classList.add('active');
+            } 
+            // Dim if hour passed & empty
+            else if (i < now.getHours()) {
+                sq.style.opacity = "0.3"; 
+                sq.style.borderColor = "#333";
             }
-            
             grid.appendChild(sq);
         }
     }
     
-    // 6. Update Operations Card
+    // --- 4. OPERATIONS CARD (Status) ---
     const activeRow = document.getElementById('activeTimerRow');
     if (activeRow) {
         const isWorking = !activeRow.classList.contains('hidden');
@@ -1012,6 +1017,36 @@ window.syncMobileDashboard = function() {
             if(timer) timer.classList.add('hidden');
             if(btn) btn.classList.remove('hidden');
         }
+    }
+
+    // --- 5. QUEEN'S MENU UPDATES (This was missing) ---
+    
+    // A. Kneel Progress Bar
+    const kneelFill = document.getElementById('kneelDailyFill');
+    const kneelText = document.getElementById('kneelDailyText');
+    if (kneelFill && kneelText) {
+        // Fallback to modulo if todayKneeling isn't tracked yet
+        const count = gameStats.todayKneeling || (gameStats.kneelCount % 8) || 0; 
+        const goal = 8;
+        const pct = Math.min(100, (count / goal) * 100);
+        
+        kneelFill.style.width = pct + "%";
+        kneelText.innerText = `${count} / ${goal}`;
+    }
+
+    // B. Routine Button Text
+    const routineBtn = document.getElementById('btnDailyRoutine');
+    const noRoutineMsg = document.getElementById('noRoutineMsg');
+    
+    if (userProfile.routine && userProfile.routine.length > 2) {
+        if (routineBtn) {
+            routineBtn.classList.remove('hidden');
+            routineBtn.innerText = "SUBMIT: " + userProfile.routine.toUpperCase();
+        }
+        if (noRoutineMsg) noRoutineMsg.style.display = 'none';
+    } else {
+        if (routineBtn) routineBtn.classList.add('hidden');
+        if (noRoutineMsg) noRoutineMsg.style.display = 'block';
     }
 };
 
