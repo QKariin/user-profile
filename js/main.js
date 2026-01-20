@@ -636,31 +636,36 @@ window.addEventListener("message", (event) => {
     } catch(err) { console.error("Main error:", err); }
 });
 
-// --- EXPORTS & HELPERS ---
 window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
         
-        // Check if this is the Routine Upload button
+        // 1. Check if this is the Routine Upload
         const isRoutine = inputElement.id === 'routineUpload';
         
         if (isRoutine) {
             // Visual Feedback
             const btn = document.getElementById('btnDailyRoutine');
-            if(btn) { btn.innerText = "VERIFYING..."; btn.style.opacity = "0.5"; }
+            if(btn) { 
+                btn.innerText = "VERIFYING..."; 
+                btn.style.opacity = "0.5"; 
+            }
             
-            // Tell Backend to mark as done
+            // 2. Tell Backend: Mark Routine as Done (Update History)
+            // This triggers the 'COMPLETE_ROUTINE' logic in profile.js
             window.parent.postMessage({ type: "COMPLETE_ROUTINE" }, "*");
+
+            // 3. Upload the file (Normal flow)
+            if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
             
-            // Trigger Notification
+            // 4. Notify
             if(window.showSystemNotification) window.showSystemNotification("EVIDENCE SENT", "Daily routine logged.");
+
         } else {
-            // Standard Button Feedback
+            // Standard Task Upload
             const btn = document.getElementById('btnUpload');
             if (btn) { btn.innerHTML = '...'; btn.style.background = '#333'; btn.style.color = '#ffd700'; btn.style.cursor = 'wait'; }
+            if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
         }
-
-        // Process the File Upload (Standard)
-        if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
     }
 };
 
@@ -1082,8 +1087,9 @@ window.syncMobileDashboard = function() {
     // --- D. QUEEN'S MENU (TIME GATED ROUTINE) ---
     
 // --- D. QUEEN'S MENU UPDATES ---
-
-    // 1. Kneel Progress
+// --- 5. QUEEN'S MENU UPDATES ---
+    
+    // A. KNEEL PROGRESS (Goal: 8)
     const kneelFill = document.getElementById('kneelDailyFill');
     const kneelText = document.getElementById('kneelDailyText');
     if (kneelFill && kneelText) {
@@ -1094,60 +1100,62 @@ window.syncMobileDashboard = function() {
         kneelText.innerText = `${count} / ${goal}`;
     }
 
-    // 2. Routine Button Logic (CMS BASED)
+    // B. DAILY ROUTINE LOGIC (The Fix)
+    const routineDisplay = document.getElementById('mobRoutineDisplay');
     const routineBtn = document.getElementById('btnDailyRoutine');
-    const noRoutineMsg = document.getElementById('noRoutineMsg');
+    const routineCheck = document.getElementById('mobRoutineCheck');
     
+    // 1. Check if a Routine exists in CMS
     if (userProfile.routine && userProfile.routine.length > 2) {
-        // Time Check
+        
+        // Always show the name
+        if(routineDisplay) {
+            routineDisplay.innerText = userProfile.routine.toUpperCase();
+            routineDisplay.style.color = "#fff";
+        }
+
+        // 2. Check Time & Completion
         const now = new Date();
         const currentHour = now.getHours(); 
-        const isTime = currentHour >= 7; 
-        
-        // Completion Check (FROM CMS JSON)
+        const isTime = currentHour >= 7; // 7:00 AM start
+
+        // Check CMS History (kneelHistory JSON)
         let isDoneToday = false;
         if (userProfile.kneelHistory) {
             try {
                 const hObj = JSON.parse(userProfile.kneelHistory);
-                // Check if date matches today AND routineDone is true
                 if (hObj.date === now.toDateString() && hObj.routineDone === true) {
                     isDoneToday = true;
                 }
             } catch(e) {}
         }
 
-        if (isTime && !isDoneToday) {
-            // SHOW BUTTON
-            if (routineBtn) {
-                routineBtn.classList.remove('hidden');
-                routineBtn.innerText = "SUBMIT: " + userProfile.routine.toUpperCase();
-                routineBtn.style.opacity = "1";
-            }
-            if (noRoutineMsg) noRoutineMsg.style.display = 'none';
-        } else {
-            // HIDE BUTTON
-            if (routineBtn) routineBtn.classList.add('hidden');
-            
-            if (noRoutineMsg) {
-                noRoutineMsg.style.display = 'block';
-                if (isDoneToday) {
-                    noRoutineMsg.innerText = "DUTY COMPLETED FOR TODAY";
-                    noRoutineMsg.style.color = "#00ff00";
-                } else {
-                    noRoutineMsg.innerText = "AWAITING 07:00 HOURS";
-                    noRoutineMsg.style.color = "#666";
-                }
+        // 3. Toggle UI States
+        if (isDoneToday) {
+            // STATE: DONE
+            if(routineBtn) routineBtn.classList.add('hidden');
+            if(routineCheck) routineCheck.classList.remove('hidden');
+        } 
+        else if (isTime) {
+            // STATE: TODO (Show Button)
+            if(routineBtn) routineBtn.classList.remove('hidden');
+            if(routineCheck) routineCheck.classList.add('hidden');
+        } 
+        else {
+            // STATE: TOO EARLY (Hide Both, Show Text)
+            if(routineBtn) routineBtn.classList.add('hidden');
+            if(routineCheck) routineCheck.classList.add('hidden');
+            if(routineDisplay) {
+                routineDisplay.innerText = "AWAITING 07:00";
+                routineDisplay.style.color = "#666";
             }
         }
+
     } else {
-        // No Routine Assigned
-        if (routineBtn) routineBtn.classList.add('hidden');
-        if (noRoutineMsg) {
-            noRoutineMsg.style.display = 'block';
-            noRoutineMsg.innerText = "NO ROUTINE ASSIGNED";
-            noRoutineMsg.style.color = "#666";
-        }
-    }
+        // STATE: NO ROUTINE ASSIGNED
+        if(routineDisplay) routineDisplay.innerText = "NO ROUTINE ASSIGNED";
+        if(routineBtn) routineBtn.classList.add('hidden');
+        if(routineCheck) routineCheck.classList.add('hidden');
     }
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
