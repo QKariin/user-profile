@@ -1195,29 +1195,29 @@ window.syncMobileDashboard = function() {
         });
     }
 
-// 2. BUILD FOOTER (FULL WIDTH 5-SLOT)
+// 2. BUILD FOOTER (FORCE REBUILD VERSION)
     function buildAppFooter() {
-        if (document.getElementById('app-mode-footer')) return;
+        // 1. KILL THE GHOST (Delete any existing footer)
+        const oldFooter = document.getElementById('app-mode-footer');
+        if (oldFooter) oldFooter.remove();
         
+        // 2. CREATE FRESH
         const footer = document.createElement('div');
         footer.id = 'app-mode-footer';
         
         Object.assign(footer.style, {
             display: 'flex', 
-            justifyContent: 'space-around', // Equal spacing
+            justifyContent: 'space-around', 
             alignItems: 'center',
-            
-            // FULL WIDTH STYLE
             position: 'fixed', 
             bottom: '0', 
             left: '0', 
             width: '100%', 
-            height: '60px',
-            
+            height: '80px',
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
             paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: '2147483647', 
-            borderTop: '1px solid rgba(197, 160, 89, 0.3)', // Gold Border
+            borderTop: '1px solid rgba(197, 160, 89, 0.3)',
             backdropFilter: 'blur(10px)', 
             pointerEvents: 'auto', 
             touchAction: 'none'
@@ -1225,23 +1225,19 @@ window.syncMobileDashboard = function() {
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-        // STANDARD BUTTON STYLE (Width = 20% because 100% / 5 buttons)
         const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer;";
-        
-        // ACTIVE/HIGHLIGHT STYLE (For the Middle Chat Button)
         const chatStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; text-shadow: 0 0 10px rgba(255,0,60,0.4);";
 
-       footer.innerHTML = `
-<button onclick="window.toggleMobileView('home')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">◈</span><span>PROFILE</span></button>
-<button onclick="window.toggleMobileView('record')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">▦</span><span>RECORD</span></button>
-<button onclick="window.toggleMobileView('chat')" style="${chatStyle};display:inline-flex;align-items:center;justify-content:center;padding:0;min-width:60px;">
+        footer.innerHTML = `
+            <button class="mf-btn" onclick="window.toggleMobileView('home')" style="${btnStyle}"><span style="font-size:1.4rem;">◈</span><span>PROFILE</span></button>
+            <button class="mf-btn" onclick="window.toggleMobileView('record')" style="${btnStyle}"><span style="font-size:1.4rem;">▦</span><span>RECORD</span></button>
+            <button onclick="window.toggleMobileView('chat')" style="${chatStyle};display:inline-flex;align-items:center;justify-content:center;padding:0;min-width:60px;">
 <img src="https://static.wixstatic.com/media/ce3e5b_19faff471a434690b7a40aacf5bf42c4~mv2.png" alt="Avatar" style="width:68px;height:68px;border-radius:50%;object-fit:cover;border:1px solid #ff003c;display:block;">
 </button>
-<button onclick="window.toggleMobileView('queen')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">♛</span><span>QUEEN</span></button>
-<button onclick="window.toggleMobileView('global')" style="${btnStyle}">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-<span>GLOBAL</span></button>`;
-document.body.appendChild(footer);
+            <button class="mf-btn" onclick="window.toggleMobileView('queen')" style="${btnStyle}"><span style="font-size:1.4rem;">♛</span><span>QUEEN</span></button>
+            <button class="mf-btn" onclick="window.toggleMobileView('global')" style="${btnStyle}"><span style="font-size:1.4rem;">🌐</span><span>GLOBAL</span></button>
+        `;
+        document.body.appendChild(footer);
     }
 
     // 3. RUN
