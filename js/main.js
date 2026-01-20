@@ -1,7 +1,6 @@
 
 
 
-
 // main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -172,302 +171,599 @@ Bridge.listen((data) => {
 });
 
 // =========================================
+
 // NEW: SETTINGS LOGIC (FIXED ROUTINE CRASH)
+
 // =========================================
 
+
+
 let currentActionType = "";
+
 let currentActionCost = 0;
+
 let selectedRoutineValue = ""; // <--- NEW VARIABLE TO STORE SELECTION
 
+
+
 // 1. NAVIGATION
+
 window.openLobby = function() {
+
     document.getElementById('lobbyOverlay').classList.remove('hidden');
+
     window.backToLobbyMenu();
+
 };
+
+
 
 window.closeLobby = function() {
+
     document.getElementById('lobbyOverlay').classList.add('hidden');
+
 };
+
+
 
 window.backToLobbyMenu = function() {
+
     document.getElementById('lobbyMenu').classList.remove('hidden');
+
     document.getElementById('lobbyActionView').classList.add('hidden');
+
 };
+
+
 
 // 2. SETUP ACTION SCREEN
+
 let selectedKinks = new Set(); // Store selections
 
+
+
 window.showLobbyAction = function(type) {
+
     currentActionType = type;
+
     
+
     const prompt = document.getElementById('lobbyPrompt');
+
     const input = document.getElementById('lobbyInputText');
+
     const fileBtn = document.getElementById('lobbyInputFileBtn');
+
     const routineArea = document.getElementById('routineSelectionArea');
+
     const kinkArea = document.getElementById('kinkSelectionArea'); // NEW
+
     const costDisplay = document.getElementById('lobbyCostDisplay');
+
+
 
     // Reset UI
+
     input.classList.add('hidden');
+
     fileBtn.classList.add('hidden');
+
     routineArea.classList.add('hidden');
+
     if(kinkArea) kinkArea.classList.add('hidden');
+
     
+
     // Switch View
+
     document.getElementById('lobbyMenu').classList.add('hidden');
+
     document.getElementById('lobbyActionView').classList.remove('hidden');
 
+
+
     if (type === 'name') {
+
         prompt.innerText = "Enter your new name.";
+
         input.classList.remove('hidden');
+
         currentActionCost = 100;
+
     } 
+
     else if (type === 'photo') {
+
         prompt.innerText = "Upload a new profile picture.";
+
         fileBtn.classList.remove('hidden');
+
         currentActionCost = 500;
-    }
-    else if (type === 'limits') {
-        prompt.innerText = "Define your hard limits.";
-        input.classList.remove('hidden');
-        currentActionCost = 200;
-    }
-    else if (type === 'routine') {
-        prompt.innerText = "Select a Daily Routine.";
-        routineArea.classList.remove('hidden');
-        document.getElementById('routineDropdown').value = "Morning Kneel";
-        window.checkRoutineDropdown();
-        return; 
-    }
-    // *** NEW KINK LOGIC ***
-    else if (type === 'kinks') {
-        prompt.innerText = "Select your perversions.";
-        if(kinkArea) {
-            kinkArea.classList.remove('hidden');
-            renderKinkGrid();
-        }
-        currentActionCost = 0;
+
     }
 
+    else if (type === 'limits') {
+
+        prompt.innerText = "Define your hard limits.";
+
+        input.classList.remove('hidden');
+
+        currentActionCost = 200;
+
+    }
+
+    else if (type === 'routine') {
+
+        prompt.innerText = "Select a Daily Routine.";
+
+        routineArea.classList.remove('hidden');
+
+        document.getElementById('routineDropdown').value = "Morning Kneel";
+
+        window.checkRoutineDropdown();
+
+        return; 
+
+    }
+
+    // *** NEW KINK LOGIC ***
+
+    else if (type === 'kinks') {
+
+        prompt.innerText = "Select your perversions.";
+
+        if(kinkArea) {
+
+            kinkArea.classList.remove('hidden');
+
+            renderKinkGrid();
+
+        }
+
+        currentActionCost = 0;
+
+    }
+
+
+
     costDisplay.innerText = currentActionCost;
+
 };
+
+
 
 // NEW: RENDER KINK GRID
+
 function renderKinkGrid() {
+
     const grid = document.getElementById('kinkGrid');
+
     if(!grid) return;
+
     grid.innerHTML = ""; // Clear
+
     selectedKinks.clear(); // Reset selection
 
+
+
     KINK_LIST.forEach(kink => {
+
         const btn = document.createElement('div');
+
         btn.className = "routine-tile";
+
         btn.innerText = kink.toUpperCase();
+
         btn.onclick = () => toggleKinkSelection(btn, kink);
+
         grid.appendChild(btn);
+
     });
+
 }
 
+
+
 // NEW: TOGGLE SELECTION
+
 window.toggleKinkSelection = function(el, value) {
+
     if (selectedKinks.has(value)) {
+
         selectedKinks.delete(value);
+
         el.classList.remove('selected');
+
     } else {
+
         selectedKinks.add(value);
+
         el.classList.add('selected');
+
     }
+
     
+
     // Update Price (100 per kink)
+
     currentActionCost = selectedKinks.size * 100;
+
     document.getElementById('lobbyCostDisplay').innerText = currentActionCost;
+
 };
+
+
 
 // 3. HANDLE ROUTINE TILE SELECTION (FIXED)
+
 window.selectRoutineItem = function(el, value) {
+
     // 1. Visually deselect all others
+
     document.querySelectorAll('.routine-tile').forEach(t => t.classList.remove('selected'));
+
     
+
     // 2. Select clicked
+
     el.classList.add('selected');
+
     
+
     // 3. Save Value to Variable (Not Element)
+
     selectedRoutineValue = value;
 
+
+
     // 4. Handle Logic
+
     const input = document.getElementById('routineCustomInput');
+
     const costDisplay = document.getElementById('lobbyCostDisplay');
+
     
+
     if (value === 'custom') {
+
         input.classList.remove('hidden');
+
         currentActionCost = 2000;
+
     } else {
+
         input.classList.add('hidden');
+
         currentActionCost = 1000;
+
     }
+
     
+
     costDisplay.innerText = currentActionCost;
+
 };
+
+
 
 // 4. EXECUTE ACTION (FIXED ROUTINE SELECTION)
+
 window.confirmLobbyAction = function() {
+
     // 1. Check Funds
+
     if (gameStats.coins < currentActionCost) {
+
         window.triggerPoverty();
+
         return;
+
     }
+
+
 
     let payload = "";
+
     let notifyTitle = "SYSTEM UPDATE";
+
     let notifyText = "Changes saved.";
 
+
+
     // --- A. ROUTINE LOGIC (THE FIX) ---
+
     if (currentActionType === 'routine') {
+
         // USE THE GLOBAL VARIABLE FROM TILE SELECTION
+
         let taskName = selectedRoutineValue; 
+
         
+
         // If Custom, read the input box
+
         if (taskName === 'custom') {
+
             taskName = document.getElementById('routineCustomInput').value;
+
         }
+
         
+
         // If still empty, stop here
+
         if(!taskName) return;
 
+
+
         notifyTitle = "PROTOCOL ASSIGNED";
+
         notifyText = taskName.toUpperCase();
 
+
+
         // Send to Wix
+
         window.parent.postMessage({ 
+
             type: "UPDATE_CMS_FIELD", 
+
             field: "routine", 
+
             value: taskName,
+
             cost: currentActionCost,
+
             message: "Routine set to: " + taskName
+
         }, "*");
+
         
+
         // Immediate UI Update
+
         userProfile.routine = taskName; // Update memory
+
         
+
         const btn = document.getElementById('btnDailyRoutine');
+
         const noMsg = document.getElementById('noRoutineMsg');
+
         
+
         if(btn) {
+
             btn.classList.remove('hidden');
+
             // Update button text inside the Queen Menu
+
             const txt = document.getElementById('routineBtnText'); 
+
             if(txt) txt.innerText = "SUBMIT: " + taskName.toUpperCase();
+
         }
+
         if(noMsg) noMsg.style.display = 'none';
+
     } 
+
     
+
     // --- B. PHOTO LOGIC ---
+
     else if (currentActionType === 'photo') {
+
         const fileInput = document.getElementById('lobbyFile');
+
         if (fileInput.files.length > 0) {
+
             notifyTitle = "VISUALS LOGGED";
+
             notifyText = "Uploading...";
 
+
+
             window.parent.postMessage({ 
+
                 type: "PROCESS_PAYMENT", 
+
                 cost: 500, 
+
                 note: "Photo Change" 
+
             }, "*");
+
             
+
             if(window.handleProfileUpload) window.handleProfileUpload(fileInput);
+
         } else { return; }
+
     }
+
     
+
     // --- C. NAME LOGIC ---
+
     else if (currentActionType === 'name') {
+
         const text = document.getElementById('lobbyInputText').value;
+
         if(!text) return;
+
         
+
         notifyTitle = "IDENTITY REWRITTEN";
+
         notifyText = text.toUpperCase();
 
+
+
         window.parent.postMessage({ 
+
             type: "UPDATE_CMS_FIELD", 
+
             field: "title_fld", 
+
             value: text,
+
             cost: 100,
+
             message: "Name changed to: " + text
+
         }, "*");
+
+
 
         // Update UI
+
         const el = document.getElementById('mob_slaveName');
+
         const halo = document.getElementById('mob_slaveName'); // Halo uses same ID usually
+
         if(el) el.innerText = text;
+
         if(halo) halo.innerText = text;
+
         userProfile.name = text;
+
     }
+
     
+
     // --- D. KINKS LOGIC ---
+
     else if (currentActionType === 'kinks') {
+
         // Safe check
+
         if (typeof selectedKinks === 'undefined' || selectedKinks.size === 0) return;
+
         
+
         const kinkString = Array.from(selectedKinks).join(", ");
+
         notifyTitle = "FILE UPDATED";
+
         notifyText = "Kinks registered.";
 
+
+
         window.parent.postMessage({ 
+
             type: "UPDATE_CMS_FIELD", 
+
             field: "kink", 
+
             value: kinkString,
+
             cost: currentActionCost,
+
             message: "Kinks: " + kinkString
+
         }, "*");
+
     }
+
+
 
     // --- E. LIMITS LOGIC ---
+
     else {
+
         const text = document.getElementById('lobbyInputText').value;
+
         if(!text) return;
 
+
+
         notifyTitle = "DATA APPENDED";
+
         notifyText = "Limits updated.";
 
+
+
         window.parent.postMessage({ 
+
             type: "PURCHASE_ITEM", 
+
             itemName: currentActionType.toUpperCase() + ": " + text, 
+
             cost: currentActionCost, 
+
             messageToDom: "Limits: " + text 
+
         }, "*");
+
     }
+
+
 
     // FINAL: Close & Celebrate
+
     window.closeLobby();
+
     
+
     // Trigger the Green Notification
+
     if(window.showSystemNotification) {
+
         window.showSystemNotification(notifyTitle, notifyText);
+
     }
+
 };
+
+
 
 // --- NOTIFICATION SYSTEM ---
+
 window.showSystemNotification = function(title, detail) {
+
     const overlay = document.getElementById('celebrationOverlay');
+
     if(!overlay) return;
 
+
+
     // Inject Dynamic HTML
+
     overlay.innerHTML = `
+
         <div class="glass-card" style="border: 1px solid var(--neon-green); text-align:center; padding: 30px; background: rgba(0,0,0,0.95); box-shadow: 0 0 30px rgba(0,255,0,0.2);">
+
             <div style="font-family:'Orbitron'; font-size:1.2rem; color:var(--neon-green); margin-bottom:10px; letter-spacing:2px;">${title}</div>
+
             <div style="font-family:'Cinzel'; font-size:0.9rem; color:#fff;">${detail}</div>
+
         </div>
+
     `;
 
+
+
     // Show
+
     overlay.style.pointerEvents = "auto";
+
     overlay.style.opacity = '1';
 
+
+
     // Hide after 3 seconds
+
     setTimeout(() => {
+
         overlay.style.opacity = '0';
+
         overlay.style.pointerEvents = "none";
+
     }, 3000);
+
 };
+
 
 
 
@@ -731,38 +1027,40 @@ function updateStats() {
         }
     }
 
-// 5. FILL GRID (Local Midnight Reset)
+// --- GRID SYNC (TRUST THE BACKEND) ---
     const grid = document.getElementById('mob_streakGrid');
     if(grid) {
         grid.innerHTML = '';
-        
-        let todayCount = 0;
+        let loggedHours = [];
+        const now = new Date();
 
-        // LOGIC: Check if the last kneel happened "Today" on this device
-        if (userProfile.lastWorship) {
-            const lastDate = new Date(userProfile.lastWorship);
-            const now = new Date();
-            
-            // Compare Day, Month, Year (Local Time)
-            const isToday = lastDate.getDate() === now.getDate() &&
-                            lastDate.getMonth() === now.getMonth() &&
-                            lastDate.getFullYear() === now.getFullYear();
-            
-            if (isToday) {
-                // If it is today, use the backend count (or cycle math)
-                // Use todayKneeling if available, otherwise fallback to cycle
-                todayCount = gameStats.todayKneeling || (gameStats.kneelCount % 24);
-            } else {
-                // If last worship was yesterday (or older), show 0
-                todayCount = 0;
-            }
+        if (userProfile.kneelHistory) {
+            try {
+                const hObj = JSON.parse(userProfile.kneelHistory);
+                
+                // FIX: Trust the backend data. 
+                // The backend already resets this at midnight.
+                // We do not check the date here to avoid Timezone bugs.
+                loggedHours = hObj.hours || [];
+                
+            } catch(e) { console.error("Grid parse error", e); }
         }
 
-        // Render 24 Micro-Squares
         for(let i=0; i<24; i++) {
             const sq = document.createElement('div');
-            // Fill squares based on the calculated todayCount
-            sq.className = 'streak-sq' + (i < todayCount ? ' active' : '');
+            sq.className = 'streak-sq';
+            
+            // 1. Is this hour logged? (Gold)
+            if (loggedHours.includes(i)) {
+                sq.classList.add('active');
+            }
+            // 2. Has this hour passed? (Dim/Dark)
+            else if (i < now.getHours()) {
+                sq.style.opacity = "0.3"; 
+                sq.style.borderColor = "#333";
+            }
+            // 3. Future hours are normal style
+            
             grid.appendChild(sq);
         }
     }
