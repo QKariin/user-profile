@@ -2,6 +2,7 @@
 
 
 
+
 // main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -524,7 +525,6 @@ window.addEventListener("message", (event) => {
                     memberId: data.profile.memberId || "",
                     joined: data.profile.joined,
                     profilePicture: data.profile.profilePicture, // <--- ADD THIS LINE
-                    routine: data.profile.routine,
                     kneelHistory: data.profile.kneelHistory
                     
                 });
@@ -634,32 +634,12 @@ window.addEventListener("message", (event) => {
 // --- EXPORTS & HELPERS ---
 window.handleUploadStart = function(inputElement) {
     if (inputElement.files && inputElement.files.length > 0) {
-        
-        // Check if this is the Routine Upload button
-        const isRoutine = inputElement.id === 'routineUpload';
-        
-        if (isRoutine) {
-            // Visual Feedback
-            const btn = document.getElementById('btnDailyRoutine');
-            if(btn) { btn.innerText = "VERIFYING..."; btn.style.opacity = "0.5"; }
-            
-            // Tell Backend to mark as done
-            window.parent.postMessage({ type: "COMPLETE_ROUTINE" }, "*");
-            
-            // Trigger Notification
-            if(window.showSystemNotification) window.showSystemNotification("EVIDENCE SENT", "Daily routine logged.");
-        } else {
-            // Standard Button Feedback
-            const btn = document.getElementById('btnUpload');
-            if (btn) { btn.innerHTML = '...'; btn.style.background = '#333'; btn.style.color = '#ffd700'; btn.style.cursor = 'wait'; }
-        }
-
-        // Process the File Upload (Standard)
+        const btn = document.getElementById('btnUpload');
+        if (btn) { btn.innerHTML = '...'; btn.style.background = '#333'; btn.style.color = '#ffd700'; btn.style.cursor = 'wait'; }
         if (typeof handleEvidenceUpload === 'function') handleEvidenceUpload(inputElement);
     }
 };
 
-window.handleRoutineUpload = window.handleUploadStart;
 window.switchTab = switchTab;
 window.toggleStats = toggleStats;
 window.openSessionUI = openSessionUI;
@@ -1076,8 +1056,6 @@ window.syncMobileDashboard = function() {
 
     // --- D. QUEEN'S MENU (TIME GATED ROUTINE) ---
     
-// --- D. QUEEN'S MENU UPDATES ---
-
     // 1. Kneel Progress
     const kneelFill = document.getElementById('kneelDailyFill');
     const kneelText = document.getElementById('kneelDailyText');
@@ -1089,40 +1067,28 @@ window.syncMobileDashboard = function() {
         kneelText.innerText = `${count} / ${goal}`;
     }
 
-    // 2. Routine Button Logic (CMS BASED)
+    // 2. Routine Button Logic
     const routineBtn = document.getElementById('btnDailyRoutine');
     const noRoutineMsg = document.getElementById('noRoutineMsg');
     
     if (userProfile.routine && userProfile.routine.length > 2) {
-        // Time Check
+        // Time & Done Check
         const now = new Date();
         const currentHour = now.getHours(); 
-        const isTime = currentHour >= 7; 
-        
-        // Completion Check (FROM CMS JSON)
-        let isDoneToday = false;
-        if (userProfile.kneelHistory) {
-            try {
-                const hObj = JSON.parse(userProfile.kneelHistory);
-                // Check if date matches today AND routineDone is true
-                if (hObj.date === now.toDateString() && hObj.routineDone === true) {
-                    isDoneToday = true;
-                }
-            } catch(e) {}
-        }
+        const isTime = currentHour >= 7; // 7:00 AM
+        const lastDoneDate = localStorage.getItem('routine_done_date');
+        const isDoneToday = lastDoneDate === now.toDateString();
 
         if (isTime && !isDoneToday) {
-            // SHOW BUTTON
+            // SHOW
             if (routineBtn) {
                 routineBtn.classList.remove('hidden');
                 routineBtn.innerText = "SUBMIT: " + userProfile.routine.toUpperCase();
-                routineBtn.style.opacity = "1";
             }
             if (noRoutineMsg) noRoutineMsg.style.display = 'none';
         } else {
-            // HIDE BUTTON
+            // HIDE
             if (routineBtn) routineBtn.classList.add('hidden');
-            
             if (noRoutineMsg) {
                 noRoutineMsg.style.display = 'block';
                 if (isDoneToday) {
@@ -1135,7 +1101,7 @@ window.syncMobileDashboard = function() {
             }
         }
     } else {
-        // No Routine Assigned
+        // No Routine
         if (routineBtn) routineBtn.classList.add('hidden');
         if (noRoutineMsg) {
             noRoutineMsg.style.display = 'block';
@@ -1143,6 +1109,8 @@ window.syncMobileDashboard = function() {
             noRoutineMsg.style.color = "#666";
         }
     }
+};
+
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
 // =========================================
