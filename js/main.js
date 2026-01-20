@@ -166,8 +166,7 @@ initDomProfile();
 // --- 4. BRIDGE LISTENER ---
 
 Bridge.listen((data) => {
-    const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
-    if (ignoreList.includes(data.type)) return; 
+    const ignoreList = ["CHAT_ECHO", "instantUpdate", "instantReviewSuccess"];
     window.postMessage(data, "*"); 
 });
 
