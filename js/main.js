@@ -2,6 +2,7 @@
 
 
 
+
 // main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -166,7 +167,8 @@ initDomProfile();
 // --- 4. BRIDGE LISTENER ---
 
 Bridge.listen((data) => {
-    const ignoreList = ["CHAT_ECHO", "instantUpdate", "instantReviewSuccess"];
+    const ignoreList = ["CHAT_ECHO", "UPDATE_FULL_DATA", "UPDATE_DOM_STATUS", "instantUpdate", "instantReviewSuccess"];
+    if (ignoreList.includes(data.type)) return; 
     window.postMessage(data, "*"); 
 });
 
