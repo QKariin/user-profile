@@ -1474,7 +1474,6 @@ document.body.appendChild(footer);
     lockVisuals(); buildAppFooter();
 })();
 
-BEFORE THE FUNCTION ---
 let isRequestingTask = false; 
 
 window.mobileRequestTask = function() {
@@ -1516,6 +1515,7 @@ window.mobileRequestTask = function() {
         }, 1000); // 1 second buffer
     }, 800);
 };
+
 
 window.mobileUploadEvidence = function(input) {
     if (input.files && input.files.length > 0) {
@@ -1581,50 +1581,6 @@ window.mobileSkipTask = function() {
     window.updateTaskUIState(false);
     window.syncMobileDashboard();
 };
-
-// --- ADD THIS VARIABLE AT THE TOP OF YOUR MOBILE SECTION OR BEFORE THE FUNCTION ---
-let isRequestingTask = false; 
-
-window.mobileRequestTask = function() {
-    // 1. SAFETY CHECK
-    if (!window.gameStats) return;
-
-    // 2. POVERTY CHECK
-    if (gameStats.coins < 300) {
-        window.triggerPoverty(); 
-        if(window.triggerSound) triggerSound('sfx-deny');
-        return; 
-    }
-
-    // 3. LOCK THE UI (Stop the interval from resetting it)
-    isRequestingTask = true;
-
-    // 4. SET "LOADING" STATE UI
-    const idleCard = document.getElementById('qm_TaskIdle');
-    const activeCard = document.getElementById('qm_TaskActive');
-    
-    if (idleCard) idleCard.classList.add('hidden');
-    if (activeCard) activeCard.classList.remove('hidden');
-
-    const txt = document.getElementById('mobTaskText');
-    if(txt) {
-        txt.innerHTML = "ESTABLISHING LINK...";
-        txt.className = "text-pulse"; 
-    }
-
-    // 5. EXECUTE AFTER DELAY
-    setTimeout(() => {
-        // Generate the task (starts the desktop timer)
-        if(window.getRandomTask) window.getRandomTask(); 
-        
-        // Wait a moment for the Desktop DOM to actually update, then unlock
-        setTimeout(() => { 
-            isRequestingTask = false; // Unlock
-            if(window.syncMobileDashboard) window.syncMobileDashboard(); 
-        }, 1000); // 1 second buffer
-    }, 800);
-};
-
 
 // TIMER SYNC & VISUALIZATION
 setInterval(() => {
@@ -1716,7 +1672,4 @@ setInterval(() => {
         }
     }
 }, 500);
-
-};
-
 window.parent.postMessage({ type: "UI_READY" }, "*");
