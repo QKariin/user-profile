@@ -725,49 +725,77 @@
         box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
     }
 
-    /* --- DUTY CARD STYLES --- */
-.duty-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #333;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 4px;
+/* --- QUEEN MENU HEADER (Profile Style) --- */
+.qm-header {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: 0.3s;
-}
-
-.duty-header {
-    display: flex; justify-content: space-between; align-items: center;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 8px; margin-bottom: 5px;
 }
 
-.duty-title { font-family: 'Cinzel', serif; color: #ccc; font-size: 0.8rem; letter-spacing: 2px; }
-.duty-count { font-family: 'Orbitron', sans-serif; color: var(--mob-gold); font-size: 0.8rem; }
-
-/* STATUS BARS */
-.status-pill {
-    font-size: 0.6rem; padding: 4px 8px; border-radius: 4px;
-    font-family: 'Orbitron'; text-transform: uppercase; letter-spacing: 1px;
+.qm-avatar {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    border: 1px solid #c5a059;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
 }
-.pill-idle { background: rgba(255, 0, 60, 0.2); color: #ff003c; border: 1px solid #ff003c; }
-.pill-active { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid #00ff00; }
-.pill-wait { background: #222; color: #888; border: 1px solid #444; }
 
-/* GREEN DONE STATE */
-.duty-card.done { border-color: #00ff00; background: rgba(0, 255, 0, 0.05); }
-.duty-card.done .duty-title { color: #00ff00; }
-.duty-card.done .duty-count { color: #00ff00; }
-.bar-done { background: #00ff00 !important; box-shadow: 0 0 10px #00ff00; }
+.qm-info { display: flex; flex-direction: column; }
+.qm-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; letter-spacing: 2px; }
+.qm-date { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: #c5a059; letter-spacing: 1px; }
 
-/* TIMER IN CARD */
-.card-timer-row { display: flex; justify-content: center; gap: 5px; margin: 10px 0; }
-.card-t-box { 
-    background: #000; border: 1px solid #444; color: #fff; 
-    font-family: 'Rajdhani'; font-size: 1.2rem; padding: 5px 10px; border-radius: 4px; 
+/* --- SECTIONS --- */
+.duty-section {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex; flex-direction: column; gap: 8px;
 }
+
+.duty-label {
+    font-family: 'Cinzel', serif; 
+    font-size: 0.9rem; 
+    color: #888; 
+    letter-spacing: 2px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+/* --- TEXT STATUSES (No Backgrounds) --- */
+.txt-status-red { color: #ff003c; font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 1px; text-shadow: 0 0 5px rgba(255,0,60,0.4); }
+.txt-status-green { color: #00ff00; font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0,255,0,0.4); }
+.txt-status-gold { color: #c5a059; font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 1px; }
+
+/* --- SMALL BUTTONS --- */
+.btn-upload-sm {
+    background: transparent; border: 1px solid #c5a059; color: #c5a059;
+    font-family: 'Cinzel'; font-size: 0.65rem; padding: 6px 12px;
+    cursor: pointer; align-self: flex-start;
+}
+.btn-upload-sm:active { background: rgba(197,160,89,0.2); }
+
+.btn-skip-sm {
+    background: transparent; border: 1px solid #444; color: #666;
+    font-family: 'Cinzel'; font-size: 0.65rem; padding: 6px 12px;
+    cursor: pointer;
+}
+
+/* --- REVERTED KNEELING STYLE --- */
+.kneel-track-reverted {
+    height: 10px; width: 100%; 
+    background: #111; 
+    border: 1px solid #333; 
+    margin-top: 5px;
+}
+.kneel-fill-reverted {
+    height: 100%; width: 0%; 
+    background: #c5a059;
+}
+.kneel-fill-reverted.green { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
     
   </style>
 </head>
