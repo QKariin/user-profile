@@ -1403,12 +1403,17 @@ window.syncMobileDashboard = function() {
     }
 };
 
-// --- EXCHEQUER NAVIGATION ---
+// ==========================
+// EXCHEQUER LOGIC (MOBILE)
+// ==========================
+
 window.openExchequer = function() {
     const store = document.getElementById('mobExchequer');
     if (store) {
         store.classList.remove('hidden');
-        store.style.display = 'flex';
+        store.style.display = 'flex'; // Force visible
+    } else {
+        console.error("Exchequer Overlay not found!");
     }
 };
 
@@ -1419,7 +1424,6 @@ window.closeExchequer = function() {
         store.style.display = 'none';
     }
 };
-
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
 // =========================================
