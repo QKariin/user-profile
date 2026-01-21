@@ -1245,7 +1245,70 @@
     </div>
 
     <!-- 5. GLOBAL VIEW (PROTOCOL & EXCHEQUER) -->
+    <!-- 5. GLOBAL VIEW (PROTOCOL & STORE) -->
     <div id="viewProtocol" class="mob-frame" style="display:none; flex-direction:column;">
+        
+        <!-- HEADER -->
+        <div class="mob-header">
+            <div class="mob-name" style="margin-top:20px;">GLOBAL NETWORK</div>
+        </div>
+
+        <!-- FILL WALLET BUTTON -->
+        <div class="mob-section-wrapper" style="width:90%; margin-bottom:20px;">
+            <button class="wallet-btn" onclick="openExchequer()">
+                FILL WALLET
+            </button>
+        </div>
+
+        <!-- PROTOCOL TEXT -->
+        <div class="mob-card" style="width:90%; text-align:center;">
+            <div class="status-text" style="color:#888; font-size:0.7rem; margin-bottom:10px;">PROTOCOL STATUS</div>
+            <div style="font-family:'Cinzel'; font-size:1.2rem; color:#fff;">OBEDIENCE IS MANDATORY</div>
+            <div style="font-family:'Orbitron'; font-size:0.6rem; color:#666; margin-top:10px;">SERVER: ONLINE</div>
+        </div>
+        
+        <!-- EXCHEQUER OVERLAY (Hidden Store) -->
+        <div id="mobExchequer" class="mob-reward-overlay hidden">
+            <div class="mob-reward-card lobby-card">
+                <div class="lobby-header">
+                    <div class="lobby-title">EXCHEQUER</div>
+                    <div class="lobby-subtitle">ACQUIRE CAPITAL</div>
+                </div>
+
+                <!-- COIN PACKAGES -->
+                <div class="coin-grid">
+                    <div class="coin-tile" onclick="window.buyRealCoins(1000)">
+                        <div class="coin-amount">1,000</div>
+                        <div class="coin-price">€10.00</div>
+                    </div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(5500)">
+                        <div class="coin-amount">5,500</div>
+                        <div class="coin-price">€50.00</div>
+                    </div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(12000)">
+                        <div class="coin-amount">12,000</div>
+                        <div class="coin-price">€100.00</div>
+                    </div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(30000)">
+                        <div class="coin-amount">30,000</div>
+                        <div class="coin-price">€250.00</div>
+                    </div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(70000)">
+                        <div class="coin-amount">70,000</div>
+                        <div class="coin-price">€500.00</div>
+                    </div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(150000)">
+                        <div class="coin-amount">150,000</div>
+                        <div class="coin-price">€1000.00</div>
+                    </div>
+                </div>
+
+                <button class="lobby-btn close" onclick="closeExchequer()" style="margin-top:20px;">CLOSE</button>
+            </div>
+        </div>
+
+        <div style="height: 120px;"></div>
+    </div>
         
         <!-- HEADER -->
         <div class="mob-header">
