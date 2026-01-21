@@ -1344,6 +1344,7 @@ window.syncMobileDashboard = function() {
         if(taskIdle) taskIdle.classList.remove('hidden');
         if(taskActive) taskActive.classList.add('hidden');
     }
+}; 
 
 // PUT THIS AT THE VERY BOTTOM OF MAIN.JS
 window.handleRoutineUpload = function(input) {
@@ -1474,37 +1475,30 @@ document.body.appendChild(footer);
 })();
 
 window.mobileRequestTask = function() {
-    // 0. SAFETY CHECK: If game hasn't loaded yet, stop.
+    // 1. SAFETY CHECK (Prevents crash if data isn't ready)
     if (!window.gameStats) return;
 
-    // 1. GATEKEEPER: Check for 300 Coins
+    // 2. POVERTY CHECK
     if (gameStats.coins < 300) {
         window.triggerPoverty(); 
         if(window.triggerSound) triggerSound('sfx-deny');
         return; 
     }
 
-    // 2. SUCCESS: Switch UI
-    const taskIdle = document.getElementById('qm_TaskIdle');
-    const taskActive = document.getElementById('qm_TaskActive');
-    const txt = document.getElementById('mobTaskText');
-    
-    if(taskIdle) taskIdle.classList.add('hidden');
-    if(taskActive) taskActive.classList.remove('hidden');
+    // 3. SUCCESS UI
+    document.getElementById('qm_TaskIdle').classList.add('hidden');
+    document.getElementById('qm_TaskActive').classList.remove('hidden');
 
-    // 3. ANIMATION
+    const txt = document.getElementById('mobTaskText');
     if(txt) {
         txt.innerHTML = "ESTABLISHING LINK...";
         txt.className = "text-pulse"; 
     }
 
-    // 4. GET THE TASK
+    // 4. GET TASK
     setTimeout(() => {
         if(window.getRandomTask) window.getRandomTask(); 
-        
-        setTimeout(() => {
-            if(window.syncMobileDashboard) window.syncMobileDashboard(); 
-        }, 800);
+        setTimeout(() => { if(window.syncMobileDashboard) window.syncMobileDashboard(); }, 800);
     }, 500);
 };
 
