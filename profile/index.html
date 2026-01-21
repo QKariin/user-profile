@@ -391,6 +391,38 @@
             letter-spacing: 1px;
         }
 
+      /* --- GLOBAL VIEW FIXES --- */
+        .mob-header {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            background: #000;
+            margin-bottom: 20px;
+        }
+        
+        .mob-name {
+            font-family: 'Cinzel', serif; 
+            font-size: 1.5rem; 
+            color: #fff; /* This makes the text visible */
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        
+        .mob-card {
+            background: rgba(20, 20, 20, 0.8); 
+            border: 1px solid #333;
+            padding: 20px; 
+            border-radius: 4px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            gap: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
         @keyframes spinPulse {
             0% { transform: rotate(0deg); opacity: 0.8; }
             50% { opacity: 1; box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); }
