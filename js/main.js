@@ -1280,68 +1280,56 @@ window.triggerKneel = function() {
     }
 };
 
-// 4. DATA SYNC (COMPLETE: Dashboard, Grid, & Queen Menu)
 window.syncMobileDashboard = function() {
     if (!gameStats || !userProfile) return;
 
-    // --- 1. EXISTING DASHBOARD SYNC (Keep your existing code here for name/rank/grid) ---
+    // --- 1. EXISTING DASHBOARD SYNC (Keep your existing Header/Grid logic) ---
     const elName = document.getElementById('mob_slaveName');
     if (elName) elName.innerText = userProfile.name || "SLAVE";
     const elRank = document.getElementById('mob_rankStamp');
     if (elRank) elRank.innerText = userProfile.hierarchy || "INITIATE";
-    // ... (Keep the rest of your existing Grid/Image sync logic here) ...
+    // ... (Keep grid/image sync) ...
 
-    // --- 2. NEW QUEEN MENU LOGIC ---
+    // --- 2. QUEEN MENU LOGIC ---
 
-    // A. DATE DISPLAY
+    // A. DATE
     const dateEl = document.getElementById('dutyDateDisplay');
     if(dateEl) dateEl.innerText = new Date().toLocaleDateString().toUpperCase();
 
-    // B. ROUTINE LOGIC (7AM Check)
-    const routineName = userProfile.routine || "None Assigned";
+    // B. PROTOCOL (From CMS 'routine' field)
+    const routineName = userProfile.routine || "NO PROTOCOL";
     const rDisplay = document.getElementById('mobRoutineDisplay');
     if(rDisplay) rDisplay.innerText = routineName.toUpperCase();
 
+    // Logic: 7AM Check + Done Check
     const nowHour = new Date().getHours();
-    const isMorning = nowHour >= 7; // 7 AM
-    // Check if done (You need to store 'routineDone' in gameStats or userProfile. 
-    // For now, let's assume it's stored in gameStats.routineDoneToday)
+    const isMorning = nowHour >= 7; 
     const isDone = gameStats.routineDoneToday === true;
 
-    const btnLocked = document.getElementById('btnRoutineLocked');
     const btnUpload = document.getElementById('btnRoutineUpload');
-    const msgDone = document.getElementById('routineDoneMsg');
-    const pill = document.getElementById('routineStatusPill');
-    const cardRoutine = document.getElementById('cardRoutine');
-
-    // Reset Classes
-    if(cardRoutine) cardRoutine.classList.remove('done');
+    const msgTime = document.getElementById('routineTimeMsg'); // "LOCKED UNTIL 7"
+    const msgDone = document.getElementById('routineDoneMsg'); // "COMPLETED"
 
     if (isDone) {
-        // STATE: COMPLETED
-        if(btnLocked) btnLocked.classList.add('hidden');
         if(btnUpload) btnUpload.classList.add('hidden');
+        if(msgTime) msgTime.classList.add('hidden');
         if(msgDone) msgDone.classList.remove('hidden');
-        if(pill) { pill.innerText = "COMPLETE"; pill.className = "status-pill pill-active"; }
-        if(cardRoutine) cardRoutine.classList.add('done');
     } 
     else if (isMorning) {
-        // STATE: OPEN (7AM+)
-        if(btnLocked) btnLocked.classList.add('hidden');
+        // OPEN
         if(btnUpload) btnUpload.classList.remove('hidden');
+        if(msgTime) msgTime.classList.add('hidden');
         if(msgDone) msgDone.classList.add('hidden');
-        if(pill) { pill.innerText = "PENDING"; pill.className = "status-pill pill-idle"; }
     } 
     else {
-        // STATE: LOCKED (<7AM)
-        if(btnLocked) btnLocked.classList.remove('hidden');
+        // LOCKED (<7AM)
         if(btnUpload) btnUpload.classList.add('hidden');
+        if(msgTime) msgTime.classList.remove('hidden');
         if(msgDone) msgDone.classList.add('hidden');
-        if(pill) { pill.innerText = "LOCKED"; pill.className = "status-pill pill-wait"; }
     }
 
-    // C. TASK LOGIC (Active vs Idle + Count)
-    const activeRow = document.getElementById('activeTimerRow'); // Check desktop state
+    // C. LABOR (Task)
+    const activeRow = document.getElementById('activeTimerRow'); // Desktop source of truth
     const isWorking = activeRow && !activeRow.classList.contains('hidden');
     
     const taskIdle = document.getElementById('qm_TaskIdle');
@@ -1355,19 +1343,9 @@ window.syncMobileDashboard = function() {
         if(taskActive) taskActive.classList.add('hidden');
     }
 
-    // Task Count (0/5) - Assuming gameStats.dailyTasksDone exists or we calculate it
-    // If you don't have this var yet, create a temporary one in memory
-    const dailyCount = gameStats.dailyTasksDone || 0; 
-    const countDisplay = document.getElementById('dailyTaskCount');
-    const cardTasks = document.getElementById('cardTasks');
-    
-    if(countDisplay) countDisplay.innerText = `${dailyCount} / 5`;
-    if(dailyCount >= 5 && cardTasks) cardTasks.classList.add('done'); // Green border if 5+
-
-    // D. KNEELING LOGIC (Green Bar)
+    // D. KNEELING (Reverted Style + Green Logic)
     const kneelFill = document.getElementById('kneelDailyFill');
     const kneelText = document.getElementById('kneelDailyText');
-    const cardKneel = document.getElementById('cardKneel');
     
     if (kneelFill && kneelText) {
         const kCount = gameStats.todayKneeling || (gameStats.kneelCount % 8) || 0; 
@@ -1377,12 +1355,11 @@ window.syncMobileDashboard = function() {
         kneelFill.style.width = pct + "%";
         kneelText.innerText = `${kCount} / ${kGoal}`;
 
+        // Turn GREEN if 8 or more
         if (kCount >= kGoal) {
-            kneelFill.classList.add('bar-done');
-            if(cardKneel) cardKneel.classList.add('done');
+            kneelFill.classList.add('green'); 
         } else {
-            kneelFill.classList.remove('bar-done');
-            if(cardKneel) cardKneel.classList.remove('done');
+            kneelFill.classList.remove('green');
         }
     }
 };
