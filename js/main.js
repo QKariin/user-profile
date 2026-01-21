@@ -73,8 +73,20 @@ window.closePoverty = function() {
 };
 
 window.goToExchequer = function() {
+    // 1. Close the Insult
     window.closePoverty();
-    window.toggleMobileView('buy'); // Switches to Store View
+
+    // 2. Close the Daily Duties (if they were there)
+    if(window.closeQueenMenu) window.closeQueenMenu();
+
+     // This reveals the "viewMobileGlobal" section
+    window.toggleMobileView('global'); 
+
+    // 4. Pop open the Store Overlay immediately
+    // We wait 100ms just to make sure the view transition is done
+    setTimeout(() => {
+        if(window.openExchequer) window.openExchequer();
+    }, 100);
 };
 
 // --- 2. CRITICAL UI FUNCTIONS ---
