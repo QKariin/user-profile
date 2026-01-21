@@ -1424,16 +1424,17 @@
       </div>
   </div>
       
-        <!-- 2. THE HALO (Identity) -->
+       <!-- 2. THE HALO (Identity) -->
         <div class="halo-section">
             <div class="halo-ring">
                 <div id="mob_slaveName" class="halo-name">SLAVE</div>
                 <div id="mob_rankStamp" class="halo-rank">INITIATE</div>
                 <div class="mob-section-wrapper" style="width:100%;">
-                <div class="mob-grid-label-center">DAILY PROGRESS</div>
-                <div id="mob_streakGrid" class="mob-streak-strip"></div>
+                    <div class="mob-grid-label-center">DAILY PROGRESS</div>
+                    <div id="mob_streakGrid" class="mob-streak-strip"></div>
+                </div>
             </div>
-         </div>
+        </div> <!-- FORCE CLOSE HALO SECTION HERE -->
 
         <!-- 3. STATS BRIDGE & DRAWER -->
         <div style="width:100%; display:flex; flex-direction:column; align-items:center; z-index:3;">
@@ -1483,9 +1484,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Spacer for footer -->
         <div style="height: 120px;"></div>
-    </div>
-    </div> <!-- END HOME -->
+
+    </div> <!-- CLOSES viewMobileHome (Correctly!) -->
+    
 
     <!-- 2. MOBILE RECORD (THE VERTICAL VAULT) -->
     <div id="viewMobileRecord" class="mob-frame" style="display:none; flex-direction:column; padding-left:0; padding-right:0; padding-top:10px;">
