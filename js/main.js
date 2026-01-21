@@ -1,7 +1,6 @@
 
 
 
-
 // main.js - FINAL COMPLETE VERSION (DESKTOP + MOBILE)
 
 import { CONFIG, URLS, LEVELS, FUNNY_SAYINGS, STREAM_PASSWORDS } from './config.js';
@@ -41,27 +40,26 @@ const KINK_LIST = [
 // POVERTY SYSTEM (MOCKING LOGIC)
 // =========================================
 
+const POVERTY_INSULTS = [
+    "Your wallet is as empty as your worth.",
+    "Do not waste my time with empty pockets.",
+    "Silence is free. Serving me costs.",
+    "Go beg for coins, then come back.",
+    "You cannot afford to look at me.",
+    "Access Denied. Reason: Poverty."
+];
+
 window.triggerPoverty = function() {
     const overlay = document.getElementById('povertyOverlay');
     const text = document.getElementById('povertyInsult');
     
-    // 1. POVERTY INSULTS LIST
-    const insults = [
-        "Your wallet is as empty as your worth.",
-        "Do not waste my time with empty pockets.",
-        "Silence is free. Serving me costs.",
-        "Go beg for coins, then come back.",
-        "You cannot afford to look at me.",
-        "Access Denied. Reason: Poverty."
-    ];
+    // Pick random insult
+    const insult = POVERTY_INSULTS[Math.floor(Math.random() * POVERTY_INSULTS.length)];
+    if(text) text.innerText = `"${insult}"`;
 
-    // 2. Pick Random Insult
-    if(text) text.innerText = `"${insults[Math.floor(Math.random() * insults.length)]}"`;
-
-    // 3. SHOW THE OVERLAY (Force Flex to center it)
     if(overlay) {
         overlay.classList.remove('hidden');
-        overlay.style.display = 'flex'; 
+        overlay.style.display = 'flex';
     }
 };
 
@@ -74,20 +72,8 @@ window.closePoverty = function() {
 };
 
 window.goToExchequer = function() {
-    // 1. Close the Insult
     window.closePoverty();
-
-    // 2. Close the Daily Duties (if they were there)
-    if(window.closeQueenMenu) window.closeQueenMenu();
-
-     // This reveals the "viewMobileGlobal" section
-    window.toggleMobileView('global'); 
-
-    // 4. Pop open the Store Overlay immediately
-    // We wait 100ms just to make sure the view transition is done
-    setTimeout(() => {
-        if(window.openExchequer) window.openExchequer();
-    }, 100);
+    window.toggleMobileView('buy'); // Switches to Store View
 };
 
 // --- 2. CRITICAL UI FUNCTIONS ---
@@ -1494,38 +1480,30 @@ document.body.appendChild(footer);
 })();
 
 window.mobileRequestTask = function() {
-    // 1. THE GATEKEEPER: Check for 300 Coins
-    // (If you have less than 300, she won't even talk to you)
-    if (gameStats.coins < 300) {
-        window.triggerPoverty(); // <--- SHOWS THE POVERTY OVERLAY
-        
-        if(window.triggerSound) triggerSound('sfx-deny');
-        
-        return; // <--- STOP! Do not switch view, do not get task.
-    }
-
-    // 2. IF YOU HAVE MONEY: Proceed with the fancy animation
+    // 1. INSTANT VISUAL FEEDBACK
     const taskIdle = document.getElementById('qm_TaskIdle');
     const taskActive = document.getElementById('qm_TaskActive');
     const txt = document.getElementById('mobTaskText');
     
-    // Switch View
+    // Force View Switch
     if(taskIdle) taskIdle.classList.add('hidden');
     if(taskActive) taskActive.classList.remove('hidden');
 
-    // Show "Connecting..."
+    // Show "Loading" Animation
     if(txt) {
         txt.innerHTML = "ESTABLISHING LINK...";
         txt.classList.add('text-pulse');
     }
 
-    // 3. GET THE TASK
+    // 2. CALL REAL FUNCTION (Small delay to let animation be seen, optional)
     setTimeout(() => {
-        window.getRandomTask(); 
+        window.getRandomTask(); // The real logic
         
+        // Remove pulse when text updates (The observer/sync will handle this, 
+        // but let's be safe)
         setTimeout(() => {
             if(txt) txt.classList.remove('text-pulse');
-            window.syncMobileDashboard(); 
+            window.syncMobileDashboard(); // Refresh to show real text
         }, 800);
     }, 300);
 };
@@ -1561,28 +1539,38 @@ window.mobileUploadEvidence = function(input) {
 };
 
 window.mobileSkipTask = function() {
-    // 1. CHECK FUNDS (Strict Check)
+    // 1. CHECK FUNDS (Need 300)
     if (gameStats.coins < 300) {
-        // Trigger the Fancy Overlay
-        window.triggerPoverty(); 
-        
-        // STOP HERE - Do not run the old logic that shows the cheap alert
-        return; 
+        window.triggerPoverty(); // Reuse your poverty overlay
+        return;
     }
 
-    // 2. IF RICH ENOUGH:
+    // 2. DEDUCT COINS
     gameStats.coins -= 300;
-    if(window.updateStats) window.updateStats(); 
-    if(window.triggerSound) triggerSound('sfx-deny');
+    window.updateStats(); // Refresh headers
 
+    // 3. PLAY SOUND & INSULT
+    triggerSound('sfx-deny');
+    
+    const insults = [
+        "WEAKNESS DETECTED.", 
+        "PATHETIC. -300 COINS.", 
+        "YOU PAY FOR YOUR FAILURE.", 
+        "DISAPPOINTING."
+    ];
+    const randomInsult = insults[Math.floor(Math.random() * insults.length)];
+
+    // Show Red Notification
     if(window.showSystemNotification) {
-        window.showSystemNotification("PROTOCOL ABORTED", "PENALTY: -300 COINS");
+        window.showSystemNotification("PROTOCOL ABORTED", randomInsult);
     }
 
-    if(window.cancelPendingTask) window.cancelPendingTask(); 
+    // 4. CANCEL TASK & RESET UI
+    if(window.cancelPendingTask) window.cancelPendingTask(); // Backend cleanup
     
+    // FORCE UI RESET
     window.updateTaskUIState(false);
-    if(window.syncMobileDashboard) window.syncMobileDashboard();
+    window.syncMobileDashboard();
 };
 
 // TIMER SYNC & VISUALIZATION
