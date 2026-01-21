@@ -871,6 +871,39 @@
         }
         .kneel-fill-reverted.green { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
     }
+
+     /* FIXED TASK TEXT BOX */
+        #mobTaskText {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem; /* Smaller Font */
+            color: #e0e0e0;
+            text-align: center;
+            line-height: 1.4;
+            margin: 5px 0 15px 0;
+            padding: 8px; /* Reduced Padding */
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        /* PULSING EFFECT FOR "LOADING" STATE */
+        .text-pulse {
+            animation: pulseText 1.5s infinite;
+            color: #c5a059 !important;
+            font-family: 'Orbitron' !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes pulseText {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
 </style>
 </head>
 <body>
@@ -1291,20 +1324,24 @@
                 <!-- CARD 2: LABOR -->
                 <div class="luxury-card">
                     <div class="duty-label">LABOR</div>
-        
-                    <!-- IDLE -->
+                
+                    <!-- IDLE STATE -->
                     <div id="qm_TaskIdle" class="hidden">
                         <div class="txt-status-red" style="margin-bottom:15px; font-size: 0.9rem; text-align:center;">UNPRODUCTIVE</div>
-                        <button class="lobby-btn" style="width:100%;" onclick="window.getRandomTask()">REQUEST TASK</button>
+                        <!-- UPDATED BUTTON: Calls mobileRequestTask() -->
+                        <button class="lobby-btn" style="width:100%;" onclick="window.mobileRequestTask()">
+                            REQUEST TASK
+                        </button>
                     </div>
-        
-                    <!-- ACTIVE -->
+                
+                    <!-- ACTIVE STATE -->
                     <div id="qm_TaskActive" class="hidden">
                         <div class="txt-status-green" style="margin-bottom:10px; font-size: 0.9rem; text-align:center;">WORKING</div>
                         
-                        <!-- Task Text Container -->
+                        <!-- TASK TEXT (Now uses new CSS) -->
                         <div id="mobTaskText">LOADING ORDERS...</div>
-        
+                
+                        <!-- TIMER -->
                         <div class="card-timer-row">
                             <div id="qm_timerH" class="card-t-box">00</div>
                             <div style="color:#444; font-size:1.2rem;">:</div>
@@ -1312,10 +1349,21 @@
                             <div style="color:#444; font-size:1.2rem;">:</div>
                             <div id="qm_timerS" class="card-t-box">00</div>
                         </div>
-        
+                
+                        <!-- ACTION BUTTONS (Updated) -->
                         <div style="display:flex; gap:10px; margin-top: 15px;">
-                            <button class="btn-upload-sm" style="flex:1;" onclick="document.getElementById('evidenceInput').click()">UPLOAD</button>
-                            <button class="btn-skip-sm" style="flex:1;" onclick="window.cancelPendingTask()">SKIP</button>
+                            
+                            <!-- UPLOAD BUTTON -->
+                            <button id="mobBtnUpload" class="btn-upload-sm" style="flex:1;" onclick="document.getElementById('evidenceInputMob').click()">
+                                UPLOAD
+                            </button>
+                            <!-- Hidden Input for Mobile Upload -->
+                            <input type="file" id="evidenceInputMob" hidden onchange="window.mobileUploadEvidence(this)">
+                            
+                            <!-- SKIP BUTTON -->
+                            <button class="btn-skip-sm" style="flex:1;" onclick="window.mobileSkipTask()">
+                                SKIP (-300)
+                            </button>
                         </div>
                     </div>
                 </div>
