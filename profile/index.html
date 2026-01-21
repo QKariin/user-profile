@@ -651,7 +651,37 @@
         width: 100%;
         margin-bottom: 15px;
     }
-    
+
+    /* --- FORCE FULL SCREEN (Mobile View Mode) --- */
+#queenOverlay {
+    background: #000 !important; /* Solid Black */
+    align-items: flex-start !important; /* Start at top */
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    z-index: 99999 !important; /* Above everything else */
+}
+
+/* Make the inner container fill the screen */
+#queenOverlay .mob-reward-card {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #000 !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* SCROLL AREA (Padding at bottom for the footer) */
+.qm-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    padding-bottom: 80px !important; /* Space for the Footer */
+    -webkit-overflow-scrolling: touch;
+}
     .routine-tile {
         width: 100%;
         background: rgba(255, 255, 255, 0.03); /* Subtle glass */
