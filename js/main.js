@@ -71,9 +71,23 @@ window.closePoverty = function() {
     }
 };
 
+// ==========================
+// REPLACE WINDOW.GOTOEXCHEQUER (Around Line 56) WITH THIS:
+// ==========================
+
 window.goToExchequer = function() {
+    // 1. Close any blocking overlays (Poverty, Queen Menu)
     window.closePoverty();
-    window.toggleMobileView('buy'); // Switches to Store View
+    if(window.closeQueenMenu) window.closeQueenMenu();
+
+    // 2. Switch to the Global View (Mobile) instead of 'buy' (Desktop)
+    // This prevents the "Black Screen" crash
+    if(window.toggleMobileView) window.toggleMobileView('global');
+
+    // 3. Force open the Store Overlay immediately after switching views
+    setTimeout(() => {
+        if(window.openExchequer) window.openExchequer();
+    }, 200);
 };
 
 // --- 2. CRITICAL UI FUNCTIONS ---
@@ -1383,8 +1397,10 @@ window.closeExchequer = function() {
 (function() {
     // Only run on Mobile
     if (window.innerWidth > 768) return;
+ // ==========================
+// REPLACE THE 'lockVisuals' FUNCTION (Around Line 1184) WITH THIS:
+// ==========================
 
-    // 1. LOCK THE FRAME, BUT LET THE CONTENT BREATHE
     function lockVisuals() {
         const height = window.innerHeight;
         
@@ -1401,7 +1417,9 @@ window.closeExchequer = function() {
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews');
+        // *** UPDATED LINE BELOW: Added #viewMobileGlobal and #viewMobileRecord ***
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews, #viewMobileGlobal, #viewMobileRecord');
+        
         scrollables.forEach(el => {
             Object.assign(el.style, {
                 height: '100%',
@@ -1474,21 +1492,26 @@ document.body.appendChild(footer);
     lockVisuals(); buildAppFooter();
 })();
 
-let isRequestingTask = false; 
+// ==========================
+// REPLACE FROM LINE 1235 DOWN TO LINE 1270 WITH THIS:
+// ==========================
+
+// 1. GLOBAL VARIABLE (Must be attached to window)
+window.isRequestingTask = false; 
 
 window.mobileRequestTask = function() {
     // 1. SAFETY CHECK
     if (!window.gameStats) return;
 
-    // 2. POVERTY CHECK
-    if (gameStats.coins < 300) {
+    // 2. POVERTY CHECK (Added parseInt for safety)
+    if (parseInt(gameStats.coins || 0) < 300) {
         window.triggerPoverty(); 
         if(window.triggerSound) triggerSound('sfx-deny');
         return; 
     }
 
     // 3. LOCK THE UI (Stop the interval from resetting it)
-    isRequestingTask = true;
+    window.isRequestingTask = true; // <--- CHANGED THIS TO WINDOW
 
     // 4. SET "LOADING" STATE UI
     const idleCard = document.getElementById('qm_TaskIdle');
@@ -1510,7 +1533,7 @@ window.mobileRequestTask = function() {
         
         // Wait a moment for the Desktop DOM to actually update, then unlock
         setTimeout(() => { 
-            isRequestingTask = false; // Unlock
+            window.isRequestingTask = false; // <--- CHANGED THIS TO WINDOW
             if(window.syncMobileDashboard) window.syncMobileDashboard(); 
         }, 1000); // 1 second buffer
     }, 800);
