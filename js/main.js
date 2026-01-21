@@ -1443,9 +1443,10 @@ window.closeExchequer = function() {
 // REPLACE THE 'lockVisuals' FUNCTION (Around Line 1184) WITH THIS:
 // ==========================
 
-    function lockVisuals() {
+   function lockVisuals() {
         const height = window.innerHeight;
         
+        // 1. LOCK THE BODY
         Object.assign(document.body.style, {
             height: height + 'px',
             width: '100%',
@@ -1456,11 +1457,13 @@ window.closeExchequer = function() {
             touchAction: 'none'
         });
 
+        // 2. LOCK THE APP CONTAINER
         const app = document.querySelector('.app-container');
         if (app) Object.assign(app.style, { height: '100%', overflow: 'hidden' });
 
-        // *** UPDATED LINE BELOW: Added #viewMobileGlobal and #viewMobileRecord ***
-        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #viewMobileHome, #historySection, #viewNews, #viewMobileGlobal, #viewMobileRecord');
+        // 3. ALLOW SCROLLING *ONLY* ON THESE ELEMENTS
+        // (Note: Home, Record, and Global now handle their own internal scrolling in HTML)
+        const scrollables = document.querySelectorAll('.content-stage, .chat-body-frame, #historySection, #viewNews');
         
         scrollables.forEach(el => {
             Object.assign(el.style, {
