@@ -1178,31 +1178,35 @@ window.toggleMobileStats = function() {
     }
 };
 
-// 3. MAIN NAVIGATION CONTROLLER (AUTO-RESET FIX)
+// 3. MAIN NAVIGATION CONTROLLER (FINAL SAFE VERSION)
 window.toggleMobileView = function(viewName) {
-    // --- 1. CLEANUP (Reset Overlays) ---
-    // This ensures we always land on a clean page, not an open menu
+    // --- 1. CLEANUP (Reset Overlays - KEPT SAFE) ---
     if (window.closeLobby) window.closeLobby();
-    
-    // Also close the Poverty card if it's open
+    if (window.closeQueenMenu) window.closeQueenMenu(); // Added Queen Menu closing too
     if (window.closePoverty) window.closePoverty();
 
-    // --- 2. HIDE ALL VIEWS ---
+    // --- 2. DEFINE VIEWS ---
     const home = document.getElementById('viewMobileHome');
+    
+    // Mobile Specific Views (The new ones)
     const mobRecord = document.getElementById('viewMobileRecord');
+    const mobGlobal = document.getElementById('viewMobileGlobal'); // <--- UPDATED ID
+    
+    // Desktop/Shared Views
     const chatCard = document.getElementById('chatCard');
     const mobileApp = document.getElementById('MOBILE_APP');
     const history = document.getElementById('historySection');
     const news = document.getElementById('viewNews');
     const protocol = document.getElementById('viewProtocol');
     
-    const views = [home, history, mobRecord, news, protocol];
+    // --- 3. HIDE EVERYTHING ---
+    const views = [home, mobRecord, mobGlobal, history, news, protocol];
     views.forEach(el => { if(el) el.style.display = 'none'; });
 
     // Reset Chat Visibility
     if (chatCard) chatCard.style.setProperty('display', 'none', 'important');
 
-    // --- 3. SHOW TARGET ---
+    // --- 4. SHOW TARGET ---
     if (viewName === 'home') {
         if(home) {
             home.style.display = 'flex';
@@ -1211,6 +1215,7 @@ window.toggleMobileView = function(viewName) {
     }
     else if (viewName === 'chat') {
         if(chatCard && mobileApp) {
+            // Teleport logic
             if (chatCard.parentElement !== mobileApp) {
                 mobileApp.appendChild(chatCard);
             }
@@ -1222,29 +1227,23 @@ window.toggleMobileView = function(viewName) {
         }
     }
     else if (viewName === 'record') {
+        // Open Mobile Vault
         if (mobRecord) {
             mobRecord.style.display = 'flex';
-            if(window.renderGallery) {
-                window.renderGallery();
-                console.log("Rendering Gallery from Mobile Record View");
-            }
-            console.log("End Rendering Gallery from Mobile Record View");
-        } else if (history) {
-            history.style.display = 'flex';
             if(window.renderGallery) window.renderGallery();
-            console.log("Rendering Gallery from Mobile History View");
-        } else {
-            console.warn("No valid element found for Record/History view.");        
         }
     }
     else if (viewName === 'queen') {
         if(news) news.style.display = 'block';
     }
     else if (viewName === 'global') {
-        if(protocol) protocol.style.display = 'block';
+        // Open Mobile Global (Exchequer/Protocol)
+        if(mobGlobal) {
+            mobGlobal.style.display = 'flex';
+        }
     }
     
-    // --- 4. SIDEBAR CLEANUP ---
+    // --- 5. SIDEBAR CLEANUP ---
     const sidebar = document.querySelector('.layout-left');
     if (sidebar) sidebar.classList.remove('mobile-open');
     document.querySelectorAll('.mf-btn').forEach(btn => btn.classList.remove('active'));
