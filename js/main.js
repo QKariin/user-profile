@@ -73,8 +73,20 @@ window.closePoverty = function() {
 };
 
 window.goToExchequer = function() {
+    // 1. Close the Insult
     window.closePoverty();
-    window.toggleMobileView('buy'); // Switches to Store View
+
+    // 2. Close the Daily Duties (if they were there)
+    if(window.closeQueenMenu) window.closeQueenMenu();
+
+     // This reveals the "viewMobileGlobal" section
+    window.toggleMobileView('global'); 
+
+    // 4. Pop open the Store Overlay immediately
+    // We wait 100ms just to make sure the view transition is done
+    setTimeout(() => {
+        if(window.openExchequer) window.openExchequer();
+    }, 100);
 };
 
 // --- 2. CRITICAL UI FUNCTIONS ---
@@ -1020,6 +1032,8 @@ function updateStats() {
     const mobName = document.getElementById('mob_slaveName');
     const mobRank = document.getElementById('mob_rankStamp');
     const mobPic = document.getElementById('mob_profilePic');
+    const recName = document.getElementById('mob_recordName'); 
+
     
     // Header Stats (Visible)
     const mobPoints = document.getElementById('mobPoints');
@@ -1033,6 +1047,8 @@ function updateStats() {
     // FILL DATA
     if (mobName) mobName.innerText = userProfile.name || "SLAVE";
     if (mobRank) mobRank.innerText = userProfile.hierarchy || "INITIATE";
+    if (recName) recName.innerText = userProfile.name || "Archive"; 
+
     
     // Merit & Net
     if (mobPoints) mobPoints.innerText = gameStats.points || 0;
@@ -1065,9 +1081,6 @@ function updateStats() {
             try {
                 const hObj = JSON.parse(userProfile.kneelHistory);
                 
-                // FIX: Trust the backend data. 
-                // The backend already resets this at midnight.
-                // We do not check the date here to avoid Timezone bugs.
                 loggedHours = hObj.hours || [];
                 
             } catch(e) { console.error("Grid parse error", e); }
@@ -1376,11 +1389,14 @@ window.openExchequer = function() {
 };
 
 window.closeExchequer = function() {
+    // 1. Hide the Store Overlay
     const store = document.getElementById('mobExchequer');
     if (store) {
         store.classList.add('hidden');
         store.style.display = 'none';
     }
+
+    window.toggleMobileView('home');
 };
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
@@ -1481,30 +1497,38 @@ document.body.appendChild(footer);
 })();
 
 window.mobileRequestTask = function() {
-    // 1. INSTANT VISUAL FEEDBACK
+    // 1. THE GATEKEEPER: Check for 300 Coins
+    // (If you have less than 300, she won't even talk to you)
+    if (gameStats.coins < 300) {
+        window.triggerPoverty(); // <--- SHOWS THE POVERTY OVERLAY
+        
+        if(window.triggerSound) triggerSound('sfx-deny');
+        
+        return; // <--- STOP! Do not switch view, do not get task.
+    }
+
+    // 2. IF YOU HAVE MONEY: Proceed with the fancy animation
     const taskIdle = document.getElementById('qm_TaskIdle');
     const taskActive = document.getElementById('qm_TaskActive');
     const txt = document.getElementById('mobTaskText');
     
-    // Force View Switch
+    // Switch View
     if(taskIdle) taskIdle.classList.add('hidden');
     if(taskActive) taskActive.classList.remove('hidden');
 
-    // Show "Loading" Animation
+    // Show "Connecting..."
     if(txt) {
         txt.innerHTML = "ESTABLISHING LINK...";
         txt.classList.add('text-pulse');
     }
 
-    // 2. CALL REAL FUNCTION (Small delay to let animation be seen, optional)
+    // 3. GET THE TASK
     setTimeout(() => {
-        window.getRandomTask(); // The real logic
+        window.getRandomTask(); 
         
-        // Remove pulse when text updates (The observer/sync will handle this, 
-        // but let's be safe)
         setTimeout(() => {
             if(txt) txt.classList.remove('text-pulse');
-            window.syncMobileDashboard(); // Refresh to show real text
+            window.syncMobileDashboard(); 
         }, 800);
     }, 300);
 };
