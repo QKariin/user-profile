@@ -1634,5 +1634,4 @@ setInterval(() => {
         }
     }
 }, 500);
-} // This closes the (function() { ... ) wrapper above
 window.parent.postMessage({ type: "UI_READY" }, "*");
