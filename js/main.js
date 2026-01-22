@@ -1037,19 +1037,18 @@ function updateStats() {
     if (coinsEl) coinsEl.textContent = gameStats.coins ?? 0;
     if (pointsEl) pointsEl.textContent = gameStats.points ?? 0;
 
-    // --- [NEW] CONNECT DESKTOP EXPANDED STATS ---
+    // --- CONNECT DESKTOP EXPANDED STATS ---
     if (document.getElementById('statStreak')) document.getElementById('statStreak').innerText = gameStats.taskdom_streak || 0;
     if (document.getElementById('statTotal')) document.getElementById('statTotal').innerText = gameStats.taskdom_total_tasks || 0;
     if (document.getElementById('statCompleted')) document.getElementById('statCompleted').innerText = gameStats.taskdom_completed || 0;
     if (document.getElementById('statSkipped')) document.getElementById('statSkipped').innerText = gameStats.taskdom_skipped || 0;
     if (document.getElementById('statTotalKneels')) document.getElementById('statTotalKneels').innerText = gameStats.kneelCount || 0;
-    // ---------------------------------------------
 
     // 2. MOBILE UPDATE (The New Connection)
     // Header Identity
     const mobName = document.getElementById('mob_slaveName');
     const mobRank = document.getElementById('mob_rankStamp');
-    const mobPic = document.getElementById('mob_profilePic');
+    const mobPic = document.getElementById('mob_profilePic'); // Center Hexagon
     
     // Header Stats (Visible)
     const mobPoints = document.getElementById('mobPoints');
@@ -1060,24 +1059,22 @@ function updateStats() {
     const mobTotal = document.getElementById('mobTotal');
     const mobKneels = document.getElementById('mobKneels');
 
-    //Daily duties
+    // Daily duties
     const mobDailyKneels = document.getElementById('kneelDailyText');
     const kneelDailyFill = document.getElementById("kneelDailyFill");
 
-    // FILL DATA
+    // FILL MOBILE TEXT DATA
     if (mobName) mobName.innerText = userProfile.name || "SLAVE";
     if (mobRank) mobRank.innerText = userProfile.hierarchy || "INITIATE";
     
-    // Merit & Net
     if (mobPoints) mobPoints.innerText = gameStats.points || 0;
     if (mobCoins) mobCoins.innerText = gameStats.coins || 0;
 
-    // Drawer Data
     if (mobStreak) mobStreak.innerText = gameStats.taskdom_streak || 0;
     if (mobTotal) mobTotal.innerText = gameStats.taskdom_total_tasks || 0;
     if (mobKneels) mobKneels.innerText = gameStats.kneelCount || 0;
 
-    //Daily Duties
+    // Daily Duties Logic
     const dailyKneels = (gameStats.kneelHistory ? JSON.parse(gameStats.kneelHistory).hours?.length || 0 : 0);
     if (mobDailyKneels) mobDailyKneels.innerText = dailyKneels  + " / 8";
 
@@ -1086,15 +1083,31 @@ function updateStats() {
         kneelDailyFill.style.width = percent + "%";
     }
     
-    // Profile Picture Logic (Wix Fix)
-    if (mobPic && userProfile.profilePicture) {
+    // --- [FIX] PROFILE PICTURE LOGIC (SYNC ALL 3 IMAGES) ---
+    if (userProfile.profilePicture) {
         let rawUrl = userProfile.profilePicture;
+        let finalUrl = rawUrl;
+
+        // Fix Wix URLs
         if (rawUrl.startsWith("wix:image")) {
             const uri = rawUrl.split('/')[3].split('#')[0];
-            mobPic.src = `https://static.wixstatic.com/media/${uri}`;
-        } else {
-            mobPic.src = rawUrl;
+            finalUrl = `https://static.wixstatic.com/media/${uri}`;
         }
+
+        // 1. Update the Big Hexagon (Dashboard Center)
+        if (mobPic) mobPic.src = finalUrl;
+        
+        // 2. Update the Background Blur
+        const mobBg = document.getElementById('mob_bgPic');
+        if (mobBg) mobBg.src = finalUrl;
+
+        // 3. Update the Right Circle (Slave ID)
+        const rightCircle = document.getElementById('hudSlavePic');
+        if (rightCircle) rightCircle.src = finalUrl;
+
+        // 4. Update Desktop Avatar (Just in case)
+        const deskPic = document.getElementById('profilePic');
+        if (deskPic) deskPic.src = finalUrl;
     }
 
     // --- GRID SYNC (TRUST THE BACKEND) ---
@@ -1107,7 +1120,6 @@ function updateStats() {
         if (userProfile.kneelHistory) {
             try {
                 const hObj = JSON.parse(userProfile.kneelHistory);
-                // The backend already resets this at midnight.
                 loggedHours = hObj.hours || [];
             } catch(e) { console.error("Grid parse error", e); }
         }
@@ -1151,7 +1163,6 @@ function updateStats() {
     
     updateKneelingStatus();
 }
-
 // =========================================
 // PART 3: TRIBUTE & BACKEND FUNCTIONS (RESTORED)
 // =========================================
