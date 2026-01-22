@@ -1717,15 +1717,10 @@ window.triggerRankMock = function(customTitle) {
     function lockVisuals() {
         if (window.innerWidth > 768) return; // Mobile Only
 
-        // Calculate safe area
-        const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom')) || 0;
-        const footerHeight = 60;
-        const totalFooterSpace = footerHeight + safeAreaBottom;
-
         const lockStyles = {
             position: 'fixed',
             width: '100%',
-            height: `calc(100% - ${totalFooterSpace}px)`,
+            height: '100%',  // Keep full height - footer is positioned fixed independently
             overflow: 'hidden',
             inset: '0',
             overscrollBehavior: 'none',
