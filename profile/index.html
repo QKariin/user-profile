@@ -288,6 +288,41 @@
         }
         .mob-rank-badge.main { border-color: #c5a059; color: #c5a059; bottom: 10px; background: rgba(0,0,0,0.8); }
 
+        .mob-scroll-item {
+            flex: 0 0 120px;      /* Fixed Width: Stops them from squashing */
+            height: 160px;        /* Fixed Height */
+            position: relative;
+            border: 1px solid #333;
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 10px;   /* Spacing between items */
+        }
+        
+        /* 2. Smaller Cards for the Bottom List (Trash/Denied) */
+        .mob-horiz-scroll.small .mob-scroll-item {
+            flex: 0 0 80px; 
+            height: 80px;   
+            opacity: 0.6;
+        }
+        
+        /* 3. The Image Inside */
+        .mob-scroll-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
+        }
+        
+        /* 4. The Pending Icon Overlay */
+        .mob-pending-badge {
+            position: absolute; 
+            top: 5px; 
+            right: 5px;
+            font-size: 1rem; 
+            text-shadow: 0 0 5px black;
+            z-index: 10;
+        }
         /* =========================================
            7. HUD & LOBBY
            ========================================= */
