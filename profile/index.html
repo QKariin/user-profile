@@ -1099,13 +1099,24 @@
   </div>
 </div> <!-- <<< ADD THIS DIV to Close viewMobileRecord -->
 
-<!-- 5. GLOBAL VIEW (Matched Layout) -->
-<div id="viewMobileGlobal" class="mob-frame" style="display:none; height: 100vh !important; width: 100vw; overflow: hidden !important; flex-direction: column; padding: 0 !important; background: #000; z-index: 100;">
+<!-- 5. GLOBAL VIEW (Exact Record Layout Clone) -->
+<div id="viewMobileGlobal" class="mob-frame" style="
+    display:none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100vh !important; 
+    overflow: hidden !important; /* LOCK THE PARENT */
+    flex-direction: column; 
+    padding: 0 !important;       /* KILL PARENT PADDING */
+    background: #000; 
+    z-index: 100;
+">
     
-    <!-- 1. HEADER -->
+    <!-- 1. HEADER (Fixed) -->
     <div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: center; border-bottom: 1px solid #333; background: #000; padding: 15px 0; z-index: 50;">
         <div class="chat-queen-profile">
-             <!-- Icon -->
              <div class="queen-av-wrap" style="border:none;">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
              </div>
@@ -1116,7 +1127,7 @@
         </div>
     </div>
 
-    <!-- 2. SCROLLABLE CONTENT (Layout Matched to Record) -->
+    <!-- 2. SCROLLABLE CHILD (The "Animal" inside the Cage) -->
     <div id="mobGlobalScroll" style="
         flex: 1; 
         overflow-y: auto; 
@@ -1124,10 +1135,10 @@
         display: flex; 
         flex-direction: column; 
         align-items: center; 
-        justify-content: flex-start; /* Stack from top */
-        gap: 30px;                   /* Gap between elements */
-        padding-top: 100px;          /* Matches Record Header Clearance */
-        padding-bottom: 100px;       /* Matches Record Footer Clearance */
+        justify-content: flex-start; 
+        gap: 30px; 
+        padding-top: 100px;    /* Clear Header */
+        padding-bottom: 100px; /* Clear Footer */
         -webkit-overflow-scrolling: touch;
     ">
 
@@ -1170,8 +1181,7 @@
         </div>
     </div>
 
-    <!-- Padding for footer -->
-    <div style="height: 120px;"></div>
+    <!-- Padding for footer (Handled by padding-bottom on child now) -->
 </div>
       
     <!-- POVERTY OVERLAY -->
