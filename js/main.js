@@ -1446,6 +1446,63 @@ window.closeExchequer = function() {
         store.style.display = 'none';
     }
 };
+
+// --- RANK DEFINITIONS ---
+// Low to High
+const HIERARCHY_LEVELS = ["Slave", "Initiate", "Silverman", "Butler", "Chamberlain", "High Chamberlain"];
+
+// MOCKING INSULTS
+const RANK_INSULTS = [
+    "You are too pathetic to send media.",
+    "Silverman rank required. Know your place.",
+    "I do not want to see your face.",
+    "Earn your stripes before you try to impress me."
+];
+
+window.handleMediaPlus = function() {
+    const currentRank = window.userProfile?.hierarchy || "Slave";
+    const rankIndex = HIERARCHY_LEVELS.indexOf(currentRank);
+    
+    // SILVERMAN IS INDEX 2 (0=Slave, 1=Initiate, 2=Silverman)
+    if (rankIndex < 2) {
+        triggerRankMock();
+        return;
+    }
+
+    // IF RANK IS OKAY -> Open File Picker
+    document.getElementById('chatMediaInput').click();
+};
+
+window.triggerRankMock = function() {
+    const overlay = document.getElementById('povertyOverlay'); // Reusing the visual container
+    const title = overlay.querySelector('.mob-reward-title');
+    const text = document.getElementById('povertyInsult');
+    const stamp = overlay.querySelector('.mob-rank-stamp');
+
+    if (!overlay) return;
+
+    // Pick random insult
+    const insult = RANK_INSULTS[Math.floor(Math.random() * RANK_INSULTS.length)];
+
+    // UPDATE UI FOR RANK MOCKING
+    if(title) {
+        title.innerText = "RANK INSUFFICIENT";
+        title.style.color = "#888"; // Grey instead of Red
+    }
+    if(text) text.innerText = `"${insult}"`;
+    if(stamp) {
+        stamp.innerText = "SILENCE";
+        stamp.style.borderColor = "#888";
+    }
+    
+    // Move to Body & Show
+    if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+    
+    if(window.triggerSound) triggerSound('sfx-deny');
+};
+
 // =========================================
 // PART 2: FINAL APP MODE (NATIVE FLOW)
 // =========================================
