@@ -1192,42 +1192,19 @@
 </div> <!-- THIS IS THE CLOSING DIV FOR #MOBILE_APP -->
 <script>
 
-  // =========================================
-// IOS KEYBOARD SNAP-BACK FIX
 // =========================================
-(function() {
-    // 1. Target the Chat Input
-    const input = document.getElementById('chatMsgInput');
-    
-    if (input) {
-        // 2. When you TAP the input (Keyboard Opens)
-        input.addEventListener('focus', () => {
-            // Optional: Ensure the specific element is in view if needed
-            // But usually, we just let the browser handle the open
-        });
-
-        // 3. When you CLOSE the keyboard (Blur)
-        input.addEventListener('blur', () => {
-            // FORCE WINDOW TO TOP
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            
-            // Double tap (Timeout) to handle the animation delay of the keyboard sliding down
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-                document.body.scrollTop = 0;
-                
-                // Force Footer Re-Draw (Sometimes it gets stuck visually)
-                const footer = document.getElementById('app-mode-footer');
-                if(footer) {
-                    footer.style.display = 'none';
-                    footer.offsetHeight; // Trigger Reflow
-                    footer.style.display = 'flex';
-                }
-            }, 100);
-        });
-    }
-})();
+// IOS VISUAL VIEWPORT RESIZER
+// =========================================
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+        // When keyboard opens/closes, browser resizes visualViewport.
+        // We force the body height to match, preventing the "Halfway Scroll" bug.
+        document.body.style.height = window.visualViewport.height + 'px';
+        
+        // Force scroll to top to kill any offsets
+        window.scrollTo(0, 0);
+    });
+}
   
     function checkDevice() {
         const isMobile = window.innerWidth <= 768;
