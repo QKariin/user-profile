@@ -1444,8 +1444,8 @@ window.closeExchequer = function() {
 // ==========================
 
 function lockVisuals() {
-    // 1. LOCK THE BODY (Prevent global bounce)
-    Object.assign(document.body.style, {
+    // 1. LOCK THE ROOT & BODY (Nuclear option to stop global bounce)
+    const lockStyles = {
         position: 'fixed',
         width: '100%',
         height: '100%',
@@ -1454,24 +1454,27 @@ function lockVisuals() {
         overscrollBehavior: 'none',
         touchAction: 'none',
         backgroundColor: '#000000'
-    });
+    };
+    
+    Object.assign(document.documentElement.style, lockStyles);
+    Object.assign(document.body.style, lockStyles);
 
     // 2. DEFINE SCROLLABLE ZONES
-    // These specific elements are allowed to handle vertical swipes
+    // Includes the Record Parent (#viewMobileRecord) AND the new Child IDs (#mobHomeScroll, #mobGlobalScroll)
     const scrollables = document.querySelectorAll(
         '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll'
     );
     
-    // 3. APPLY PHYSICS WITHOUT BREAKING FLEXBOX
+    // 3. APPLY PHYSICS (Without forcing height)
     scrollables.forEach(el => {
-        // We do NOT set height here. We trust the CSS.
+        if (!el) return;
         el.style.overflowY = 'auto';
         el.style.webkitOverflowScrolling = 'touch';
-        el.style.overscrollBehaviorY = 'contain'; // Stops the "Chain Reaction" to body
-        el.style.touchAction = 'pan-y';           // Explicitly allows vertical scroll
+        el.style.overscrollBehaviorY = 'contain'; // Traps scroll inside the element
+        el.style.touchAction = 'pan-y';           // Allows vertical interaction
     });
 
-    // 4. PREVENT TEXT SELECTION (Optional, helps feel like an app)
+    // 4. PREVENT TEXT SELECTION
     document.onselectstart = function() { return false; }
 }
 
