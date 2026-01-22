@@ -1447,7 +1447,8 @@ window.closeExchequer = function() {
 // ==========================
 
 function lockVisuals() {
-    // 1. LOCK THE ROOT & BODY (Nuclear option to stop global bounce)
+    // 1. LOCK THE CAGE (The Body)
+    // We force the body to act as a static wall.
     const lockStyles = {
         position: 'fixed',
         width: '100%',
@@ -1455,28 +1456,60 @@ function lockVisuals() {
         overflow: 'hidden',
         inset: '0',
         overscrollBehavior: 'none',
-        touchAction: 'none',
+        touchAction: 'none', // Disables browser handling of gestures on the background
         backgroundColor: '#000000'
     };
-    
     Object.assign(document.documentElement.style, lockStyles);
     Object.assign(document.body.style, lockStyles);
 
-    // 2. DEFINE SCROLLABLE ZONES
-   const scrollables = document.querySelectorAll(
-    '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll, #mobRecordScroll, .qm-scroll-content'
-);
+    const allowedSelectors = '#mobHomeScroll, #mobGlobalScroll, #mobRecordScroll, .chat-body-frame, .qm-scroll-content, .mob-horiz-scroll, #gridOkay, #gridFailed';
+    const scrollables = document.querySelectorAll(allowedSelectors);
     
-    // 3. APPLY PHYSICS (Without forcing height)
     scrollables.forEach(el => {
         if (!el) return;
-        el.style.overflowY = 'auto';
-        el.style.webkitOverflowScrolling = 'touch';
-        el.style.overscrollBehaviorY = 'contain'; // Traps scroll inside the element
-        el.style.touchAction = 'pan-y';           // Allows vertical interaction
+        el.style.overflowY = 'auto'; // or overflowX for horizontal
+        el.style.webkitOverflowScrolling = 'touch'; // Momentum
+        el.style.overscrollBehavior = 'contain'; // Stops bounce from leaking to the cage
+        el.style.touchAction = 'pan-y'; // Explicitly allow vertical panning here
+        
+        // Special case for horizontal scrolls
+        if (el.classList.contains('mob-horiz-scroll') || el.id.includes('grid')) {
+            el.style.touchAction = 'pan-x';
+            el.style.overflowX = 'auto';
+            el.style.overflowY = 'hidden';
+        }
     });
 
-    // 4. PREVENT TEXT SELECTION
+    // 4. THE ACTIVE GUARD (The Interceptor)
+    // This watches every move. If you aren't touching an Animal, you don't move.
+    document.addEventListener('touchmove', function(e) {
+        
+        // Find if the target is inside one of our Allowed Animals
+        const target = e.target;
+        const scrollableParent = target.closest(allowedSelectors);
+
+        if (scrollableParent) {
+            // WE ARE TOUCHING AN ANIMAL.
+            // Check: Does the animal actually have room to move?
+            // (If the content fits on one screen, it shouldn't scroll either).
+            const isVertical = scrollableParent.scrollHeight > scrollableParent.clientHeight;
+            const isHorizontal = scrollableParent.scrollWidth > scrollableParent.clientWidth;
+
+            if (isVertical || isHorizontal) {
+                // Allow the move (Exit the guard)
+                return; 
+            }
+        }
+
+        // WE ARE TOUCHING THE CAGE (or a non-moving animal).
+        // KILL THE MOVEMENT.
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+
+    }, { passive: false }); // 'passive: false' is REQUIRED to use preventDefault()
+
+    // 5. PREVENT TEXT SELECTION (Optional: Makes it feel more like an app)
     document.onselectstart = function() { return false; }
 }
 
