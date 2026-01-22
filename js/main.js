@@ -1463,10 +1463,9 @@ function lockVisuals() {
     Object.assign(document.body.style, lockStyles);
 
     // 2. DEFINE SCROLLABLE ZONES
-    // Includes the Record Parent (#viewMobileRecord) AND the new Child IDs (#mobHomeScroll, #mobGlobalScroll)
     const scrollables = document.querySelectorAll(
-        '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll'
-    );
+    '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll, #mobRecordScroll'
+);
     
     // 3. APPLY PHYSICS (Without forcing height)
     scrollables.forEach(el => {
