@@ -1780,6 +1780,9 @@ window.triggerRankMock = function(customTitle) {
         }
         
         console.log('[Footer] Creating new footer for mobile (width:', window.innerWidth, ')');
+        
+        // Create footer element
+        footer = document.createElement('div');
         footer.id = 'app-mode-footer';
         
         // CSS INJECTION with !important for override
