@@ -363,6 +363,56 @@
             text-shadow: 0 0 5px black;
             z-index: 10;
         }
+
+      /* --- REWARD SHELVES --- */
+.reward-shelf {
+    display: flex;
+    gap: 12px;
+    padding: 0 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    /* Uses existing scrollbar hiding logic via 'mob-horiz-scroll' class */
+}
+
+.reward-badge {
+    flex: 0 0 80px; /* Fixed width */
+    height: 80px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #333;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: 0.3s;
+}
+
+/* ICONS */
+.rb-icon { font-size: 1.8rem; margin-bottom: 5px; filter: grayscale(100%); opacity: 0.3; }
+.rb-label { font-family: 'Orbitron'; font-size: 0.5rem; color: #555; text-transform: uppercase; text-align: center; line-height: 1.1; }
+
+/* LOCKED STATE */
+.reward-badge.locked {
+    opacity: 0.5;
+}
+.reward-badge.locked::after {
+    content: '🔒';
+    position: absolute; top: 5px; right: 5px; font-size: 0.6rem;
+}
+
+/* UNLOCKED STATE */
+.reward-badge.unlocked {
+    background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(10,10,10,1));
+    border-color: #c5a059;
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+}
+.reward-badge.unlocked .rb-icon { filter: none; opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.reward-badge.unlocked .rb-label { color: #fff; }
+
+/* SPECIAL BORDERS */
+.reward-badge.rare { border-color: #ff003c; box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
+.reward-badge.legendary { border-color: #00ff00; box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
         /* =========================================
            7. HUD & LOBBY
            ========================================= */
@@ -1048,6 +1098,27 @@
                     </div>
                 </div>
              </div>
+
+            <!-- 5. REWARDS TROPHY CASE -->
+            <div class="mob-section-wrapper" style="margin-top: 30px; width: 100%; padding-bottom: 20px;">
+                <div class="duty-label">SERVICE RECORD</div>
+                
+                <!-- Rank Shelf -->
+                <div class="mob-grid-label-center" style="text-align: left; padding-left: 10px; color: #666;">HIERARCHY</div>
+                <div id="shelfRanks" class="reward-shelf mob-horiz-scroll"></div>
+
+                <!-- Tasks Shelf -->
+                <div class="mob-grid-label-center" style="text-align: left; padding-left: 10px; color: #666; margin-top: 15px;">LABOR</div>
+                <div id="shelfTasks" class="reward-shelf mob-horiz-scroll"></div>
+
+                <!-- Kneeling Shelf -->
+                <div class="mob-grid-label-center" style="text-align: left; padding-left: 10px; color: #666; margin-top: 15px;">ENDURANCE</div>
+                <div id="shelfKneel" class="reward-shelf mob-horiz-scroll"></div>
+
+                <!-- Spending Shelf -->
+                <div class="mob-grid-label-center" style="text-align: left; padding-left: 10px; color: #666; margin-top: 15px;">SACRIFICE</div>
+                <div id="shelfSpend" class="reward-shelf mob-horiz-scroll"></div>
+            </div>
 
             <!-- REWARD POPUP -->
             <div id="mobKneelReward" class="mob-reward-overlay hidden">
