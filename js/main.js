@@ -1530,103 +1530,77 @@ window.triggerRankMock = function(customTitle) {
 // PART 2: FINAL APP MODE (NATIVE FLOW)
 // =========================================
 
+// =========================================
+// FINAL PART: APP NAVIGATION BAR (FORCE RENDER)
+// =========================================
+
 (function() {
-    // Only run on Mobile
-    if (window.innerWidth > 768) return;
- // ==========================
-// REPLACE THE 'lockVisuals' FUNCTION (Around Line 1184) WITH THIS:
-// ==========================
+    // 1. Force Visual Lock (Anti-Bounce)
+    function lockVisuals() {
+        if (window.innerWidth > 768) return; // Mobile Only
 
-function lockVisuals() {
-    // 1. LOCK THE CAGE (The Body)
-    // We force the body to act as a static wall.
-    const lockStyles = {
-        position: 'fixed',
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        inset: '0',
-        overscrollBehavior: 'none',
-        touchAction: 'none', // Disables browser handling of gestures on the background
-        backgroundColor: '#000000'
-    };
-    Object.assign(document.documentElement.style, lockStyles);
-    Object.assign(document.body.style, lockStyles);
+        const lockStyles = {
+            position: 'fixed',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            inset: '0',
+            overscrollBehavior: 'none',
+            touchAction: 'none', 
+            backgroundColor: '#000000'
+        };
+        Object.assign(document.documentElement.style, lockStyles);
+        Object.assign(document.body.style, lockStyles);
 
-    const allowedSelectors = '#mobHomeScroll, #mobGlobalScroll, #mobRecordScroll, .chat-body-frame, .qm-scroll-content, .mob-horiz-scroll, #gridOkay, #gridFailed';
-    const scrollables = document.querySelectorAll(allowedSelectors);
-    
-    scrollables.forEach(el => {
-        if (!el) return;
-        el.style.overflowY = 'auto'; // or overflowX for horizontal
-        el.style.webkitOverflowScrolling = 'touch'; // Momentum
-        el.style.overscrollBehavior = 'contain'; // Stops bounce from leaking to the cage
-        el.style.touchAction = 'pan-y'; // Explicitly allow vertical panning here
+        const allowedSelectors = '#mobHomeScroll, #mobGlobalScroll, #mobRecordScroll, .chat-body-frame, .qm-scroll-content, .mob-horiz-scroll, #gridOkay, #gridFailed';
+        const scrollables = document.querySelectorAll(allowedSelectors);
         
-        // Special case for horizontal scrolls
-        if (el.classList.contains('mob-horiz-scroll') || el.id.includes('grid')) {
-            el.style.touchAction = 'pan-x pan-y';
-            el.style.overflowX = 'auto';
-            el.style.overflowY = 'hidden';
-        }
-    });
-
-    // 4. THE ACTIVE GUARD (The Interceptor)
-    // This watches every move. If you aren't touching an Animal, you don't move.
-    document.addEventListener('touchmove', function(e) {
-        
-        // Find if the target is inside one of our Allowed Animals
-        const target = e.target;
-        const scrollableParent = target.closest(allowedSelectors);
-
-        if (scrollableParent) {
-            // WE ARE TOUCHING AN ANIMAL.
-            // Check: Does the animal actually have room to move?
-            // (If the content fits on one screen, it shouldn't scroll either).
-            const isVertical = scrollableParent.scrollHeight > scrollableParent.clientHeight;
-            const isHorizontal = scrollableParent.scrollWidth > scrollableParent.clientWidth;
-
-            if (isVertical || isHorizontal) {
-                // Allow the move (Exit the guard)
-                return; 
+        scrollables.forEach(el => {
+            if (!el) return;
+            el.style.overflowY = 'auto';
+            el.style.webkitOverflowScrolling = 'touch';
+            el.style.overscrollBehavior = 'contain'; 
+            el.style.touchAction = 'pan-y'; 
+            
+            if (el.classList.contains('mob-horiz-scroll') || el.id.includes('grid')) {
+                el.style.touchAction = 'pan-x pan-y';
+                el.style.overflowX = 'auto';
+                el.style.overflowY = 'hidden';
             }
-        }
+        });
 
-        // WE ARE TOUCHING THE CAGE (or a non-moving animal).
-        // KILL THE MOVEMENT.
-        if (e.cancelable) {
-            e.preventDefault();
-        }
+        document.addEventListener('touchmove', function(e) {
+            const target = e.target;
+            const scrollableParent = target.closest(allowedSelectors);
+            if (!scrollableParent && e.cancelable) e.preventDefault();
+        }, { passive: false });
+    }
 
-    }, { passive: false }); // 'passive: false' is REQUIRED to use preventDefault()
-
-    // 5. PREVENT TEXT SELECTION (Optional: Makes it feel more like an app)
-    document.onselectstart = function() { return false; }
-}
-
-// 2. BUILD FOOTER (FULL WIDTH 5-SLOT)
+    // 2. Build The Footer
     function buildAppFooter() {
+        // Run only on mobile
+        if (window.innerWidth > 768) return;
+
+        // If exists, don't rebuild
         if (document.getElementById('app-mode-footer')) return;
         
         const footer = document.createElement('div');
         footer.id = 'app-mode-footer';
         
+        // CSS INJECTION (Max Z-Index to stay on top of everything)
         Object.assign(footer.style, {
             display: 'flex', 
-            justifyContent: 'space-around', // Equal spacing
+            justifyContent: 'space-around',
             alignItems: 'center',
-            
-            // FULL WIDTH STYLE
             position: 'fixed', 
             bottom: '0', 
             left: '0', 
             width: '100%', 
             height: '60px',
-            
             background: 'linear-gradient(to top, #000 40%, rgba(0,0,0,0.95))',
-            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingBottom: 'env(safe-area-inset-bottom)', /* Handles iPhone Home Bar */
             zIndex: '2147483647', 
-            borderTop: '1px solid rgba(197, 160, 89, 0.3)', // Gold Border
+            borderTop: '1px solid rgba(197, 160, 89, 0.3)',
             backdropFilter: 'blur(10px)', 
             pointerEvents: 'auto', 
             touchAction: 'none'
@@ -1634,36 +1608,38 @@ function lockVisuals() {
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-        // STANDARD BUTTON STYLE (Width = 20% because 100% / 5 buttons)
-        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer;";
-        
-        // ACTIVE/HIGHLIGHT STYLE (For the Middle Chat Button)
-        const chatStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; text-shadow: 0 0 10px rgba(255,0,60,0.4);";
+        const btnStyle = "background:none; border:none; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; -webkit-tap-highlight-color: transparent;";
+        const centerStyle = "background:none; border:none; color:#ff003c; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:'Cinzel',serif; font-size:0.55rem; width:20%; height:100%; cursor:pointer; -webkit-tap-highlight-color: transparent;";
 
-       footer.innerHTML = `
-<button onclick="window.toggleMobileView('home')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">◈</span><span>PROFILE</span></button>
-<button onclick="window.toggleMobileView('record')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">▦</span><span>RECORD</span></button>
-<button onclick="window.toggleMobileView('chat')" style="${chatStyle};display:inline-flex;align-items:center;justify-content:center;padding:0;min-width:60px;">
-<img src="https://static.wixstatic.com/media/ce3e5b_19faff471a434690b7a40aacf5bf42c4~mv2.png" alt="Avatar" style="width:68px;height:68px;border-radius:50%;object-fit:cover;border:1px solid #ff003c;display:block;">
-</button>
-<button onclick="window.toggleMobileView('queen')" style="${btnStyle}"><span style="font-size:1.4rem;color:#888;">♛</span><span>QUEEN</span></button>
-<button onclick="window.toggleMobileView('global')" style="${btnStyle}">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-<span>GLOBAL</span></button>`;
-document.body.appendChild(footer);
+        footer.innerHTML = `
+            <button onclick="window.toggleMobileView('home')" style="${btnStyle}">
+                <span style="font-size:1.4rem;color:#888;">◈</span><span>PROFILE</span>
+            </button>
+            <button onclick="window.toggleMobileView('record')" style="${btnStyle}">
+                <span style="font-size:1.4rem;color:#888;">▦</span><span>RECORD</span>
+            </button>
+            <button onclick="window.toggleMobileView('chat')" style="${centerStyle}">
+                <img src="https://static.wixstatic.com/media/ce3e5b_19faff471a434690b7a40aacf5bf42c4~mv2.png" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ff003c;box-shadow:0 0 10px rgba(255,0,60,0.3);">
+            </button>
+            <button onclick="window.toggleMobileView('queen')" style="${btnStyle}">
+                <span style="font-size:1.4rem;color:#888;">♛</span><span>QUEEN</span>
+            </button>
+            <button onclick="window.toggleMobileView('global')" style="${btnStyle}">
+                <span style="font-size:1.4rem;color:#888;">⊕</span><span>GLOBAL</span>
+            </button>`;
+        
+        document.body.appendChild(footer);
     }
 
-    // 3. RUN
-    window.addEventListener('load', () => { 
-        lockVisuals(); 
-        buildAppFooter();
-        // FORCE HOME ON LOAD
-        if(window.toggleMobileView) window.toggleMobileView('home'); 
-    });
-    window.addEventListener('resize', lockVisuals);
-    lockVisuals(); buildAppFooter();
-})();
+    // 3. Init
+    window.addEventListener('load', () => { lockVisuals(); buildAppFooter(); });
+    window.addEventListener('resize', () => { lockVisuals(); buildAppFooter(); });
+    
+    // Force run immediately in case load event passed
+    lockVisuals(); 
+    buildAppFooter();
 
+})();
 // ==========================
 // REPLACE FROM LINE 1235 DOWN TO LINE 1270 WITH THIS:
 // ==========================
