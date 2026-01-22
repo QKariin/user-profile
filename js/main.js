@@ -1474,7 +1474,7 @@ function lockVisuals() {
         
         // Special case for horizontal scrolls
         if (el.classList.contains('mob-horiz-scroll') || el.id.includes('grid')) {
-            el.style.touchAction = 'pan-x';
+            el.style.touchAction = 'pan-x pan-y';
             el.style.overflowX = 'auto';
             el.style.overflowY = 'hidden';
         }
