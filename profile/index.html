@@ -364,55 +364,121 @@
             z-index: 10;
         }
 
-      /* --- REWARD SHELVES --- */
-.reward-shelf {
-    display: flex;
-    gap: 12px;
-    padding: 0 10px;
-    width: 100%;
-    margin-bottom: 10px;
-    /* Uses existing scrollbar hiding logic via 'mob-horiz-scroll' class */
-}
-
-.reward-badge {
-    flex: 0 0 80px; /* Fixed width */
-    height: 80px;
-    background: rgba(20, 20, 20, 0.8);
-    border: 1px solid #333;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: 0.3s;
-}
-
-/* ICONS */
-.rb-icon { font-size: 1.8rem; margin-bottom: 5px; filter: grayscale(100%); opacity: 0.3; }
-.rb-label { font-family: 'Orbitron'; font-size: 0.5rem; color: #555; text-transform: uppercase; text-align: center; line-height: 1.1; }
-
-/* LOCKED STATE */
-.reward-badge.locked {
-    opacity: 0.5;
-}
-.reward-badge.locked::after {
-    content: '🔒';
-    position: absolute; top: 5px; right: 5px; font-size: 0.6rem;
-}
-
-/* UNLOCKED STATE */
-.reward-badge.unlocked {
-    background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(10,10,10,1));
-    border-color: #c5a059;
-    box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
-}
-.reward-badge.unlocked .rb-icon { filter: none; opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-.reward-badge.unlocked .rb-label { color: #fff; }
-
-/* SPECIAL BORDERS */
-.reward-badge.rare { border-color: #ff003c; box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
-.reward-badge.legendary { border-color: #00ff00; box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
+/* =========================================
+   LUXURY TROPHY CASE (SHAPES & SVGS)
+   ========================================= */
+        
+        .reward-shelf {
+            display: flex;
+            gap: 15px; /* More breathing room */
+            padding: 10px 15px;
+            width: 100%;
+            margin-bottom: 25px; /* Clear separation between shelves */
+            overflow-x: auto;
+            scrollbar-width: none;
+            align-items: center; /* Center vertically */
+        }
+        
+        /* --- BASE BADGE DNA --- */
+        .reward-badge {
+            flex: 0 0 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy pop */
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+        
+        /* --- THE SHAPES --- */
+        
+        /* 1. RANKS: HEXAGONS */
+        .reward-badge.shape-hex {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            width: 70px; height: 80px; /* Taller for hex aspect ratio */
+            border: none; /* Clip path hides border, so we use pseudo-element or background */
+            background: #111; /* Fallback */
+        }
+        /* Inner Hexagon for Border Effect */
+        .reward-badge.shape-hex::before {
+            content: ''; position: absolute; inset: 1px; 
+            background: linear-gradient(145deg, #1a1a1a, #050505);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            z-index: -1;
+        }
+        
+        /* 2. TASKS: DATA CHIPS (Cut Corners) */
+        .reward-badge.shape-chip {
+            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+            width: 70px; height: 70px;
+        }
+        
+        /* 3. KNEELING: RINGS (Circles) */
+        .reward-badge.shape-circle {
+            border-radius: 50%;
+            width: 70px; height: 70px;
+            border: 1px solid #333;
+        }
+        
+        /* 4. SPENDING: DIAMONDS */
+        .reward-badge.shape-diamond {
+            transform: rotate(45deg);
+            width: 55px; height: 55px; /* Smaller because rotation takes space */
+            margin: 10px; /* Space for the corners */
+            border: 1px solid #333;
+        }
+        /* Counter-rotate content so icon isn't sideways */
+        .reward-badge.shape-diamond .rb-inner { transform: rotate(-45deg); }
+        
+        
+        /* --- THE ICONS (SVGs) --- */
+        .rb-icon {
+            width: 24px; height: 24px;
+            fill: #444; /* Locked color */
+            margin-bottom: 5px;
+            transition: 0.3s;
+        }
+        
+        /* --- TEXT LABELS --- */
+        .rb-label {
+            font-family: 'Orbitron'; 
+            font-size: 0.45rem; 
+            color: #444; 
+            text-transform: uppercase; 
+            text-align: center; 
+            line-height: 1;
+            letter-spacing: 1px;
+        }
+        
+        /* --- STATES --- */
+        
+        /* LOCKED */
+        .reward-badge.locked { opacity: 0.6; filter: grayscale(100%); }
+        
+        /* UNLOCKED */
+        .reward-badge.unlocked {
+            background: linear-gradient(135deg, rgba(20,20,20,1), rgba(40,40,40,1));
+            z-index: 2;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.15); /* Gold Glow */
+        }
+        
+        .reward-badge.unlocked.shape-circle { border-color: var(--gold); }
+        .reward-badge.unlocked.shape-chip { border-right: 2px solid var(--gold); }
+        .reward-badge.unlocked.shape-diamond { border-color: var(--gold); }
+        
+        /* Hexagon Unlocked Border Trick */
+        .reward-badge.unlocked.shape-hex { background: var(--gold); } /* The "Border" */
+        .reward-badge.unlocked.shape-hex::before { background: #111; } /* The Dark Inner */
+        
+        .reward-badge.unlocked .rb-icon { fill: var(--gold); filter: drop-shadow(0 0 5px rgba(197,160,89,0.5)); }
+        .reward-badge.unlocked .rb-label { color: #ccc; }
+        
+        /* LEGENDARY TIER (Last items) */
+        .reward-badge.unlocked.legendary .rb-icon { fill: #ff003c; filter: drop-shadow(0 0 8px #ff003c); }
         /* =========================================
            7. HUD & LOBBY
            ========================================= */
