@@ -809,8 +809,10 @@
 <!-- 🟢 MOBILE UNIVERSE (HALO + WORKING TIMER + RECORD) -->
 <div id="MOBILE_APP" style="display:none;">
     
-  <!-- 1. DASHBOARD (HOME) -->
-<div id="viewMobileHome" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; padding: 0; z-index: 1;">
+    <!-- =======================================================
+         1. DASHBOARD (HOME)
+         ======================================================= -->
+    <div id="viewMobileHome" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; padding: 0; z-index: 1;">
         
         <!-- === FIXED LAYER (Background & HUD) === -->
         <div class="mob-bg-layer">
@@ -821,25 +823,22 @@
         <div class="mob-hud-row">
             <!-- LEFT CIRCLE: SETTINGS (Now shows Queen Image) -->
             <div class="hud-circle slave" onclick="openLobby()">
-                <!-- Permanent Queen Image -->
                 <img src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png">
                 <div class="hud-gear">⚙</div>
             </div>
         
             <!-- RIGHT CIRCLE: QUEEN MENU (Now shows Slave Image) -->
             <div class="hud-circle queen" onclick="openQueenMenu()">
-                <!-- Dynamic Slave Image -->
                 <img id="hudSlavePic" src="">
                 <div id="hudDomStatus" class="hud-status-dot offline"></div>
             </div>
         </div>
 
-        <!-- === POPUP OVERLAYS (Hidden by default) === -->
+        <!-- === POPUP OVERLAYS === -->
         
         <!-- LOBBY (Settings) -->
         <div id="lobbyOverlay" class="mob-reward-overlay hidden">
             <div class="mob-reward-card lobby-card">
-                <!-- VIEW 1: MENU LIST -->
                 <div id="lobbyMenu" class="lobby-content">
                     <button class="lobby-btn" onclick="showLobbyAction('name')">ADD YOUR NAME</button>
                     <button class="lobby-btn" onclick="showLobbyAction('photo')">UPLOAD PHOTO</button>
@@ -850,7 +849,6 @@
                     <button class="lobby-btn close" onclick="closeLobby()">CLOSE</button>
                 </div>
 
-                <!-- VIEW 2: ACTION INPUT -->
                 <div id="lobbyActionView" class="lobby-content hidden">
                     <div id="lobbyPrompt" class="lobby-prompt">...</div>
                     <input type="text" id="lobbyInputText" class="lobby-input hidden" placeholder="Type here...">
@@ -887,10 +885,8 @@
         <!-- QUEEN'S DUTY MENU -->
         <div id="queenOverlay" class="mob-reward-overlay hidden">
             <div class="mob-reward-card queen-card-layout">
-                <!-- DUTIES HEADER (Standardized: Profile Left, '×' Right) -->
+                <!-- DUTIES HEADER -->
                 <div class="mob-chat-header" style="position: sticky !important; top: 0 !important; width: 100%; justify-content: space-between; border-bottom: 1px solid #333; background: #000; padding: 0 15px; z-index: 50;">
-                    
-                    <!-- LEFT: PROFILE INFO -->
                     <div class="chat-queen-profile">
                         <div class="queen-av-wrap">
                             <img src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png" class="queen-av-img">
@@ -901,8 +897,6 @@
                             <div class="chat-status-text" id="dutyDateDisplay" style="color: #c5a059;">--/--/--</div>
                         </div>
                     </div>
-                
-                    <!-- RIGHT: CLOSE BUTTON -->
                     <button onclick="closeQueenMenu()" style="background: none; border: none; color: #444; font-size: 2rem; line-height: 1; cursor: pointer; padding: 0;">×</button>
                 </div>
 
@@ -976,10 +970,9 @@
             </div>
         </div>
 
-        <!-- *** INTERNAL SCROLLING WRAPPER (This is the Fix!) *** -->
-<!-- Added padding: 60px top, 5px sides, 120px bottom (for footer safety) -->
-<div id="mobHomeScroll" style="flex: 1; width: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 5px 120px 5px; -webkit-overflow-scrolling: touch;">      
-            <!-- 2. THE HALO (Identity) -->
+        <!-- *** INTERNAL SCROLLING WRAPPER *** -->
+        <div id="mobHomeScroll" style="flex: 1; width: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 5px 120px 5px; -webkit-overflow-scrolling: touch;">      
+            <!-- THE HALO -->
             <div class="halo-section">
                 <div class="halo-ring">
                     <div id="mob_slaveName" class="halo-name">SLAVE</div>
@@ -991,7 +984,7 @@
                 </div>
             </div> 
 
-            <!-- 3. STATS BRIDGE & DRAWER -->
+            <!-- STATS BRIDGE -->
             <div style="width:100%; display:flex; flex-direction:column; align-items:center; z-index:3;">
                 <div class="halo-stats-card">
                     <div class="h-stat"><span class="h-val" id="mobPoints">0</span><span class="h-lbl">MERIT</span></div>
@@ -1010,7 +1003,7 @@
                 </div>
             </div>
 
-            <!-- 4. ACTION STACK -->
+            <!-- ACTION STACK -->
             <div class="halo-stack" style="padding: 0 20px; width:100%; margin-top:15px;">
                 <div class="mob-kneel-bar mob-kneel-zone" 
                      onmousedown="if(window.handleHoldStart) window.handleHoldStart(event)" 
@@ -1026,7 +1019,7 @@
                 </div>
              </div>
 
-            <!-- REWARD POPUP (Inside Scrollable, but overlay logic handles display) -->
+            <!-- REWARD POPUP -->
             <div id="mobKneelReward" class="mob-reward-overlay hidden">
                 <div class="mob-reward-card">
                     <div class="mob-hex-wrap small-reward">
@@ -1040,157 +1033,114 @@
                 </div>
             </div>
             
-            <!-- Spacer for footer -->
             <div style="height: 120px;"></div>
-
-        </div> <!-- END INTERNAL SCROLL WRAPPER -->
-
+        </div> 
     </div> <!-- CLOSES viewMobileHome -->
 
-    <!-- 2. MOBILE RECORD (THE VERTICAL VAULT) -->
-<!-- RECORD HEADER (Standardized: Profile Left, '×' Right) -->
-<div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: space-between; border-bottom: 1px solid #333; background: #000; padding: 0 15px; z-index: 50;">
-    
-    <!-- LEFT: PROFILE INFO -->
-    <div class="chat-queen-profile">
-        <div class="queen-av-wrap">
-            <img src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png" class="queen-av-img">
-            <div class="status-dot online"></div>
+
+    <!-- =======================================================
+         2. MOBILE RECORD (THE VERTICAL VAULT) - [FIXED]
+         ======================================================= -->
+    <div id="viewMobileRecord" class="mob-frame" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh !important; overflow: hidden !important; flex-direction: column; padding: 0 !important; background: #000; z-index: 10;">
+
+        <!-- RECORD HEADER -->
+        <div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: space-between; border-bottom: 1px solid #333; background: #000; padding: 0 15px; z-index: 50;">
+            <div class="chat-queen-profile">
+                <div class="queen-av-wrap">
+                    <img src="https://static.wixstatic.com/media/ce3e5b_e06c7a2254d848a480eb98107c35e246~mv2.png" class="queen-av-img">
+                    <div class="status-dot online"></div>
+                </div>
+                <div class="chat-meta-col">
+                    <div class="chat-queen-name">SLAVE <span id="mob_recordName">...</span></div>
+                    <div class="chat-status-text" style="color: #c5a059;">OFFICIAL RECORD</div>
+                </div>
+            </div>
+            <button onclick="window.toggleMobileView('home')" style="background: none; border: none; color: #444; font-size: 2rem; line-height: 1; cursor: pointer; padding: 0;">×</button>
         </div>
-        <div class="chat-meta-col">
-            <div class="chat-queen-name">SLAVE <span id="mob_recordName">...</span></div>
-            <div class="chat-status-text" style="color: #c5a059;">OFFICIAL RECORD</div>
+        
+        <!-- SCROLLABLE CONTENT -->
+        <div id="mobRecordScroll" style="flex: 1; overflow-y: auto; width: 100%; display: flex; flex-direction: column; justify-content: space-evenly; padding-top: 100px; padding-bottom: 80px; -webkit-overflow-scrolling: touch;">        
+            
+            <div class="mob-altar-container">
+                <div class="mob-grid-label-center">HIGHEST MERIT</div>
+                <div class="mob-pyramid-stage">
+                    <div class="mob-idol side"><img id="mobRec_Slot2" src=""><div class="mob-rank-badge">II</div></div>
+                    <div class="mob-idol side right"><img id="mobRec_Slot3" src=""><div class="mob-rank-badge">III</div></div>
+                    <div class="mob-idol center"><img id="mobRec_Slot1" src=""><div class="mob-rank-badge main">I</div></div>
+                </div>
+            </div>
+
+            <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
+                <div class="mob-grid-label">ACCEPTED PROTOCOLS</div>
+                <div id="mobRec_Grid" class="mob-horiz-scroll"></div>
+            </div>
+
+            <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
+                <div class="mob-grid-label" style="color:#ff003c;">DENIED / FAILED</div>
+                <div id="mobRec_Heap" class="mob-horiz-scroll small"></div>
+            </div>
+
         </div>
-    </div>
+    </div> 
 
-    <!-- RIGHT: CLOSE BUTTON (Acts as Back) -->
-    <button onclick="window.toggleMobileView('home')" style="background: none; border: none; color: #444; font-size: 2rem; line-height: 1; cursor: pointer; padding: 0;">×</button>
-  </div>
-</div>
-    
-<!-- 2. SCROLLABLE CONTENT (FIXED: Spacing & Padding) -->
-<div id="mobRecordScroll" style="
-    flex: 1; 
-    overflow-y: auto; 
-    width: 100%; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-evenly; /* This kills the black gap by spreading items out */
-    padding-top: 100px;            /* Clears the Fixed Header */
-    padding-bottom: 80px;          /* Clears the Footer */
-    -webkit-overflow-scrolling: touch;
-">        
-    
-    <!-- ALTAR -->
-    <div class="mob-altar-container">
-        <div class="mob-grid-label-center">HIGHEST MERIT</div>
-        <div class="mob-pyramid-stage">
-            <div class="mob-idol side"><img id="mobRec_Slot2" src=""><div class="mob-rank-badge">II</div></div>
-            <div class="mob-idol side right"><img id="mobRec_Slot3" src=""><div class="mob-rank-badge">III</div></div>
-            <div class="mob-idol center"><img id="mobRec_Slot1" src=""><div class="mob-rank-badge main">I</div></div>
+
+    <!-- =======================================================
+         5. GLOBAL VIEW (Record Layout Clone)
+         ======================================================= -->
+    <div id="viewMobileGlobal" class="mob-frame" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh !important; overflow: hidden !important; flex-direction: column; padding: 0 !important; background: #000; z-index: 100;">
+        
+        <!-- HEADER -->
+        <div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: center; border-bottom: 1px solid #333; background: #000; padding: 15px 0; z-index: 50;">
+            <div class="chat-queen-profile">
+                 <div class="queen-av-wrap" style="border:none;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                 </div>
+                <div class="chat-meta-col" style="align-items: center; text-align: center;">
+                    <div class="chat-queen-name">GLOBAL NETWORK</div>
+                    <div class="chat-status-text" style="color: #c5a059;">FINANCIAL ACCESS</div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- ARCHIVE -->
-    <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
-        <div class="mob-grid-label">ACCEPTED PROTOCOLS</div>
-        <div id="mobRec_Grid" class="mob-horiz-scroll"></div>
-    </div>
+        <!-- SCROLLABLE CHILD -->
+        <div id="mobGlobalScroll" style="flex: 1; overflow-y: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 30px; padding-top: 100px; padding-bottom: 100px; -webkit-overflow-scrolling: touch;">
 
-    <!-- HEAP -->
-    <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
-        <div class="mob-grid-label" style="color:#ff003c;">DENIED / FAILED</div>
-        <div id="mobRec_Heap" class="mob-horiz-scroll small"></div>
-    </div>
+            <div style="width: 90%;">
+                <button class="wallet-btn" onclick="openExchequer()" style="background: rgba(20,20,20,0.8); border: 1px solid #c5a059; color: #c5a059; padding: 20px; font-size: 1.1rem; box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);">
+                    FILL WALLET
+                </button>
+            </div>
 
-  </div>
-</div> <!-- <<< ADD THIS DIV to Close viewMobileRecord -->
+            <div style="width: 90%; background: #111; border: 1px solid #333; padding: 20px; text-align: center; border-radius: 4px;">
+                <div style="color:#888; font-size:0.7rem; margin-bottom:10px; font-family:'Orbitron';">PROTOCOL STATUS</div>
+                <div style="font-family:'Cinzel'; font-size:1.1rem; color:#fff; letter-spacing: 2px;">OBEDIENCE IS MANDATORY</div>
+                <div style="font-family:'Orbitron'; font-size:0.6rem; color:#00ff00; margin-top:10px; letter-spacing: 2px;">SERVER: ONLINE</div>
+            </div>
 
-<!-- 5. GLOBAL VIEW (Exact Record Layout Clone) -->
-<div id="viewMobileGlobal" class="mob-frame" style="
-    display:none; 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100vh !important; 
-    overflow: hidden !important; /* LOCK THE PARENT */
-    flex-direction: column; 
-    padding: 0 !important;       /* KILL PARENT PADDING */
-    background: #000; 
-    z-index: 100;
-">
-    
-    <!-- 1. HEADER (Fixed) -->
-    <div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: center; border-bottom: 1px solid #333; background: #000; padding: 15px 0; z-index: 50;">
-        <div class="chat-queen-profile">
-             <div class="queen-av-wrap" style="border:none;">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-             </div>
-            <div class="chat-meta-col" style="align-items: center; text-align: center;">
-                <div class="chat-queen-name">GLOBAL NETWORK</div>
-                <div class="chat-status-text" style="color: #c5a059;">FINANCIAL ACCESS</div>
+        </div>
+        
+        <!-- EXCHEQUER OVERLAY -->
+        <div id="mobExchequer" class="mob-reward-overlay hidden" style="z-index: 2147483640;">
+            <div class="mob-reward-card lobby-card" style="border: 1px solid #c5a059;">
+                <div class="lobby-header">
+                    <div class="lobby-title">EXCHEQUER</div>
+                    <div class="lobby-subtitle">ACQUIRE CAPITAL</div>
+                </div>
+
+                <div class="coin-grid">
+                    <div class="coin-tile" onclick="window.buyRealCoins(1000)"><div class="coin-amount">1,000</div><div class="coin-price">€10.00</div></div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(5500)"><div class="coin-amount">5,500</div><div class="coin-price">€50.00</div></div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(12000)"><div class="coin-amount">12,000</div><div class="coin-price">€100.00</div></div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(30000)"><div class="coin-amount">30,000</div><div class="coin-price">€250.00</div></div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(70000)"><div class="coin-amount">70,000</div><div class="coin-price">€500.00</div></div>
+                    <div class="coin-tile" onclick="window.buyRealCoins(150000)"><div class="coin-amount">150,000</div><div class="coin-price">€1000.00</div></div>
+                </div>
+
+                <button class="lobby-btn close" onclick="closeExchequer()" style="margin-top:20px;">CLOSE</button>
             </div>
         </div>
     </div>
-
-    <!-- 2. SCROLLABLE CHILD (The "Animal" inside the Cage) -->
-    <div id="mobGlobalScroll" style="
-        flex: 1; 
-        overflow-y: auto; 
-        width: 100%; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: flex-start; 
-        gap: 30px; 
-        padding-top: 100px;    /* Clear Header */
-        padding-bottom: 100px; /* Clear Footer */
-        -webkit-overflow-scrolling: touch;
-    ">
-
-        <!-- FILL WALLET BUTTON -->
-        <div style="width: 90%;">
-            <button class="wallet-btn" onclick="openExchequer()" style="background: rgba(20,20,20,0.8); border: 1px solid #c5a059; color: #c5a059; padding: 20px; font-size: 1.1rem; box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);">
-                FILL WALLET
-            </button>
-        </div>
-
-        <!-- PROTOCOL TEXT CARD -->
-        <div style="width: 90%; background: #111; border: 1px solid #333; padding: 20px; text-align: center; border-radius: 4px;">
-            <div style="color:#888; font-size:0.7rem; margin-bottom:10px; font-family:'Orbitron';">PROTOCOL STATUS</div>
-            <div style="font-family:'Cinzel'; font-size:1.1rem; color:#fff; letter-spacing: 2px;">OBEDIENCE IS MANDATORY</div>
-            <div style="font-family:'Orbitron'; font-size:0.6rem; color:#00ff00; margin-top:10px; letter-spacing: 2px;">SERVER: ONLINE</div>
-        </div>
-
-    </div>
-    
-    <!-- EXCHEQUER OVERLAY (Hidden Store) -->
-    <div id="mobExchequer" class="mob-reward-overlay hidden" style="z-index: 2147483640;">
-        <div class="mob-reward-card lobby-card" style="border: 1px solid #c5a059;">
-            <div class="lobby-header">
-                <div class="lobby-title">EXCHEQUER</div>
-                <div class="lobby-subtitle">ACQUIRE CAPITAL</div>
-            </div>
-
-            <!-- COIN PACKAGES -->
-            <div class="coin-grid">
-                <div class="coin-tile" onclick="window.buyRealCoins(1000)"><div class="coin-amount">1,000</div><div class="coin-price">€10.00</div></div>
-                <div class="coin-tile" onclick="window.buyRealCoins(5500)"><div class="coin-amount">5,500</div><div class="coin-price">€50.00</div></div>
-                <div class="coin-tile" onclick="window.buyRealCoins(12000)"><div class="coin-amount">12,000</div><div class="coin-price">€100.00</div></div>
-                <div class="coin-tile" onclick="window.buyRealCoins(30000)"><div class="coin-amount">30,000</div><div class="coin-price">€250.00</div></div>
-                <div class="coin-tile" onclick="window.buyRealCoins(70000)"><div class="coin-amount">70,000</div><div class="coin-price">€500.00</div></div>
-                <div class="coin-tile" onclick="window.buyRealCoins(150000)"><div class="coin-amount">150,000</div><div class="coin-price">€1000.00</div></div>
-            </div>
-
-            <!-- CLOSE BUTTON -->
-            <button class="lobby-btn close" onclick="closeExchequer()" style="margin-top:20px;">CLOSE</button>
-        </div>
-    </div>
-
-    <!-- Padding for footer (Handled by padding-bottom on child now) -->
-</div>
-      
+          
     <!-- POVERTY OVERLAY -->
     <div id="povertyOverlay" class="mob-reward-overlay hidden">
         <div class="mob-reward-card" style="border-color: #ff003c; box-shadow: 0 0 30px rgba(255, 0, 60, 0.2);">
