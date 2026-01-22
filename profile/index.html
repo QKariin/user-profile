@@ -1061,37 +1061,45 @@
     </div>
 </div>
     
-<!-- Added ID: mobRecordScroll -->
-<div id="mobRecordScroll" style="flex: 1; overflow-y: auto; width: 100%; padding-top: 25px; -webkit-overflow-scrolling: touch;">        
-        <!-- ALTAR -->
-        <div class="mob-altar-container">
-            <div class="mob-grid-label-center">HIGHEST MERIT</div>
-            <div class="mob-pyramid-stage">
-                <div class="mob-idol side"><img id="mobRec_Slot2" src=""><div class="mob-rank-badge">II</div></div>
-                <div class="mob-idol side right"><img id="mobRec_Slot3" src=""><div class="mob-rank-badge">III</div></div>
-                <div class="mob-idol center"><img id="mobRec_Slot1" src=""><div class="mob-rank-badge main">I</div></div>
-            </div>
-        </div>
+<!-- 2. SCROLLABLE CONTENT (FIXED: Spacing & Padding) -->
+<div id="mobRecordScroll" style="
+    flex: 1; 
+    overflow-y: auto; 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-evenly; /* This kills the black gap by spreading items out */
+    padding-top: 100px;            /* Clears the Fixed Header */
+    padding-bottom: 80px;          /* Clears the Footer */
+    -webkit-overflow-scrolling: touch;
+">        
     
-        <!-- ARCHIVE -->
-        <div class="mob-section-wrapper" style="margin-top:20px; align-items:flex-start; padding-left:20px;">
-            <div class="mob-grid-label">ACCEPTED PROTOCOLS</div>
-            <div id="mobRec_Grid" class="mob-horiz-scroll"></div>
+    <!-- ALTAR -->
+    <div class="mob-altar-container">
+        <div class="mob-grid-label-center">HIGHEST MERIT</div>
+        <div class="mob-pyramid-stage">
+            <div class="mob-idol side"><img id="mobRec_Slot2" src=""><div class="mob-rank-badge">II</div></div>
+            <div class="mob-idol side right"><img id="mobRec_Slot3" src=""><div class="mob-rank-badge">III</div></div>
+            <div class="mob-idol center"><img id="mobRec_Slot1" src=""><div class="mob-rank-badge main">I</div></div>
         </div>
-    
-        <!-- HEAP -->
-        <div class="mob-section-wrapper" style="margin-top:20px; align-items:flex-start; padding-left:20px;">
-            <div class="mob-grid-label" style="color:#ff003c;">DENIED / FAILED</div>
-            <div id="mobRec_Heap" class="mob-horiz-scroll small"></div>
-        </div>
-    
-        <!-- Spacer for Footer -->
-        <div style="height: 60px;"></div>
-    </div> <!-- Closes Scrollable Content -->
+    </div>
+
+    <!-- ARCHIVE -->
+    <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
+        <div class="mob-grid-label">ACCEPTED PROTOCOLS</div>
+        <div id="mobRec_Grid" class="mob-horiz-scroll"></div>
+    </div>
+
+    <!-- HEAP -->
+    <div class="mob-section-wrapper" style="margin-top:0; align-items:flex-start; padding-left:20px;">
+        <div class="mob-grid-label" style="color:#ff003c;">DENIED / FAILED</div>
+        <div id="mobRec_Heap" class="mob-horiz-scroll small"></div>
+    </div>
+
+  </div>
 </div> <!-- <<< ADD THIS DIV to Close viewMobileRecord -->
 
 <!-- 5. GLOBAL VIEW (REBUILT TO MATCH RECORD VIEW EXACTLY) -->
-<!-- REMOVED class="mob-frame". Added Fixed Position + 100% Height to stop overflow -->
 <div id="viewMobileGlobal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; flex-direction: column; background: #000; z-index: 100;">    
     <!-- 1. HEADER (Cloned from Record View logic) -->
     <div class="mob-chat-header" style="flex-shrink: 0; width: 100%; justify-content: center; border-bottom: 1px solid #333; background: #000; padding: 15px 0; z-index: 50;">
