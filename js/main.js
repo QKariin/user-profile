@@ -1803,8 +1803,8 @@ window.triggerRankMock = function(customTitle) {
         };
         
         // Apply styles with setAttribute for better compatibility
-        // Use calc to ensure footer stays within viewport bounds
-        let styleString = 'display: flex !important; justify-content: space-around !important; align-items: stretch !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100vw !important; min-height: 60px !important; max-height: 60px !important; box-sizing: border-box !important; background: linear-gradient(to top, #000 40%, rgba(0,0,0,0.95)) !important; padding-bottom: env(safe-area-inset-bottom) !important; z-index: 99999999 !important; border-top: 1px solid rgba(197, 160, 89, 0.3) !important; backdrop-filter: blur(10px) !important; pointer-events: auto !important; touch-action: none !important; visibility: visible !important; opacity: 1 !important; margin: 0 !important; overflow: hidden !important;';
+        // IMPORTANT: Remove padding-bottom to keep footer at exactly 60px height
+        let styleString = 'display: flex !important; justify-content: space-around !important; align-items: stretch !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100vw !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; box-sizing: border-box !important; background: linear-gradient(to top, #000 40%, rgba(0,0,0,0.95)) !important; z-index: 99999999 !important; border-top: 1px solid rgba(197, 160, 89, 0.3) !important; backdrop-filter: blur(10px) !important; pointer-events: auto !important; touch-action: none !important; visibility: visible !important; opacity: 1 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;';
         footer.setAttribute('style', styleString);
 
         footer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
@@ -1829,10 +1829,15 @@ window.triggerRankMock = function(customTitle) {
                 <span style="font-size:1.4rem !important;color:#888 !important;">⊕</span><span>GLOBAL</span>
             </button>`;
         
-        // Append to documentElement to stay above all other elements
-        document.documentElement.appendChild(footer);
-        console.log('[Footer] Footer appended to documentElement, element:', footer);
+        // Append to body, and ensure it's positioned above everything
+        if (document.body) {
+            document.body.appendChild(footer);
+        } else {
+            document.documentElement.appendChild(footer);
+        }
+        console.log('[Footer] Footer appended, checking parent:', footer.parentElement?.tagName);
         console.log('[Footer] Footer computed style bottom:', window.getComputedStyle(footer).bottom);
+        console.log('[Footer] Footer getBoundingClientRect:', footer.getBoundingClientRect());
         
         // Force a reflow to ensure it renders
         footer.offsetHeight;

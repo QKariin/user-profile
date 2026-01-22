@@ -687,15 +687,38 @@
             left: 0 !important;
             right: 0 !important;
             z-index: 99999999 !important;
-            /* Prevent footer buttons from wrapping or shrinking */
+            width: 100vw !important;
+            height: 60px !important;
+            min-height: 60px !important;
+            max-height: 60px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-around !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            background: linear-gradient(to top, #000 40%, rgba(0,0,0,0.95)) !important;
+            border-top: 1px solid rgba(197, 160, 89, 0.3) !important;
+            overflow: visible !important;
+            clip-path: none !important;
         }
         
         #app-mode-footer button {
             /* Ensure buttons fill available space */
             flex: 1 !important;
+            height: 60px !important;
             min-height: 60px !important;
+            max-height: 60px !important;
             padding: 0 !important;
             margin: 0 !important;
+            border: none !important;
+            background: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #666 !important;
         }
     }
 </style>
