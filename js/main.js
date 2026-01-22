@@ -1463,8 +1463,8 @@ function lockVisuals() {
     Object.assign(document.body.style, lockStyles);
 
     // 2. DEFINE SCROLLABLE ZONES
-    const scrollables = document.querySelectorAll(
-    '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll, #mobRecordScroll'
+   const scrollables = document.querySelectorAll(
+    '.content-stage, .chat-body-frame, #historySection, #viewNews, #viewMobileRecord, #mobHomeScroll, #mobGlobalScroll, #mobRecordScroll, .qm-scroll-content'
 );
     
     // 3. APPLY PHYSICS (Without forcing height)
