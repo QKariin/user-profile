@@ -1,7 +1,7 @@
-/* --- LUXURY TACTICAL CHAT DNA --- */
+/* --- LUXURY TACTICAL CHAT DNA (REPAIRED & ORGANIZED) --- */
 
 /* =========================================
-   1. GLOBAL VARIABLES & UTILS
+   1. VARIABLES & GLOBAL UTILS
    ========================================= */
 :root {
     --pink: #ff00de;
@@ -13,31 +13,30 @@
 
 .hidden { display: none !important; }
 
-/* HEADER TOGGLE LOGIC (Desktop Default) */
-/* Hide Giant Mobile Header, Show Black Bar */
+/* --- HEADER TOGGLE LOGIC (DESKTOP DEFAULTS) --- */
+/* Hide Mobile Header on Desktop */
 .mob-chat-header { display: none !important; }
+/* Show Desktop Header on Desktop */
 .right-header { display: flex !important; }
 
 
 /* =========================================
-   2. DESKTOP LAYOUT & CONTAINERS
+   2. DESKTOP LAYOUT (The Prison)
    ========================================= */
-
-/* The Main Chat Box */
 .chat-container {
     background: var(--panel-bg);
     border: 1px solid var(--border);
     flex: 1; 
-    min-height: 0; /* CRITICAL: Allows internal scrollbar */
     display: flex;
     flex-direction: column;
     overflow: hidden;
     box-shadow: inset 0 0 40px #000;
-    position: relative; /* Anchor for absolute elements like Store */
+    position: relative; 
     margin-bottom: 20px;
+    height: 100%; /* Ensures it fills the desktop stage */
 }
 
-/* The Scrolling Message Area */
+/* Scrollable Area */
 .chat-body-frame {
     flex: 1;
     overflow-y: auto;
@@ -57,7 +56,6 @@
     height: 80px; 
     background: #000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 30px;
@@ -77,7 +75,7 @@
 
 
 /* =========================================
-   4. SYSTEM TICKER (Notification Bar)
+   4. SYSTEM TICKER
    ========================================= */
 .system-ticker {
     width: 100%; padding: 8px 0; background: rgba(10, 10, 10, 0.95);
@@ -86,9 +84,6 @@
     letter-spacing: 3px; text-transform: uppercase; flex-shrink: 0; z-index: 40;
     transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
-.system-ticker.hidden { display: none !important; }
-
-/* Flash Animation */
 .ticker-flash { animation: textFlash 0.5s ease-in-out; }
 @keyframes textFlash { 
     0% { color: #fff; text-shadow: 0 0 10px #fff; background: rgba(197, 160, 89, 0.2); } 
@@ -97,11 +92,12 @@
 
 
 /* =========================================
-   5. CHAT FOOTER (Input & Buttons)
+   5. CHAT FOOTER (STRICT LAYOUT)
    ========================================= */
 .chat-footer {
     display: flex !important;
     flex-direction: row !important;
+    flex-wrap: nowrap !important; /* Forces single line */
     align-items: center !important;
     gap: 10px;
     padding: 15px;
@@ -112,15 +108,15 @@
     min-height: 70px;
 }
 
-/* Wrapper to hold Input + Floating Button */
+/* Wrapper for Input + Plus Button */
 .chat-input-wrapper { 
     position: relative; 
-    flex-grow: 1; 
+    flex-grow: 1; /* Takes all space */
     display: flex; 
     align-items: center; 
 }
 
-/* The Text Input */
+/* The Input Field */
 .chat-input {
     width: 100% !important; 
     background: #111; 
@@ -129,7 +125,7 @@
     font-family: 'Inter', sans-serif; 
     font-size: 0.95rem;
     padding: 12px 15px; 
-    padding-left: 45px !important; /* Space for the + button */
+    padding-left: 45px !important; /* Room for Plus Button */
     border-radius: 20px; 
     outline: none; 
     height: 40px; 
@@ -137,7 +133,7 @@
 }
 .chat-input:focus { border-color: var(--gold); color: #fff; }
 
-/* The Floating Plus Button */
+/* Floating Plus Button */
 .chat-btn-plus {
     position: absolute; left: 5px; top: 50%; transform: translateY(-50%);
     width: 30px; height: 30px; border-radius: 50%; background: #222; border: 1px solid #444; color: #888;
@@ -146,14 +142,26 @@
 }
 .chat-btn-plus:hover { background: var(--gold); color: #000; border-color: var(--gold); }
 
-/* Other Buttons */
-.chat-btn-send { color: var(--gold); font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; background: none; border: none; cursor: pointer; padding-left: 5px; }
-.chat-btn-tribute { font-size: 1.2rem; background: none; border: none; cursor: pointer; opacity: 0.7; }
+/* Send Button */
+.chat-btn-send { color: var(--gold); font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; background: none; border: none; cursor: pointer; padding-left: 5px; flex-shrink: 0; }
+
+/* Tribute Button (Forced Visible) */
+.chat-btn-tribute { 
+    display: flex !important; /* Force it to show */
+    font-size: 1.5rem; 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    opacity: 0.8;
+    color: var(--gold); 
+    padding: 0 5px;
+    flex-shrink: 0;
+}
 .chat-btn-tribute:hover { opacity: 1; transform: scale(1.1); }
 
 
 /* =========================================
-   6. MESSAGE STYLES
+   6. MESSAGES
    ========================================= */
 .msg-row { display: flex; gap: 12px; max-width: 100%; align-items: flex-end; margin-bottom: 10px; }
 .mr-out { flex-direction: row-reverse; justify-content: flex-start; } 
@@ -172,7 +180,7 @@
 
 .msg-time { font-family: 'Rajdhani', sans-serif; font-size: 0.65rem; font-weight: 700; color: #333333; margin-top: 4px; width: fit-content; }
 
-/* System Messages in Chat (Fallback) */
+/* System Messages */
 .system-row { justify-content: center; width: 100%; margin: 8px 0; }
 .msg-system { width: 98%; background: rgba(10, 10, 10, 0.9); border: 1px solid #1a1a1a; padding: 10px 0; text-align: center; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
 .sys-gold { color: var(--gold); border: 1px solid var(--gold-dim); background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05), transparent); }
@@ -180,49 +188,51 @@
 
 
 /* =========================================
-   7. LUXURY STORE & TRIBUTE GRID
+   7. STORE GRID & OVERLAY
    ========================================= */
 .store-grid-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 1200px; margin: 0 auto; }
 
 .store-card { background: linear-gradient(180deg, rgba(30,30,30,0.8) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: all 0.2s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 .store-card:active { transform: scale(0.98); border-color: var(--gold); }
-
 .store-img-box { width: 100%; aspect-ratio: 1 / 1; background: #000; border-bottom: 1px solid #333; position: relative; }
 .store-img { width: 100%; height: 100%; object-fit: cover; }
-
 .store-info { padding: 15px 10px; text-align: center; display: flex; flex-direction: column; gap: 5px; }
 .store-name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: #fff; line-height: 1.2; }
 .store-price { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); font-weight: 700; margin-top: 5px; }
 .store-buy-btn { margin-top: 10px; background: transparent; border: 1px solid #333; color: #666; font-size: 0.6rem; font-family: 'Orbitron'; padding: 8px; text-transform: uppercase; letter-spacing: 2px; }
 .store-card:active .store-buy-btn { background: var(--gold); color: #000; border-color: var(--gold); }
 
-/* --- DESKTOP STORE POSITIONING (New Fix) --- */
+/* Desktop Store Positioning */
 @media screen and (min-width: 769px) {
     #tributeStoreOverlay {
         position: absolute !important;
         top: 0; right: 0; bottom: 0; left: 0;
         width: 100%; height: 100%;
         background: rgba(0,0,0,0.95);
-        z-index: 500; /* Sit above chat */
+        z-index: 500;
     }
 }
 
 
 /* =========================================
-   8. MOBILE OVERRIDE (FULL SCREEN MODE)
+   8. MOBILE OVERRIDES (FULL SCREEN)
    ========================================= */
 @media screen and (max-width: 768px) {
 
-    /* [FIX] SWAP HEADERS: Show Giant Mobile Header, Hide Desktop Bar */
+    /* HEADER SWAP */
     .mob-chat-header { display: flex !important; }
     .right-header { display: none !important; }
-    .desktop-only { display: none !important; }
+    .desktop-only { display: none !important; } /* Only hides elements explicitly marked 'desktop-only' */
 
     /* CHAT CONTAINER ABSOLUTE */
     .chat-container, #chatCard {
-        display: flex !important; flex-direction: column !important; position: absolute !important;
-        top: 0 !important; left: 0 !important; width: 100vw !important; height: 100dvh !important;
-        z-index: 5000 !important; background: #000 !important; border: none !important; margin: 0 !important; overflow: hidden !important;
+        display: flex !important; flex-direction: column !important; 
+        position: absolute !important;
+        top: 0 !important; left: 0 !important; 
+        width: 100vw !important; height: 100dvh !important;
+        z-index: 5000 !important; 
+        background: #000 !important; 
+        border: none !important; margin: 0 !important; overflow: hidden !important;
     }
 
     /* SCROLL AREA */
@@ -238,16 +248,19 @@
     /* CHAT FOOTER FIXED */
     .chat-footer {
         position: fixed !important;
-        bottom: calc(65px + env(safe-area-inset-bottom)) !important; /* Sits above Nav Bar */
-        left: 0 !important; width: 100% !important; z-index: 2147483647 !important;
-        padding: 8px 10px !important; background: #000 !important; border-top: 1px solid #222 !important;
+        bottom: calc(65px + env(safe-area-inset-bottom)) !important;
+        left: 0 !important; width: 100% !important; 
+        z-index: 2147483647 !important;
+        padding: 8px 10px !important; 
+        background: #000 !important; 
+        border-top: 1px solid #222 !important;
         box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
     }
 
     .chat-input { font-size: 16px !important; height: 40px !important; }
 
     /* MOBILE GRID */
-    .store-grid-layout { grid-template-columns: repeat(2, 1fr); } /* 2 cols on mobile */
+    .store-grid-layout { grid-template-columns: repeat(2, 1fr); }
 
     /* MESSAGES MOBILE */
     .msg { max-width: 88% !important; font-size: 0.65rem !important; padding: 5px 12px !important; }
