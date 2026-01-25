@@ -729,6 +729,8 @@ if (window.visualViewport) {
         const dashboard = document.getElementById('viewMobileHome');
         
         if (isMobile) {
+            renderMobile(document.getElementById('device'));
+            renderView('home');
             if(desktop) desktop.style.display = 'none';
             if(mobile) mobile.style.display = 'flex';
             // Force Dashboard Visible
@@ -744,8 +746,6 @@ if (window.visualViewport) {
     }
     // Run immediately and on resize
     checkDevice();
-    renderMobile(document.getElementById('device'));
-    renderView('home');
     //document.getElementById('device') = renderMobileHome();
     window.addEventListener('resize', checkDevice);
     window.addEventListener('load', checkDevice);
